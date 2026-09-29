@@ -413,6 +413,32 @@ details.wr-guide>summary,details.wr-help>summary{font-weight:700;cursor:pointer;
 .hd-tip .hd-en .hd-pos{color:#93c5fd;font-weight:700;margin-right:4px}
 .hd-tip .hd-en .hd-ex{color:#9ca3af;font-style:italic;display:block;margin-left:10px}
 .hd-tip .hd-ko .hd-pos{color:#93c5fd;font-weight:700;margin-right:4px}
+/* TCSE 실전형 */
+.tcx-body{border:1px solid #d0d5dd;border-top:none;background:#fff;padding:22px 28px 16px;min-height:calc(100vh - 250px)}
+.tcx-dir{font-size:13px;color:#5a6b82;font-style:italic;border-bottom:1px solid #e5e7eb;padding-bottom:10px;margin-bottom:18px;line-height:1.5}
+.tcx-q{font-size:16.5px;line-height:1.95;color:#1a1a1a;margin:0 0 6px}
+.tcx-blank{display:inline-block;min-width:96px;border-bottom:2px solid #1f3a5f;margin:0 4px;vertical-align:-3px;height:1.1em}
+.tcx-cols{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;margin:24px 0 10px}
+.tcx-col{flex:0 1 240px;min-width:170px}
+.tcx-colhead{text-align:center;font-weight:700;font-size:13px;color:#39506e;margin-bottom:6px}
+.tcx-colbox{border:1px solid #8e9aad;background:#fff}
+.tcx-colbox .tcse-choice{display:block;width:100%;margin:0;border:none;border-bottom:1px solid #d0d5dd;border-radius:0;background:#fff;text-align:center;padding:13px 10px;font-size:15px;box-shadow:none}
+.tcx-colbox .tcse-choice:last-child{border-bottom:none}
+.tcx-colbox .tcse-choice:hover:not(:disabled){background:#eef3fb}
+.tcx-colbox .tcse-choice.sel,.tcx-colbox .tcse-choice.sel:hover:not(:disabled){background:#1f3a5f;color:#fff;box-shadow:none}
+.tcx-cols .tcse-cl,.tcx-se .tcse-cl{display:none}
+.tcx-colbox .tcse-choice.correct{background:#e6f7ee;color:#176b43;box-shadow:inset 0 0 0 2px #2da56a}
+.tcx-colbox .tcse-choice.wrong{background:#fdeaea;color:#b42323;box-shadow:inset 0 0 0 2px #e05555}
+.tcx-se{max-width:420px;margin:22px auto 10px}
+.tcx-se .tcse-choice{display:flex;align-items:center;gap:12px;width:100%;margin:2px 0;border:1px solid transparent;border-radius:4px;background:transparent;text-align:left;padding:9px 10px;font-size:15px;box-shadow:none}
+.tcx-se .tcse-choice::before{content:'';flex:0 0 17px;height:17px;border:1.5px solid #4b5563;border-radius:2px;background:#fff;font-size:12px;line-height:15px;text-align:center;color:#fff}
+.tcx-se .tcse-choice:hover:not(:disabled){background:#eef3fb}
+.tcx-se .tcse-choice.sel{background:transparent;box-shadow:none}
+.tcx-se .tcse-choice.sel::before{content:'✓';background:#1f3a5f;border-color:#1f3a5f}
+.tcx-se .tcse-choice.correct{background:#e6f7ee;border-color:#9fd8ba}
+.tcx-se .tcse-choice.wrong{background:#fdeaea;border-color:#efb4b4}
+#tcseBody .rc-nav:disabled{opacity:.45;cursor:default}
+@media(max-width:640px){.tcx-body{padding:16px 14px}.tcx-cols{gap:12px}.tcx-col{flex:1 1 100%}}
 </style>
 </head>
 <body>
@@ -2944,46 +2970,79 @@ function startTcse(){
   document.getElementById('mainTabs').classList.add('hide');
   showTcseStep();
 }
-function endTcse(){tcseSession=null;tcEdit=null;document.getElementById('mainTabs').classList.remove('hide');renderTcse();}
+function endTcse(){tcStopTimer();tcseSession=null;tcEdit=null;document.getElementById('mainTabs').classList.remove('hide');renderTcse();}
 function tcNext(){tcseSession.i++;tcseSession.sel=[];tcseSession.answered=false;tcEdit=null;showTcseStep();}
 
-function tcHead(){
-  const s=tcseSession;
-  return '<div class="row" style="justify-content:space-between"><span class="count">'+(s.i+1)+'/'+s.pool.length+' · 점수 '+s.score+'</span><button class="small" onclick="endTcse()">그만</button></div>';
+var tcTimer=null;
+function tcStopTimer(){if(tcTimer){clearInterval(tcTimer);tcTimer=null;}}
+function tcStartTimer(){
+  tcStopTimer();
+  tcTimer=setInterval(function(){
+    if(!tcseSession){tcStopTimer();return;}
+    const t=document.getElementById('tcTime');
+    if(t)t.textContent=rcFmtTime(Math.floor((Date.now()-tcseSession.t0)/1000));
+  },1000);
 }
+const TC_DIRS={
+  TC1:'For the following question, choose one entry for the blank. Complete the text in the way that makes the most sense.',
+  TC2:'For each blank, choose one entry from the matching column. Complete the text in the way that makes the most sense.',
+  TC3:'For each blank, choose one entry from the matching column. Complete the text in the way that makes the most sense.',
+  SE:'Choose the two answer choices that each complete the sentence sensibly and produce two sentences alike in meaning.'
+};
 function showTcseStep(){
   const el=document.getElementById('tcseBody');if(!el||!tcseSession)return;
   {const wc=document.getElementById('tcseWordCard');if(wc)wc.classList.add('hide');}
   const s=tcseSession;
-  if(s.i>=s.pool.length){el.innerHTML=tcDoneHTML();return;}
-  el.innerHTML=tcHead()+tcQuestionHTML(s.pool[s.i]);
+  if(!s.t0)s.t0=Date.now();
+  if(s.i>=s.pool.length){tcStopTimer();el.innerHTML=tcDoneHTML();return;}
+  const q=s.pool[s.i], p=tcProg[q.id], mk=!!(p&&p.bookmarked);
+  el.innerHTML='<div class="rc-exam">'+
+    '<div class="rc-topbar">'+
+      '<div class="rc-tt">Text Completion &amp; Sentence Equivalence</div>'+
+      '<div class="rc-tmid"><span>Question '+(s.i+1)+' of '+s.pool.length+'</span><span class="rc-time" id="tcTime">'+rcFmtTime(Math.floor((Date.now()-s.t0)/1000))+'</span></div>'+
+      '<div class="rc-tbtns">'+
+        '<button id="tcMarkBtn" class="rc-tbtn'+(mk?' on':'')+'" onclick="tcToggleBookmark(\''+q.id+'\')" aria-label="이 문제 표시">'+(mk?'★ Marked':'☆ Mark')+'</button>'+
+        '<button class="rc-tbtn danger" onclick="endTcse()" aria-label="나가기">✕ Exit</button>'+
+      '</div>'+
+    '</div>'+
+    '<div class="tcx-body">'+tcQuestionHTML(q)+'</div>'+
+    '<div class="rc-bottombar">'+
+      '<div class="rc-bmid">S'+esc(q.section)+' · Q'+esc(q.question_no)+' · '+q.type+' · '+esc(q.difficulty)+' · 점수 '+s.score+'</div>'+
+      '<div class="rc-bright">'+
+        '<button class="rc-nav" id="tcDunno" onclick="tcDunno()">모르겠어요</button>'+
+        '<button class="rc-nav primary" id="tcSubmit" onclick="tcCheck()">Check Answer</button>'+
+        '<button class="rc-nav primary hide" id="tcNextBtn" onclick="tcNext()">Next →</button>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
   tcUpdateSubmitState();
-  if(typeof hdPrefetch==='function')hdPrefetch(s.pool[s.i]);
+  if(!tcTimer)tcStartTimer();
+  if(typeof hdPrefetch==='function')hdPrefetch(q);
 }
 function tcQMarked(text){
-  // 그래픽/일반 빈칸: (i)_____ 등을 강조. 이미 _____ 존재하면 그대로.
-  return esc(text);
+  return esc(text).replace(/_{3,}/g,'<span class="tcx-blank"></span>');
 }
 function tcQuestionHTML(q){
-  const s=tcseSession, p=tcProg[q.id];
-  let h='<div class="tcse-meta"><span class="e-day">S'+q.section+' Q'+q.question_no+'</span><span class="tcse-type tc-'+q.type+'">'+q.type+'</span><span class="tcse-diff d-'+q.difficulty+'">'+q.difficulty+'</span>'+
-    '<button class="small" style="margin-left:auto;color:'+((p&&p.bookmarked)?'#e0a800':'var(--sub)')+'" onclick="tcToggleBookmark(\''+q.id+'\')">'+((p&&p.bookmarked)?'★':'☆')+'</button></div>';
-  h+='<div class="tcse-q">'+tcQMarked(q.question)+'</div>';
   const groups=tcGroups(q.type);
-  h+='<div id="tcChoices">';
-  groups.forEach((g,gi)=>{
-    if(g.lab)h+='<div class="tcse-grouplab">'+esc(g.lab)+(q.type==='SE'?'':' 빈칸')+'</div>';
-    for(const L of g.letters){
-      if(!q.choices[L])continue;
-      h+='<button class="tcse-choice" data-l="'+L+'" data-g="'+gi+'" onclick="tcPick(\''+L+'\','+gi+')"><span class="tcse-cl">'+L+'</span> '+esc(q.choices[L])+'</button>';
-    }
-  });
-  h+='</div>';
-  h+='<div class="row" style="margin-top:10px"><button class="primary" id="tcSubmit" onclick="tcCheck()" style="min-height:42px;font-weight:700">정답 확인</button>'+
-     '<button class="btn" id="tcDunno" onclick="tcDunno()" style="color:var(--sub)">모르겠어요</button></div>';
-  h+='<div id="tcMsg" class="tcse-msg"></div><div id="tcAfter"></div>';
-  const need=q.type==='SE'?2:(q.type==='TC1'?1:groups.length);
-  h+='<div class="study-tip">키보드: 1~9 선택 · Enter 정답확인/다음 · Esc 종료 &nbsp;(정확히 '+need+'개 선택)</div>';
+  let h='<div class="tcx-dir">'+esc(TC_DIRS[q.type]||'')+'</div>';
+  h+='<div class="tcse-q tcx-q">'+tcQMarked(q.question)+'</div>';
+  if(q.type==='SE'){
+    h+='<div id="tcChoices" class="tcx-se">';
+    for(const L of groups[0].letters){ if(!q.choices[L])continue;
+      h+='<button class="tcse-choice" data-l="'+L+'" data-g="0" onclick="tcPick(\''+L+'\',0)"><span class="tcse-cl">'+L+'</span><span class="tcx-ct">'+esc(q.choices[L])+'</span></button>'; }
+    h+='</div>';
+  }else{
+    h+='<div id="tcChoices" class="tcx-cols">';
+    groups.forEach(function(g,gi){
+      h+='<div class="tcx-col">'+(groups.length>1?'<div class="tcx-colhead">Blank '+esc(g.lab)+'</div>':'')+'<div class="tcx-colbox">';
+      for(const L of g.letters){ if(!q.choices[L])continue;
+        h+='<button class="tcse-choice" data-l="'+L+'" data-g="'+gi+'" onclick="tcPick(\''+L+'\','+gi+')"><span class="tcse-cl">'+L+'</span><span class="tcx-ct">'+esc(q.choices[L])+'</span></button>'; }
+      h+='</div></div>';
+    });
+    h+='</div>';
+  }
+  h+='<div id="tcMsg" class="tcse-msg" style="text-align:center"></div><div id="tcAfter"></div>';
+  h+='<div class="study-tip" style="text-align:center">키보드: 1~9 선택 · Enter 확인/다음 · Esc 나가기</div>';
   return h;
 }
 function tcSelForGroup(gi){return tcseSession.sel.filter(x=>x.g===gi).map(x=>x.l);}
@@ -3037,6 +3096,7 @@ function tcGrade(q,selected,viaDunno){
     else if(selSet.has(L))b.classList.add('wrong');
   });
   document.getElementById('tcSubmit').classList.add('hide');
+  {const nb=document.getElementById('tcNextBtn');if(nb)nb.classList.remove('hide');}
   const dn=document.getElementById('tcDunno');if(dn){dn.disabled=true;if(viaDunno)dn.classList.add('dunno-wrong');}
   // 진행 저장
   const p=tcP(q.id);p.attempts++;if(correct)p.correct++;else p.wrong++;
@@ -3053,7 +3113,6 @@ function tcGrade(q,selected,viaDunno){
   if(q.validation_note)af+='<div class="tcse-note">⚠ '+esc(q.validation_note)+(q.source_answer&&q.source_answer!==q.answer.join('|')?' (source_answer: '+esc(q.source_answer)+')':'')+'</div>';
   if(q.validation_source)af+='<div class="tcse-src"><a href="'+esc(q.validation_source)+'" target="_blank" rel="noopener">검증 출처 ↗</a></div>';
   af+='<div class="tcse-linkbox"><div class="count" style="margin-bottom:4px">연결된 GRE 단어</div>'+tcLinkPanelHTML(q,gre)+'</div>';
-  af+='<button class="primary" onclick="tcNext()" style="width:100%;margin-top:10px;min-height:42px">다음 →</button>';
   document.getElementById('tcAfter').innerHTML=af;
 }
 function tcUpdateWordStats(q,selSet,viaDunno){
@@ -3119,7 +3178,7 @@ function tcSetLink(qid,L,words){
 function tcToggleBookmark(qid){const p=tcP(qid);p.bookmarked=!p.bookmarked;tcSaveProg();const q=tcseSession&&tcseSession.pool[tcseSession.i];if(q&&q.id===qid)showTcseAgain();}
 function showTcseAgain(){/* 북마크만 갱신: 헤더 별표 */
   const s=tcseSession;if(!s)return;const q=s.pool[s.i];const p=tcProg[q.id];
-  const b=document.querySelector('.tcse-meta button');if(b){b.textContent=(p&&p.bookmarked)?'★':'☆';b.style.color=(p&&p.bookmarked)?'#e0a800':'var(--sub)';}
+  const b=document.getElementById('tcMarkBtn');if(b){const on=!!(p&&p.bookmarked);b.textContent=on?'★ Marked':'☆ Mark';b.classList.toggle('on',on);}
 }
 
 function tcDoneHTML(){
