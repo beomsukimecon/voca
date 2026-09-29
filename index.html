@@ -401,13 +401,18 @@ details.wr-guide>summary,details.wr-help>summary{font-weight:700;cursor:pointer;
 .sc-reveal{text-align:center;padding:26px 0}
 .rstep{display:inline-flex;align-items:center;gap:8px}.rstep b{min-width:48px;text-align:center}
 .set-sec{border:1px solid var(--line);border-radius:8px;margin-top:10px;overflow:hidden}.set-sec>summary{cursor:pointer;font-weight:700;padding:10px 12px;background:var(--card2,#f7f8fb);list-style:none}.set-sec>summary::-webkit-details-marker{display:none}.set-sec>summary::after{content:'▾';float:right;color:var(--sub)}.set-sec[open]>summary::after{content:'▴'}.set-body{padding:10px 12px}.set-sub{font-weight:700;font-size:12px;color:var(--sub);margin:4px 0 6px;letter-spacing:.02em}
-.hd-tip{position:fixed;z-index:9999;max-width:330px;background:#1f2328;color:#f5f5f5;font-size:13px;line-height:1.5;padding:8px 11px;border-radius:9px;box-shadow:0 6px 18px rgba(0,0,0,.28);pointer-events:none;display:none}
+.hd-tip{position:fixed;z-index:9999;max-width:400px;background:#1f2328;color:#f5f5f5;font-size:13px;line-height:1.5;padding:8px 11px;border-radius:9px;box-shadow:0 6px 18px rgba(0,0,0,.28);pointer-events:none;display:none}
 .hd-tip .hd-w{font-weight:700;font-size:15px}
 .hd-tip .hd-pron{opacity:.7;font-size:12px;margin-left:5px}
 .hd-tip .hd-mean{margin-top:3px;white-space:pre-line}
 .hd-tip .hd-syn{color:#c4b5fd;font-size:12px;margin-top:3px}
 .hd-tip .hd-foot{margin-top:5px;padding-top:4px;border-top:1px solid #3a3f47;font-size:11px;opacity:.75}
 .hd-tip .hd-sub{opacity:.65;font-size:12px}
+.hd-tip .hd-rare{opacity:.45;font-size:12px}
+.hd-tip .hd-en{margin-top:6px;padding-top:5px;border-top:1px dashed #3a3f47;font-size:12px;color:#cbd5e1}
+.hd-tip .hd-en .hd-pos{color:#93c5fd;font-weight:700;margin-right:4px}
+.hd-tip .hd-en .hd-ex{color:#9ca3af;font-style:italic;display:block;margin-left:10px}
+.hd-tip .hd-ko .hd-pos{color:#93c5fd;font-weight:700;margin-right:4px}
 </style>
 </head>
 <body>
@@ -559,8 +564,24 @@ details.wr-guide>summary,details.wr-help>summary{font-weight:700;cursor:pointer;
     <details class="set-sec" open>
       <summary>🔍 호버 사전</summary>
       <div class="set-body">
-      <label class="tog"><input type="checkbox" id="optHover">호버 사전 켜기</label>
-      <p class="study-tip" style="margin-top:6px">TCSE·RC·Writing 문장에서 단어에 마우스를 올리면 뜻을 보여줍니다. GRE 단어장 → 내 단어장 → TCSE 내 뜻 → 온라인 번역 순서로 찾고, Alt+클릭하면 내 단어장에 담깁니다.</p>
+      <label class="tog" style="font-weight:700"><input type="checkbox" id="optHover">호버 사전 켜기 (전체)</label>
+      <div id="hdOptBox" style="margin-top:8px">
+        <div class="set-sub">어디서 쓸지</div>
+        <div class="row">
+          <label class="tog"><input type="checkbox" data-hd="tcse">TCSE</label>
+          <label class="tog"><input type="checkbox" data-hd="rc">RC</label>
+          <label class="tog"><input type="checkbox" data-hd="wr">Writing</label>
+        </div>
+        <div class="set-sub" style="margin-top:10px">툴팁에 보여줄 것</div>
+        <label class="tog"><input type="checkbox" data-hd="net">온라인 사전 조회 <span class="count">(끄면 내 단어장에 있는 단어만)</span></label>
+        <label class="tog" style="margin-top:4px"><input type="checkbox" data-hd="ko">한국어 뜻 (온라인)</label>
+        <label class="tog" style="margin-top:4px"><input type="checkbox" data-hd="en">영영 정의·예문 (온라인)</label>
+        <label class="tog" style="margin-top:4px"><input type="checkbox" data-hd="syn">유의어 (내 단어장)</label>
+        <div class="set-sub" style="margin-top:10px">클릭 단축 기능</div>
+        <label class="tog"><input type="checkbox" data-hd="alt">Alt+클릭 → 내 단어장에 담기</label>
+        <label class="tog" style="margin-top:4px"><input type="checkbox" data-hd="shift">Shift+클릭 → 네이버 영어사전 열기</label>
+      </div>
+      <p class="study-tip" style="margin-top:8px">찾는 순서: GRE 단어장 → 내 단어장 → TCSE 내 뜻 → 온라인 사전.</p>
       </div>
     </details>
 
@@ -2850,6 +2871,11 @@ function renderTcse(){
      '<div class="stat"><b>'+TCSE.filter(q=>{const p=tcProg[q.id];return p&&p.attempts>0&&!p.lastCorrect;}).length+'</b><span class="count">최근 오답</span></div></div>';
   h+='<div class="count" style="margin-top:6px">유형: TC1 '+s.TC1+' · TC2 '+s.TC2+' · TC3 '+s.TC3+' · SE '+s.SE+' &nbsp;|&nbsp; 난이도: Easy '+s.easy+' · Medium '+s.medium+' · Hard '+s.hard+(s.vnotes?' &nbsp;|&nbsp; 검증노트 '+s.vnotes:'')+'</div>';
   const minS=secs[0]||1, maxS=secs[secs.length-1]||150;
+  h+='<div class="official-box" style="margin-top:14px"><div class="count" style="font-weight:700;color:var(--ink);margin-bottom:6px">🔎 번호로 찾기</div>'+
+     '<div class="row">Section <input type="number" id="tcFindSec" min="1" style="width:64px" onkeydown="if(event.key===\'Enter\')tcFindStart()"> '+
+     'Q <input type="number" id="tcFindQ" min="1" placeholder="전체" style="width:64px" onkeydown="if(event.key===\'Enter\')tcFindStart()"> '+
+     '<button class="primary" onclick="tcFindStart()">바로 풀기</button></div>'+
+     '<div class="study-tip" style="margin-top:4px">Q를 비우면 그 섹션 전체, Q를 넣으면 그 문제부터 섹션 끝까지 풉니다.</div></div>';
   h+='<div class="row" style="margin-top:14px">Section <input type="number" id="tcSecFrom" min="1" max="150" value="'+minS+'" style="width:64px"> ~ <input type="number" id="tcSecTo" min="1" max="150" value="'+maxS+'" style="width:64px"></div>';
   h+='<div class="row" style="margin-top:8px"><select id="tcDiff"><option value="all">전체 난이도</option><option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option></select>'+
      '<select id="tcType"><option value="all">전체 유형</option><option value="TC1">TC1</option><option value="TC2">TC2</option><option value="TC3">TC3</option><option value="SE">SE</option></select>'+
@@ -2875,6 +2901,23 @@ function renderTcse(){
   }
   el.innerHTML=h;
   renderTcseWordCard();
+}
+function tcFindStart(){
+  const sec=+((document.getElementById('tcFindSec')||{}).value)||0;
+  const qraw=String((document.getElementById('tcFindQ')||{}).value||'').trim();
+  if(!sec)return alert('Section 번호를 입력하세요.');
+  const qn=s=>{const n=parseInt(String(s).replace(/[^0-9]/g,''));return isNaN(n)?0:n;};
+  let pool=TCSE.filter(q=>+q.section===sec).sort((a,b)=>qn(a.question_no)-qn(b.question_no)||a.id.localeCompare(b.id));
+  if(!pool.length)return alert('Section '+sec+'에 문제가 없습니다.');
+  if(qraw){
+    const want=qn(qraw);
+    const k=pool.findIndex(q=>qn(q.question_no)===want);
+    if(k<0)return alert('Section '+sec+'에 Q'+want+'가 없습니다.\n(있는 번호: '+pool.map(q=>q.question_no).join(', ')+')');
+    pool=pool.slice(k);
+  }
+  tcseSession={pool:pool,i:0,score:0,total:0,wrong:[],byType:{TC1:[0,0],TC2:[0,0],TC3:[0,0],SE:[0,0]},sel:[],answered:false};
+  document.getElementById('mainTabs').classList.add('hide');
+  showTcseStep();
 }
 function tcResetProgress(){
   if(!confirm('TCSE 진행 기록·연결·통계를 모두 초기화할까요? (문제 데이터는 유지)'))return;
@@ -2915,6 +2958,7 @@ function showTcseStep(){
   if(s.i>=s.pool.length){el.innerHTML=tcDoneHTML();return;}
   el.innerHTML=tcHead()+tcQuestionHTML(s.pool[s.i]);
   tcUpdateSubmitState();
+  if(typeof hdPrefetch==='function')hdPrefetch(s.pool[s.i]);
 }
 function tcQMarked(text){
   // 그래픽/일반 빈칸: (i)_____ 등을 강조. 이미 _____ 존재하면 그대로.
@@ -4406,9 +4450,24 @@ document.addEventListener('keydown',function(e){
   if(e.key==='Escape'&&tag!=='TEXTAREA'&&tag!=='INPUT'){wrExitEditor();}
 });
 /* ================= 호버 사전 ================= */
-const HD_KEY='voca_hover_on', HD_CACHE='voca_hover_cache';
+const HD_KEY='voca_hover_on', HD_CACHE='voca_hover_cache3';
 const HD_SEL='.tcse-q,.tcse-choice,.tcse-ans-choice,.rc-ptext,.rc-qtext,.rc-ctext,.rc-wch,.rc-fbsent,.wr-topic,.wr-instr,.wr-show';
+const HD_STOP=new Set(('a an the it its it\'s this that these those they them their theirs he him his she her hers we us our ours you your yours i me my mine who whom whose which what when where why how '+
+ 'and or but nor so yet if then than as at by for from in into onto on of off to up down out over under with without about above below between among through during before after since until '+
+ 'is am are was were be been being do does did done have has had having will would shall should can could may might must ought '+
+ 'not no yes all any some each every either neither both few many much more most less least other another such own same very too also just only even still '+
+ 'there here one two three first second new old own well also however therefore thus hence').split(' '));
+function hdSkip(k){return !k||k.length<3||HD_STOP.has(k)||MV_COMMON.has(k);}
 const HD_POS={noun:'명',verb:'동',adjective:'형',adverb:'부',preposition:'전',conjunction:'접',pronoun:'대',interjection:'감'};
+const HD_OPT_KEY='voca_hover_opts', HD_OPT_DEF={tcse:1,rc:1,wr:1,net:1,ko:1,en:1,syn:1,alt:1,shift:1};
+var hdOpt=(function(){try{return Object.assign({},HD_OPT_DEF,JSON.parse(localStorage.getItem(HD_OPT_KEY))||{})}catch(e){return Object.assign({},HD_OPT_DEF)}})();
+function hdSaveOpt(){try{localStorage.setItem(HD_OPT_KEY,JSON.stringify(hdOpt));}catch(e){}}
+function hdAreaOk(el){
+  if(el.closest('.tcse-q,.tcse-choice,.tcse-ans-choice'))return !!hdOpt.tcse;
+  if(el.closest('.rc-ptext,.rc-qtext,.rc-ctext,.rc-wch,.rc-fbsent'))return !!hdOpt.rc;
+  if(el.closest('.wr-topic,.wr-instr,.wr-show'))return !!hdOpt.wr;
+  return false;
+}
 var hdOn=localStorage.getItem(HD_KEY)!=='0', hdIdx=null, hdTip=null, hdTimer=null, hdLast='', hdFlashT=null;
 var hdNet=(function(){try{return JSON.parse(localStorage.getItem(HD_CACHE))||{}}catch(e){return{}}})();
 function hdSaveNet(){try{const ks=Object.keys(hdNet);if(ks.length>3000)ks.slice(0,ks.length-3000).forEach(k=>{delete hdNet[k];});localStorage.setItem(HD_CACHE,JSON.stringify(hdNet));}catch(e){}}
@@ -4430,20 +4489,84 @@ function hdLookup(raw){
   for(const f of forms){if(tcMeanings[f])return {kind:'tc',word:f,mean:tcMeanings[f],src:'TCSE 내 뜻'};}
   return {kind:'net',word:raw,key:k};
 }
-function hdFetchNet(k){
-  if(hdNet[k]!==undefined)return Promise.resolve(hdNet[k]);
-  return fetch('https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ko&dt=t&dt=bd&q='+encodeURIComponent(k))
+function hdPrefetch(q){
+  if(!hdOn||!hdOpt.net||!hdOpt.tcse||!q)return;
+  const txt=[q.question].concat(Object.keys(q.choices||{}).map(function(L){return q.choices[L];})).join(' ');
+  const seen={},todo=[];
+  (txt.match(/[A-Za-z][A-Za-z'’-]{3,}/g)||[]).forEach(function(w){
+    const info=hdLookup(w); if(!info||info.kind!=='net')return;
+    const k=info.key; if(seen[k])return; seen[k]=1;
+    if(hdSkip(k))return;
+    const c=hdNet[k]; if(c&&(!hdOpt.ko||c.ko!==undefined)&&(!hdOpt.en||c.en!==undefined))return;
+    todo.push(k);
+  });
+  const list=todo.slice(0,30); let idx=0;
+  const run=function(){ if(idx>=list.length)return; const k=list[idx++];
+    Promise.all([hdOpt.ko?hdGetPart(k,'ko'):null,hdOpt.en?hdGetPart(k,'en'):null]).then(run,run); };
+  run();run();
+}
+function hdTimedFetch(url,ms){
+  if(typeof AbortController==='undefined')return fetch(url);
+  const ac=new AbortController(); const t=setTimeout(function(){ac.abort();},ms);
+  return fetch(url,{signal:ac.signal}).finally(function(){clearTimeout(t);});
+}
+function hdFetchKo(k){
+  return hdTimedFetch('https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ko&dt=t&dt=bd&q='+encodeURIComponent(k),4000)
     .then(function(r){if(!r.ok)throw 0;return r.json();})
-    .then(function(d){let m='';
-      if(d&&d[1])m=d[1].map(function(p){return (HD_POS[p[0]]||p[0])+'. '+(p[1]||[]).slice(0,4).join(', ');}).join('\n');
-      else if(d&&d[0])m=d[0].map(function(x){return x[0];}).join('');
-      if(m&&m.trim().toLowerCase()===k)m='';
-      hdNet[k]=m;hdSaveNet();return m;})
-    .catch(function(){return null;});
+    .then(function(d){
+      if(d&&d[1])return {dict:d[1].map(function(p){
+        const sc={}; (p[2]||[]).forEach(function(e){if(e&&e[0])sc[e[0]]=(typeof e[3]==='number')?e[3]:null;});
+        return {pos:(HD_POS[p[0]]||p[0]),terms:(p[1]||[]).slice(0,12).map(function(t){const v=sc[t];return {t:t,rare:(typeof v==='number'&&v<0.005)};})};})};
+      const mt=(d&&d[0])?d[0].map(function(x){return x[0];}).join(''):'';
+      return {mt:(mt&&mt.trim().toLowerCase()!==k)?mt:''};
+    }).catch(function(){return null;});
+}
+function hdFetchEn(k){
+  return hdTimedFetch('https://api.dictionaryapi.dev/api/v2/entries/en/'+encodeURIComponent(k),3500)
+    .then(function(r){if(r.status===404)return [];if(!r.ok)throw 0;return r.json();})
+    .then(function(d){
+      if(!Array.isArray(d)||!d.length)return {senses:[],pron:''};
+      const byPos={},order=[];let pron='';
+      d.forEach(function(e){
+        if(!pron)pron=e.phonetic||((e.phonetics||[]).find(function(x){return x.text;})||{}).text||'';
+        (e.meanings||[]).forEach(function(m){
+          const ps=HD_POS[m.partOfSpeech]||m.partOfSpeech;
+          if(!byPos[ps]){byPos[ps]=[];order.push(ps);}
+          (m.definitions||[]).forEach(function(df){if(byPos[ps].length<4)byPos[ps].push({d:df.definition,ex:df.example||''});});
+        });
+      });
+      return {pron:pron,senses:order.slice(0,4).map(function(ps){return {pos:ps,defs:byPos[ps]};})};
+    }).catch(function(){return null;});
+}
+var hdInflight={};
+function hdGetPart(k,part){
+  const c=hdNet[k];
+  if(c&&c[part]!==undefined)return Promise.resolve(c[part]);
+  const key=part+'|'+k;
+  if(hdInflight[key])return hdInflight[key];
+  const pr=(part==='ko'?hdFetchKo(k):hdFetchEn(k)).then(function(v){
+    delete hdInflight[key];
+    if(v!==null){hdNet[k]=hdNet[k]||{};hdNet[k][part]=v;hdSaveNetSoon();}
+    return v;
+  });
+  hdInflight[key]=pr; return pr;
+}
+var hdSaveT=null;
+function hdSaveNetSoon(){clearTimeout(hdSaveT);hdSaveT=setTimeout(hdSaveNet,800);}
+function hdFetchNet(k){
+  return Promise.all([hdGetPart(k,'ko'),hdGetPart(k,'en')]).then(function(a){
+    if(a[0]===null&&a[1]===null)return null;
+    return {ko:a[0]||{},en:a[1]||{senses:[],pron:''}};
+  });
+}
+function hdNetText(r){
+  if(!r||!r.ko)return '';
+  if(r.ko.dict)return r.ko.dict.map(function(p){return p.pos+'. '+p.terms.filter(function(x){return !x.rare;}).slice(0,6).map(function(x){return x.t;}).join(', ');}).filter(function(l){return !/\. $/.test(l);}).join('\n');
+  return r.ko.mt||'';
 }
 function hdWordAt(x,y){
   const el=document.elementFromPoint(x,y); if(!el||!el.closest)return null;
-  if(!el.closest(HD_SEL))return null;
+  if(!el.closest(HD_SEL)||!hdAreaOk(el))return null;
   const tw=document.createTreeWalker(el,NodeFilter.SHOW_TEXT); const rg=document.createRange(); let n;
   while((n=tw.nextNode())){
     const t=n.textContent, re=/[A-Za-z][A-Za-z'’-]*/g; let m;
@@ -4465,22 +4588,48 @@ function hdPlace(x,y){const t=hdEnsureTip();t.style.display='block';
 function hdHide(){if(hdTip)hdTip.style.display='none';hdLast='';}
 function hdRender(info,x,y){
   const inMy=MYVOCAB.some(function(v){return v.wkey===mvNorm(info.word);});
-  let mean=info.mean;
-  let body;
-  if(info.kind==='net'&&mean===null)body='<div class="hd-sub">온라인 사전 연결 실패 (오프라인이거나 차단됨)</div>';
-  else if(!mean)body='<div class="hd-sub">결과 없음</div>';
-  else{const lines=breakNumbered(mean).split('\n').filter(Boolean);let txt=lines.slice(0,5).join('\n');if(txt.length>240)txt=txt.slice(0,240)+'…';body='<div class="hd-mean">'+esc(txt)+'</div>';}
-  const syn=info.syn?'<div class="hd-syn">≈ '+esc(info.syn.length>80?info.syn.slice(0,80)+'…':info.syn)+'</div>':'';
-  const foot=info.kind==='deck'?esc(info.src):(esc(info.src||'')+' · '+(inMy?'✓ 내 단어장에 있음':'Alt+클릭: 내 단어장에 담기'));
+  let body='', pron=info.pron||'';
+  if(info.kind==='net'){
+    const r=info.net;
+    const wantKo=hdOpt.ko, wantEn=hdOpt.en;
+    const koDone=!wantKo||r.ko!==undefined, enDone=!wantEn||r.en!==undefined;
+    const koFail=wantKo&&r.ko===null, enFail=wantEn&&r.en===null;
+    if(koDone&&enDone&&(!wantKo||koFail)&&(!wantEn||enFail))body='<div class="hd-sub">온라인 사전 연결 실패 (오프라인이거나 차단됨)</div>';
+    else{
+      if(!pron&&r.en&&r.en.pron)pron=r.en.pron;
+      if(!hdOpt.ko){}
+      else if(r.ko&&r.ko.dict&&r.ko.dict.length)body+='<div class="hd-ko">'+r.ko.dict.map(function(p){return '<div><span class="hd-pos">'+esc(p.pos)+'</span>'+p.terms.map(function(x){return x.rare?'<span class="hd-rare" title="드물게 쓰이는 뜻">'+esc(x.t)+'</span>':esc(x.t);}).join(', ')+'</div>';}).join('')+'</div>';
+      else if(r.ko&&r.ko.mt)body+='<div class="hd-mean">'+esc(r.ko.mt)+' <span class="hd-sub">(기계번역)</span></div>';
+      if(hdOpt.en&&r.en&&r.en.senses&&r.en.senses.length){
+        body+='<div class="hd-en">'+r.en.senses.map(function(s){return s.defs.map(function(df,di){
+          return '<div>'+(di===0?'<span class="hd-pos">'+esc(s.pos)+'</span>':'<span style="margin-left:14px"></span>')+esc(df.d)+(df.ex?'<span class="hd-ex">“'+esc(df.ex)+'”</span>':'')+'</div>';}).join('');}).join('')+'</div>';
+      }
+      if(wantKo&&r.ko===undefined)body='<div class="hd-sub">한국어 뜻 불러오는 중…</div>'+body;
+      if(wantEn&&r.en===undefined)body+='<div class="hd-en hd-sub">영영 정의 불러오는 중…</div>';
+      if(!body)body='<div class="hd-sub">결과 없음</div>';
+    }
+  }else{
+    const lines=breakNumbered(info.mean||'').split('\n').filter(Boolean);
+    let txt=lines.slice(0,10).join('\n'); if(txt.length>520)txt=txt.slice(0,520)+'…';
+    body=txt?'<div class="hd-mean">'+esc(txt)+'</div>':'<div class="hd-sub">결과 없음</div>';
+    if(hdOpt.syn&&info.syn)body+='<div class="hd-syn">≈ '+esc(info.syn.length>140?info.syn.slice(0,140)+'…':info.syn)+'</div>';
+  }
+  const hint=info.kind==='deck'?'':(inMy?' · ✓ 내 단어장':(hdOpt.alt?' · Alt+클릭 담기':''));
+  const foot=esc(info.src||'')+hint+(hdOpt.shift?' · Shift+클릭 네이버':'');
   const t=hdEnsureTip();
-  t.innerHTML='<span class="hd-w">'+esc(info.word)+'</span>'+(info.pron?'<span class="hd-pron">'+esc(info.pron)+'</span>':'')+body+syn+'<div class="hd-foot">'+foot+'</div>';
+  t.innerHTML='<span class="hd-w">'+esc(info.word)+'</span>'+(pron?'<span class="hd-pron">'+esc(pron)+'</span>':'')+body+'<div class="hd-foot">'+foot+'</div>';
   hdPlace(x,y);
 }
 function hdShow(w,x,y){
   const info=hdLookup(w); if(!info){hdHide();return;}
   if(info.kind!=='net'){hdRender(info,x,y);return;}
+  if(hdSkip(info.key)){hdHide();return;}
+  if(!hdOpt.net||(!hdOpt.ko&&!hdOpt.en)){hdRender({kind:'none',word:w,mean:'',src:'내 단어장에 없음'},x,y);return;}
   const t=hdEnsureTip(); t.innerHTML='<span class="hd-w">'+esc(w)+'</span> <span class="hd-sub">찾는 중…</span>'; hdPlace(x,y);
-  hdFetchNet(info.key).then(function(m){ if(hdLast!==w)return; hdRender({kind:'net',word:w,mean:m,src:'온라인 번역'},x,y); });
+  const st={};const k=info.key;
+  const draw=function(){ if(hdLast!==w)return; hdRender({kind:'net',word:w,net:st,src:'온라인 사전'},x,y); };
+  if(hdOpt.ko)hdGetPart(k,'ko').then(function(v){st.ko=v;draw();});
+  if(hdOpt.en)hdGetPart(k,'en').then(function(v){st.en=v;draw();});
 }
 function hdFlash(msg,x,y){const t=hdEnsureTip();t.innerHTML='<span class="hd-sub" style="opacity:1">'+esc(msg)+'</span>';hdPlace(x,y);
   clearTimeout(hdFlashT);hdFlashT=setTimeout(function(){hdHide();},1300);}
@@ -4494,10 +4643,10 @@ document.addEventListener('mousemove',function(e){
     if(!w){hdHide();return;}
     if(w===hdLast&&hdTip&&hdTip.style.display==='block')return;
     hdLast=w; hdShow(w,x,y);
-  },350);
+  },140);
 },{passive:true});
 document.addEventListener('click',function(e){
-  if(!hdOn||!e.altKey)return;
+  if(!hdOn||!hdOpt.alt||!e.altKey)return;
   const w=hdWordAt(e.clientX,e.clientY); if(!w)return;
   e.preventDefault();e.stopPropagation();
   const info=hdLookup(w)||{kind:'net',key:tcNorm(w)};
@@ -4505,12 +4654,19 @@ document.addEventListener('click',function(e){
   const added=mvAdd(w,hdSrcLabel());
   const item=MYVOCAB.find(function(v){return v.wkey===mvNorm(w);});
   const fill=function(m){if(item&&!item.mean&&m){item.mean=String(m).replace(/\n/g,' / ');mvSave();}};
-  if(info.kind==='tc'||info.kind==='my')fill(info.mean); else hdFetchNet(info.key||tcNorm(w)).then(fill);
+  if(info.kind==='tc'||info.kind==='my')fill(info.mean); else if(hdOpt.net)hdFetchNet(info.key||tcNorm(w)).then(function(r){fill(hdNetText(r));});
   mvBump(); hdLast='';
   hdFlash(added?'✓ 내 단어장에 담음 ('+MYVOCAB.length+'개)':'이미 내 단어장에 있음',e.clientX,e.clientY);
 },true);
+document.addEventListener('click',function(e){
+  if(!hdOn||!hdOpt.shift||!e.shiftKey||e.altKey)return;
+  const w=hdWordAt(e.clientX,e.clientY); if(!w)return;
+  e.preventDefault();e.stopPropagation();
+  const k=(hdLookup(w)||{}).word||w;
+  window.open('https://en.dict.naver.com/#/search?query='+encodeURIComponent(tcNorm(k)||w),'_blank','noopener');
+},true);
 window.addEventListener('scroll',function(){hdHide();},true);
-document.addEventListener('keydown',function(e){if(e.key!=='Alt')hdHide();});
+document.addEventListener('keydown',function(e){if(e.key!=='Alt'&&e.key!=='Shift')hdHide();});
 document.addEventListener('mouseleave',hdHide);
 /* ================= init ================= */
 const VIEWMAP=[['optMean','m'],['optSent','s'],['optSyn','y'],['optPron','p'],['optEtym','e']];
@@ -4519,7 +4675,12 @@ VIEWMAP.forEach(([id,k])=>{const el=document.getElementById(id);if(!el)return;
   el.onchange=function(){settings.view[k]=el.checked?1:0;saveSettings();render();};});
 syncViewUI();
 syncSettingsUI();
-{const hc=document.getElementById('optHover');if(hc){hc.checked=hdOn;hc.onchange=function(){hdOn=hc.checked;try{localStorage.setItem(HD_KEY,hdOn?'1':'0');}catch(e){}if(!hdOn)hdHide();};}}
+{const hc=document.getElementById('optHover');if(hc){hc.checked=hdOn;hc.onchange=function(){hdOn=hc.checked;try{localStorage.setItem(HD_KEY,hdOn?'1':'0');}catch(e){}if(!hdOn)hdHide();hdSyncOptUI();};}
+  document.querySelectorAll('#hdOptBox input[data-hd]').forEach(function(cb){const k=cb.getAttribute('data-hd');cb.checked=!!hdOpt[k];
+    cb.onchange=function(){hdOpt[k]=cb.checked?1:0;hdSaveOpt();hdHide();hdSyncOptUI();};});
+  hdSyncOptUI();}
+function hdSyncOptUI(){const box=document.getElementById('hdOptBox');if(!box)return;box.style.opacity=hdOn?'1':'.45';
+  box.querySelectorAll('input[data-hd]').forEach(function(cb){const k=cb.getAttribute('data-hd');cb.disabled=!hdOn||((k==='ko'||k==='en')&&!hdOpt.net);});}
 document.getElementById('setChoices').onchange=e=>{settings.choices=Math.min(6,Math.max(3,parseInt(e.target.value)||4));e.target.value=settings.choices;saveSettings();};
 document.getElementById('setQuizTime').onchange=e=>{settings.quizTime=Math.max(0,parseInt(e.target.value)||0);e.target.value=settings.quizTime;saveSettings();};
 document.getElementById('setCorrectDelay').onchange=e=>{settings.correctDelay=Math.max(0,parseFloat(e.target.value)||0);saveSettings();};
