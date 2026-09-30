@@ -3114,6 +3114,7 @@ function tcGrade(q,selected,viaDunno){
   tcSaveProg();
   // 세션 집계
   s.total++;if(correct)s.score++;else s.wrong.push(q);
+  s.picks=s.picks||{};s.picks[q.id]={sel:selected.slice(),dunno:!!viaDunno};
   if(s.byType[q.type]){s.byType[q.type][0]++;if(correct)s.byType[q.type][1]++;}
   // GRE 단어 통계
   tcUpdateWordStats(q,selSet,viaDunno);
@@ -3122,6 +3123,7 @@ function tcGrade(q,selected,viaDunno){
   let af='<div class="v-verdict '+(correct?'ok':'bad')+'">'+(correct?'정답':(viaDunno?'모르겠어요 처리':'오답'))+'</div>';
   if(q.validation_note)af+='<div class="tcse-note">⚠ '+esc(q.validation_note)+(q.source_answer&&q.source_answer!==q.answer.join('|')?' (source_answer: '+esc(q.source_answer)+')':'')+'</div>';
   if(q.validation_source)af+='<div class="tcse-src"><a href="'+esc(q.validation_source)+'" target="_blank" rel="noopener">검증 출처 ↗</a></div>';
+  af+='<div class="row" style="justify-content:center;margin:8px 0 4px"><button class="small" onclick="tcCopyAnalyze(\''+q.id+'\',this)">🤖 '+(correct?'AI 해설':'AI 오답 분석')+' 프롬프트 복사</button></div>';
   af+='<div class="tcse-linkbox"><div class="count" style="margin-bottom:4px">연결된 GRE 단어</div>'+tcLinkPanelHTML(q,gre)+'</div>';
   document.getElementById('tcAfter').innerHTML=af;
 }
@@ -3201,9 +3203,57 @@ function tcDoneHTML(){
   h+='<div class="row" style="margin-top:12px"><button class="primary" onclick="tcRetry()">다시 풀기</button><button onclick="endTcse()">TCSE 홈으로</button></div>';
   if(s.wrong.length){
     h+='<h3 style="margin-top:16px;color:var(--red)">틀린 문제 '+s.wrong.length+'개</h3>';
-    h+=s.wrong.map(q=>'<div class="tcse-wrongitem"><span class="e-day">S'+q.section+' Q'+q.question_no+'</span> <span class="tcse-type tc-'+q.type+'">'+q.type+'</span> <span class="count">정답 '+q.answer.join(', ')+'</span></div>').join('');
+    h+='<div class="row" style="margin:-4px 0 8px"><button class="small primary" onclick="tcCopyAllWrong(this)">🤖 전체 오답 프롬프트 복사</button></div>';
+    h+=s.wrong.map(q=>{const pk=(s.picks||{})[q.id]||{};return '<div class="tcse-wrongitem"><span class="e-day">S'+q.section+' Q'+q.question_no+'</span> <span class="tcse-type tc-'+q.type+'">'+q.type+'</span> <span class="count">내 답 '+(pk.dunno?'모르겠어요':((pk.sel||[]).join(', ')||'-'))+' · 정답 '+q.answer.join(', ')+'</span> <button class="small" style="margin-left:6px" onclick="tcCopyAnalyze(\''+q.id+'\',this)">🤖 복사</button></div>';}).join('');
   }
   return h;
+}
+/* ---- AI 분석 프롬프트 (TCSE) ---- */
+function tcChoiceText(q,L){return L+'. '+(q.choices[L]||'');}
+function tcAnalyzePrompt(q){
+  const s=tcseSession, pk=(s&&s.picks&&s.picks[q.id])||null, pr=tcProg[q.id]||{};
+  const sel=pk?pk.sel:(pr.lastSelected||[]), dunno=pk?pk.dunno:false;
+  const correct=!dunno&&sel.length===q.answer.length&&q.answer.every(a=>sel.indexOf(a)>=0);
+  const groups=tcGroups(q.type);
+  let block;
+  if(q.type==='SE'){
+    block='[Answer Choices] (정답 2개 선택)\n'+[...groups[0].letters].filter(L=>q.choices[L]).map(L=>tcChoiceText(q,L)).join('\n');
+  }else{
+    block=groups.map(g=>(groups.length>1?'Blank '+g.lab+'\n':'[Answer Choices]\n')+[...g.letters].filter(L=>q.choices[L]).map(L=>tcChoiceText(q,L)).join('\n')).join('\n\n');
+    if(groups.length>1)block='[Answer Choices]\n'+block;
+  }
+  const fmt=arr=>arr.map(L=>L+'('+(q.choices[L]||'')+')').join(', ');
+  const mine=dunno?'모르겠어요 (답 고르지 않음)':(sel.length?fmt(sel):'(미응답)');
+  const typeName={TC1:'Text Completion 1빈칸',TC2:'Text Completion 2빈칸',TC3:'Text Completion 3빈칸',SE:'Sentence Equivalence'}[q.type]||q.type;
+  const asks=correct?[
+    '이 문제는 맞혔지만 확실히 이해하고 싶습니다. 한국어로 설명해 주세요.',
+    '1) 정답을 결정하는 문맥 단서(시그널 워드, 대조/인과/부연 구조)를 문장에서 그대로 인용해 설명',
+    '2) 각 오답 선지가 안 되는 이유를 한 줄씩',
+    (q.type==='SE'?'3) 정답 두 단어가 왜 같은 의미의 문장을 만드는지, 그리고 뜻이 비슷해 보이는 함정 쌍이 있다면 지적':(q.type==='TC1'?'3) 선지를 보기 전에 빈칸에 들어갈 말을 스스로 예측하는 과정':'3) 어떤 빈칸부터 푸는 게 효율적인지와 그 이유')),
+    '4) 선지 단어들의 GRE 기준 핵심 뜻(한국어)과 헷갈리기 쉬운 2차 의미'
+  ]:[
+    '아래 GRE '+typeName+' 문제를 틀렸습니다. 한국어로 분석해 주세요.',
+    '1) 정답을 결정하는 문맥 단서(시그널 워드, 대조/인과/부연 구조)를 문장에서 그대로 인용해 설명',
+    '2) 제가 고른 답이 왜 틀렸는지 — 문맥의 어느 부분과 충돌하는지',
+    '3) 각 오답 선지가 안 되는 이유를 한 줄씩',
+    (q.type==='SE'?'4) 정답 두 단어가 왜 같은 의미의 문장을 만드는지, 그리고 뜻이 비슷해 보이는 함정 쌍이 있다면 지적':(q.type==='TC1'?'4) 선지를 보기 전에 빈칸에 들어갈 말을 스스로 예측하는 과정':'4) 어떤 빈칸부터 푸는 게 효율적인지와 그 이유')),
+    '5) 선지 단어들의 GRE 기준 핵심 뜻(한국어)과 헷갈리기 쉬운 2차 의미',
+    '6) 다음에 같은 유형에서 이런 실수를 피하는 요령 한두 줄'
+  ];
+  return [
+    '[GRE '+typeName+' '+(correct?'해설':'오답 분석')+' 요청] (S'+q.section+' Q'+q.question_no+', '+q.difficulty+')',
+    asks.join('\n'),
+    '[Sentence]\n'+q.question,
+    block,
+    '[내 답] '+mine+'\n[정답] '+fmt(q.answer)
+  ].join('\n\n');
+}
+function tcCopyAnalyze(qid,btn){const q=TCSE.find(x=>x.id===qid);if(!q)return;rcCopyText(tcAnalyzePrompt(q),btn,'복사됨!');}
+function tcCopyAllWrong(btn){
+  const s=tcseSession;if(!s||!s.wrong.length)return alert('틀린 문제가 없습니다.');
+  const txt='[GRE TC/SE 오답 '+s.wrong.length+'개 일괄 분석 요청] 각 문제를 문맥 단서 중심으로 한국어 분석해 주세요. 마지막에 제 오답들에서 보이는 공통 약점을 3줄로 정리해 주세요.\n\n'+
+    s.wrong.map((q,i)=>'===== 오답 '+(i+1)+' =====\n'+tcAnalyzePrompt(q)).join('\n\n');
+  rcCopyText(txt,btn,'전체 복사됨!');
 }
 function tcRetry(){
   const pool=tcseSession.pool.slice();
