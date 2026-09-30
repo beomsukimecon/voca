@@ -117,6 +117,9 @@ label.tog{font-size:13px;display:flex;gap:5px;align-items:center;cursor:pointer}
 .tw-list{margin-top:4px}
 .tw-item{font-size:12.5px;color:#4b5563;padding:3px 0;white-space:pre-line;line-height:1.5}
 .tw-item b{color:var(--ink)}
+.tw-item+.tw-item{border-top:1px dashed var(--line);padding-top:6px;margin-top:3px}
+.tw-etym{margin-top:3px;font-size:12px;color:#5b3db5;background:#f5f1ff;border-radius:6px;padding:4px 8px}
+.tw-sent{margin-top:3px;font-size:12px;color:var(--sub);font-style:italic}
 .pr-date{border-bottom:1px solid var(--line);padding:6px 0}
 .pr-date>summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--ink);padding:4px 0;list-style:none}
 .pr-date>summary::-webkit-details-marker{display:none}
@@ -718,6 +721,13 @@ function ymd(){return todayKey().slice(2).replace(/-/g,'');}
 function loadWords(){try{return JSON.parse(localStorage.getItem(WORD_KEY()))||[]}catch(e){return[]}}
 var __quotaWarned=false;
 function quotaWarn(){if(__quotaWarned)return;__quotaWarned=true;try{alert('브라우저 저장 공간이 부족합니다.\n설정 → 기록·백업에서 [전체 저장]으로 백업한 뒤, 오래된 연습기록을 정리하거나 RC/TCSE 등 큰 데이터를 줄여주세요.\n(일부 변경이 저장되지 않을 수 있습니다)');}catch(e){}}
+function twItemHTML(y){
+  const k=(y.word||'').trim().toLowerCase();
+  const x=data.find(d=>d.day==y.day&&d.no==y.no&&(d.word||'').trim().toLowerCase()===k)||data.find(d=>(d.word||'').trim().toLowerCase()===k)||{};
+  return '<div class="tw-item"><b>'+esc(y.word)+'</b>'+(y.mean?' — '+esc(breakNumbered(y.mean)):'')+
+    (x.etym?'<div class="tw-etym">어근 · '+esc(x.etym)+'</div>':'')+
+    (x.sent?'<div class="tw-sent">'+esc(breakNumbered(x.sent))+'</div>':'')+'</div>';
+}
 function saveWords(){try{localStorage.setItem(WORD_KEY(),JSON.stringify(data));}catch(e){quotaWarn();}tcFreqCache=null;hdIdx=null;}
 function loadCal(){try{return JSON.parse(localStorage.getItem(CAL_KEY()))||{}}catch(e){return{}}}
 function saveCal(){try{localStorage.setItem(CAL_KEY(),JSON.stringify(calendar));}catch(e){quotaWarn();}}
@@ -1250,7 +1260,7 @@ function renderPracticeLog(){
         '<button class="small danger" onclick="deletePractice('+x.idx+')">삭제</button></div>';
       if(r.wrong&&r.wrong.length){
         row+='<details class="test-wrong"><summary>틀린 단어 '+r.wrong.length+'개 보기</summary><div class="tw-list">'+
-          r.wrong.map(y=>'<div class="tw-item"><b>'+esc(y.word)+'</b>'+(y.mean?' — '+esc(breakNumbered(y.mean)):'')+'</div>').join('')+'</div></details>';
+          r.wrong.map(twItemHTML).join('')+'</div></details>';
       }
       return row;
     }).join('');
@@ -1817,7 +1827,7 @@ function showQ(){
     const wl=[...(quiz.wrongList||[])].sort((a,b)=>(a.day-b.day)||(a.no-b.no));
     const wrongHtml = wl.length
       ? '<h3 style="margin-top:14px;color:var(--red)">틀린 단어 '+wl.length+'개</h3>'+
-        wl.map(x=>'<div class="entry"><div class="e-top"><span class="e-day">'+x.day+'일차</span><span class="e-word">'+esc(x.word)+'</span>'+(x.pron?'<span class="e-pron">'+esc(x.pron)+'</span>':'')+'</div>'+(x.mean?'<div class="e-mean">'+esc(breakNumbered(x.mean))+'</div>':'')+(x.sent?'<div class="e-sent">'+esc(breakNumbered(x.sent))+'</div>':'')+'</div>').join('')
+        wl.map(x=>'<div class="entry"><div class="e-top"><span class="e-day">'+x.day+'일차</span><span class="e-word">'+esc(x.word)+'</span>'+(x.pron?'<span class="e-pron">'+esc(x.pron)+'</span>':'')+'</div>'+(x.mean?'<div class="e-mean">'+esc(breakNumbered(x.mean))+'</div>':'')+(x.etym?'<div class="etym"><b>어근·어원</b> · '+esc(x.etym)+'</div>':'')+(x.sent?'<div class="e-sent">'+esc(breakNumbered(x.sent))+'</div>':'')+'</div>').join('')
       : '<p class="count" style="margin-top:10px">틀린 단어 없이 전부 맞혔어요! 🎉</p>';
     const pct=Math.round(quiz.score/quiz.pool.length*100);
     if(quiz.official){
@@ -1939,7 +1949,7 @@ function renderDayDetail(){
       let row='<div class="test-rec"><span>'+tt.greDay+'일차 · '+(tt.mode==='mean'?'뜻 고르기':'단어 고르기')+' · '+tt.score+'/'+tt.total+' · '+tt.percentage+'% · '+(tt.completedAt?tt.completedAt.slice(11,16):'')+'</span><button class="small danger" onclick="deleteTest(\''+key+'\','+idx+')">삭제</button></div>';
       if(tt.wrong&&tt.wrong.length){
         const twSorted=[...tt.wrong].sort((a,b)=>((a.day||0)-(b.day||0))||((a.no||0)-(b.no||0)));
-        row+='<details class="test-wrong"><summary>틀린 단어 '+tt.wrong.length+'개 보기</summary><div class="tw-list">'+twSorted.map(w=>'<div class="tw-item"><b>'+esc(w.word)+'</b>'+(w.mean?' — '+esc(breakNumbered(w.mean)):'')+'</div>').join('')+'</div></details>';
+        row+='<details class="test-wrong"><summary>틀린 단어 '+tt.wrong.length+'개 보기</summary><div class="tw-list">'+twSorted.map(twItemHTML).join('')+'</div></details>';
       }
       return row;
     }).join('');
