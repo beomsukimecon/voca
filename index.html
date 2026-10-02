@@ -442,6 +442,19 @@ details.wr-guide>summary,details.wr-help>summary{font-weight:700;cursor:pointer;
 .tcx-se .tcse-choice.wrong{background:#fdeaea;border-color:#efb4b4}
 #tcseBody .rc-nav:disabled{opacity:.45;cursor:default}
 @media(max-width:640px){.tcx-body{padding:16px 14px}.tcx-cols{gap:12px}.tcx-col{flex:1 1 100%}}
+.wex-match{margin-top:10px;padding:8px 10px;border:1px dashed #b9a7f0;background:#faf8ff;border-radius:8px;font-size:13px}
+.wex-match button{margin:3px 4px 0 0}
+.wex-frame{font-size:11px;padding:1px 7px;border-radius:999px;background:#eef6ff;color:#1f5fa8}
+.wex-skel{margin-top:10px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.wex-row{display:flex;border-bottom:1px solid var(--line);font-size:13px}
+.wex-row:last-child{border-bottom:none}
+.wex-k{flex:0 0 96px;padding:7px 9px;background:var(--card2,#f7f8fb);font-weight:700;color:var(--sub)}
+.wex-v{padding:7px 9px;line-height:1.5}
+.wex-note{margin-top:8px;font-size:12.5px;color:#8a5a00;background:#fff8e6;border-radius:8px;padding:7px 10px;line-height:1.5}
+.wex-essay p{text-indent:1.5em;line-height:1.85;margin:0 0 10px;font-size:15px}
+.wex-mv{color:#1f3a5f;background:#eaf0f8;border-radius:3px;padding:0 2px}
+.wex-tag{font-size:11px;color:#6b46d0;background:#f1ecff;border-radius:4px;padding:0 4px;margin:0 2px}
+@media(max-width:640px){.wex-row{flex-direction:column}.wex-k{flex:none}}
 </style>
 </head>
 <body>
@@ -4163,6 +4176,96 @@ function wrShowGuide(){
     WR_TIPS.guide.map((g,i)=>'<details class="wr-guide"'+(i===0?' open':'')+'><summary>'+esc(g.t)+'</summary><ul class="wr-tiplist">'+
       g.items.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></details>').join('');
 }
+/* ================= 예시 에세이 (CSV로 추가) ================= */
+const WR_EXAMPLES='voca_writing_examples';
+function wexLoad(){try{return JSON.parse(localStorage.getItem(WR_EXAMPLES))||[]}catch(e){return[]}}
+function wexSave(){try{localStorage.setItem(WR_EXAMPLES,JSON.stringify(WEX));return true;}catch(e){alert('저장 공간이 부족합니다.');return false;}}
+var WEX=wexLoad(), wexBack=null;
+const WEX_COLS=['id','source','field','subject','kind','prompt','instruction','instruction_type','frame','condition','body1','body2','body3','essay','word_count','notes'];
+function wexWords(s){return ((s||'').replace(/\(body ?\d\)/gi,'').match(/[A-Za-z][A-Za-z'’-]*/g)||[]).length;}
+function wexImport(inp){
+  const f=inp.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=function(e){
+    inp.value='';
+    let rows;try{rows=parseCSV(String(e.target.result).replace(/^﻿/,''));}catch(err){return alert('CSV를 읽을 수 없습니다.');}
+    if(rows.length<2)return alert('빈 파일입니다.');
+    const head=rows[0].map(h=>(h||'').trim().toLowerCase());
+    const ix=n=>head.indexOf(n);
+    if(ix('prompt')<0||ix('essay')<0)return alert('prompt / essay 칼럼이 필요합니다.\n칼럼: '+WEX_COLS.join(', '));
+    let add=0,upd=0;
+    rows.slice(1).forEach(function(r,ri){
+      const o={};WEX_COLS.forEach(c=>{const i=ix(c);o[c]=i>=0?String(r[i]==null?'':r[i]).replace(/\r\n/g,'\n').trim():'';});
+      if(!o.prompt||!o.essay)return;
+      if(!o.id)o.id='EX'+Date.now().toString(36)+ri;
+      o.word_count=+o.word_count||wexWords(o.essay);
+      const k=WEX.findIndex(x=>x.id===o.id);
+      if(k>=0){WEX[k]=o;upd++;}else{WEX.push(o);add++;}
+    });
+    if(!add&&!upd)return alert('불러올 예시가 없습니다.');
+    if(!wexSave())return;
+    alert('예시 에세이 '+add+'개 추가'+(upd?', '+upd+'개 갱신(같은 id)':'')+'했습니다.');
+    wrShowExamples();
+  };
+  rd.readAsText(f,'utf-8');
+}
+function wexExport(){
+  if(!WEX.length)return alert('내보낼 예시가 없습니다.');
+  const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const csv=WEX_COLS.join(',')+'\r\n'+WEX.map(o=>WEX_COLS.map(c=>q(o[c])).join(',')).join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download='writing_examples_'+ymd()+'.csv';a.click();
+}
+function wexDel(id){if(!confirm('이 예시를 삭제할까요?'))return;WEX=WEX.filter(x=>x.id!==id);wexSave();wrShowExamples();}
+function wexClear(){if(!confirm('예시 에세이를 전부 삭제할까요?'))return;WEX=[];wexSave();wrShowExamples();}
+function wexNorm(s){return (s||'').toLowerCase().replace(/[^a-z\s]/g,' ').split(/\s+/).filter(w=>w.length>3);}
+function wexSim(a,b){const A=new Set(wexNorm(a)),B=new Set(wexNorm(b));if(!A.size||!B.size)return 0;let n=0;A.forEach(w=>{if(B.has(w))n++;});return n/Math.min(A.size,B.size);}
+function wexMatches(t){if(!t||!t.topic)return [];return WEX.map(o=>({o:o,s:wexSim(t.topic,o.prompt)})).filter(x=>x.s>=0.6).sort((a,b)=>b.s-a.s).map(x=>x.o);}
+function wexMatchHTML(t){
+  const m=wexMatches(t);if(!m.length)return '';
+  return '<div class="wex-match">📚 비슷한 주제의 예시 에세이: '+m.map(o=>'<button class="small" onclick="wexBack=function(){wrOpenTopic(\''+esc(t.id)+'\')};wrShowExample(\''+esc(o.id)+'\')">'+esc(o.subject||o.id)+' · '+esc(o.source||'')+'</button>').join(' ')+
+    '<div class="study-tip" style="margin:4px 0 0">실전 연습이라면 먼저 직접 쓰고 나서 보세요.</div></div>';
+}
+function wexItypeLabel(k){const d=WR_TIPS.byType[k];return d?d.label:(k||'');}
+function wrShowExamples(){
+  wexBack=null;
+  const el=document.getElementById('writingBody');if(!el)return;
+  let h='<div class="row" style="justify-content:space-between"><h3 style="margin:0">📚 예시 에세이</h3><button class="small" onclick="renderWriting()">← 홈</button></div>';
+  h+='<div class="row" style="margin-top:10px"><label class="btn primary" style="cursor:pointer">CSV로 예시 추가<input type="file" accept=".csv" class="hide" onchange="wexImport(this)"></label>'+
+     (WEX.length?'<button class="small" onclick="wexExport()">CSV 내보내기</button><button class="small danger" onclick="wexClear()">전체 삭제</button>':'')+'</div>';
+  h+='<div class="tcse-help" style="margin-top:8px"><b>CSV 칼럼</b> (prompt, essay 필수)<br>'+WEX_COLS.join(', ')+
+     '<br>essay는 문단 사이를 빈 줄로 구분. 같은 id를 다시 불러오면 덮어씁니다.<br>instruction_type: claim_challenge · policy_consequences · recommendation_circumstances · statement_conditions · claim_reason · two_views</div>';
+  if(!WEX.length){h+='<p class="count" style="margin-top:10px">아직 예시가 없습니다.</p>';el.innerHTML=h;return;}
+  h+='<div style="margin-top:10px">'+WEX.map(o=>'<div class="entry"><div class="e-top">'+
+     '<span class="e-no">'+esc(o.id)+'</span>'+(o.kind?'<span class="wr-type">'+esc(o.kind)+'</span>':'')+
+     (o.instruction_type?'<span class="wr-dir">'+esc(wexItypeLabel(o.instruction_type))+'</span>':'')+
+     (o.frame?'<span class="wex-frame">'+esc(o.frame)+'</span>':'')+
+     '<span class="e-act"><button class="small primary" onclick="wrShowExample(\''+esc(o.id)+'\')">보기</button><button class="small danger" onclick="wexDel(\''+esc(o.id)+'\')">삭제</button></span></div>'+
+     '<div class="wr-topic">'+esc(o.prompt)+'</div>'+
+     '<div class="count" style="margin-top:4px">'+esc([o.source,o.subject,(o.word_count?o.word_count+' words':'')].filter(Boolean).join(' · '))+'</div></div>').join('')+'</div>';
+  el.innerHTML=h;
+}
+function wexMark(p){
+  let x=esc(p);
+  x=x.replace(/\((body ?\d)\)/gi,'<span class="wex-tag">$1</span>');
+  x=x.replace(/(^|\. )(The extent to which|Admittedly|Granted|Of course|OF course|To be sure|It is true that|However|Nevertheless|Furthermore|Even if|In sum|In conclusion)\b/g,'$1<b class="wex-mv">$2</b>');
+  x=x.replace(/(Some would claim that|For this reason, some may (?:claim|feel) that|depends on)/g,'<b class="wex-mv">$1</b>');
+  x=x.replace(/((?:Such|The|This)(?: an?)? (?:ramifications?|examples?|scenarios?|possibilities|observation|case|information) (?:illustrates?|demonstrates?|reveals?))/g,'<b class="wex-mv">$1</b>');
+  return x;
+}
+function wrShowExample(id){
+  const o=WEX.find(x=>x.id===id);if(!o)return wrShowExamples();
+  const el=document.getElementById('writingBody');
+  const back=wexBack?'<button class="small" onclick="(wexBack||wrShowExamples)()">← 돌아가기</button>':'<button class="small" onclick="wrShowExamples()">← 예시 목록</button>';
+  let h=back;
+  h+='<div class="wr-topicbox" style="margin-top:8px"><div class="e-no">'+esc([o.id,o.source,o.kind].filter(Boolean).join(' · '))+'</div><div class="wr-topic">'+esc(o.prompt)+'</div>'+(o.instruction?'<div class="wr-instr">'+esc(o.instruction)+'</div>':'')+'</div>';
+  const rows=[['프레임',o.frame],['조건 (thesis)',o.condition],['Body 1',o.body1],['Body 2',o.body2],['Body 3',o.body3]].filter(r=>r[1]);
+  if(rows.length)h+='<div class="wex-skel">'+rows.map(r=>'<div class="wex-row"><div class="wex-k">'+r[0]+'</div><div class="wex-v">'+esc(r[1])+'</div></div>').join('')+'</div>';
+  if(o.notes)h+='<div class="wex-note">📝 '+esc(o.notes)+'</div>';
+  h+='<div class="row" style="justify-content:space-between;align-items:baseline;margin-top:14px"><div class="wr-lab" style="margin:0">에세이</div><span class="count">'+(o.word_count||wexWords(o.essay))+' words · <b class="wex-mv">굵은 글씨</b> = 구조 표현</span></div>';
+  h+='<div class="wex-essay">'+String(o.essay).split(/\n\s*\n/).map(p=>'<p>'+wexMark(p.trim())+'</p>').join('')+'</div>';
+  el.innerHTML=h; window.scrollTo(0,0);
+}
 function wrRevisePlanHTML(a){
   const list=(a&&a.checklist)||[];
   return '<div class="wr-lab" style="margin-top:14px">다음 재작성 체크리스트 (이번 답안에서 고칠 것 3개)</div>'+
@@ -4248,7 +4351,7 @@ function renderWriting(){
     el.innerHTML='<h3>Writing (GRE 작문)</h3>'+
       '<p class="count" style="margin-top:8px">작문 문제 데이터가 없습니다. ETS 문제 CSV를 불러오세요.</p>'+
       '<div class="row" style="margin-top:12px"><button class="primary" onclick="document.getElementById(\'wrCsvFile\').click()">ETS CSV 불러오기</button>'+
-      '<input type="file" id="wrCsvFile" accept=".csv" class="hide" onchange="wrImport(this)"></div>'+
+      '<input type="file" id="wrCsvFile" accept=".csv" class="hide" onchange="wrImport(this)"><button onclick="wrShowExamples()">📚 예시 에세이 ('+WEX.length+')</button></div>'+
       '<div class="tcse-help"><b>CSV 형식</b><br>id, topic(주제), instruction(지시문), instruction_type · instruction_label_ko(지시문 유형)<br>type 칼럼이 없으면 모두 Issue로 처리됩니다.</div>';
     return;
   }
@@ -4264,6 +4367,7 @@ function renderWriting(){
      '<button class="primary" onclick="wrRandomStart()">🎲 랜덤 1문제 뽑기</button>'+
      '<button class="small" onclick="mvOpen(\'writingBody\',renderWriting)">📒 내 단어장 ('+MYVOCAB.length+')</button>'+
      '<button class="small" onclick="wrShowGuide()">📖 Writing Guide</button>'+
+     '<button class="small" onclick="wrShowExamples()">📚 예시 에세이 ('+WEX.length+')</button>'+
      '<button class="small" onclick="document.getElementById(\'wrCsvFile\').click()">다른 CSV 불러오기</button>'+
      '<input type="file" id="wrCsvFile" accept=".csv" class="hide" onchange="wrImport(this)"></div>';
   h+='<div class="row" style="margin-top:10px">'+
@@ -4321,6 +4425,7 @@ function wrChooseMode(tid,parentId){
   el.innerHTML='<button class="small" onclick="renderWriting()">← Writing 홈</button>'+
     '<div class="wr-topicbox"><div class="e-no">'+esc(t.id)+(t.type?' · '+esc(t.type):'')+'</div><div class="wr-topic">'+esc(t.topic)+'</div>'+(t.instruction?'<div class="wr-instr">'+esc(t.instruction)+'</div>':'')+'</div>'+
     wrTypeTipHTML(t)+
+    wexMatchHTML(t)+
     mvCollectorHTML((t.topic||'')+' '+(t.instruction||''),'Writing '+t.id)+
     '<p class="count" style="margin-top:12px">'+(parentId?'재작성 모드':'작성 모드')+'를 선택하세요.</p>'+
     '<div class="row" style="margin-top:8px"><button class="primary" onclick="startWriting(\''+tid+'\',\'timed\','+(parentId?'\''+parentId+'\'':'null')+')">실전 30분</button>'+
@@ -4494,6 +4599,7 @@ function wrShowResult(aid){
   const fbs=wrAttFb(aid);
   let h='<button class="small" onclick="renderWriting()">← Writing 홈</button>';
   h+='<div class="wr-topicbox" style="margin-top:8px"><div class="e-no">'+esc(t.id||'')+(a.parentAttemptId?' · 재작성본':'')+'</div><div class="wr-topic">'+esc(t.topic)+'</div></div>';
+  h+=wexMatchHTML(t);
   h+='<div class="count" style="margin-top:8px">'+fmtMMSS(a.elapsedSec)+' · '+a.wordCount+' words · '+(a.mode==='timed'?'실전':'연습')+(fbs.length?' · 피드백 '+fbs.length+'개':'')+'</div>';
   h+='<div class="row" style="margin-top:10px"><button onclick="wrToggle(\'wrOrig\')">원문 보기</button>'+
      (fbs.length?'<button onclick="wrToggle(\'wrFb\')">AI 피드백 보기</button>':'<button onclick="showWritingFeedback(\''+aid+'\')">피드백 추가</button>')+
