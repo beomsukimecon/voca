@@ -455,11 +455,68 @@ details.wr-guide>summary,details.wr-help>summary{font-weight:700;cursor:pointer;
 .wex-mv{color:#1f3a5f;background:#eaf0f8;border-radius:3px;padding:0 2px}
 .wex-tag{font-size:11px;color:#6b46d0;background:#f1ecff;border-radius:4px;padding:0 4px;margin:0 2px}
 @media(max-width:640px){.wex-row{flex-direction:column}.wex-k{flex:none}}
+/* ===== 테마: 기본에서는 숨김 ===== */
+.th-only,.ti{display:none}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+/* ===== 테마: 말랑 ===== */
+body.th-cute{--acc:#4CC552;--accD:#38A23E;--bg:#fff}
+body.th-cute .th-only{display:inline-flex}
+body.th-cute .th-cat{cursor:default}body.th-cute .th-cat svg{width:70px;height:52px;display:block}
+body.th-cute #appHeader h2{display:flex;align-items:baseline;gap:6px}
+body.th-cute #appHeader .wm{font-family:"Nunito","Jua",sans-serif;font-weight:900;font-size:34px;letter-spacing:-.5px;color:#4CC552;text-transform:lowercase;line-height:1}
+body.th-cute #total{font-family:"Jua",sans-serif;font-size:14px}
+body.th-cute #todayWord{position:relative;align-items:center;gap:6px;font-family:"Jua",sans-serif;font-size:15px;color:#3C3C3C;background:#fff;border:2px solid #E5E5E5;border-radius:14px;padding:6px 12px;margin-left:6px;max-width:440px;white-space:nowrap}
+body.th-cute #todayWord .twm{font-family:"Jua",sans-serif;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+body.th-cute #todayWord::before{content:'';position:absolute;left:-8px;top:50%;width:12px;height:12px;background:#fff;border-left:2px solid #E5E5E5;border-bottom:2px solid #E5E5E5;transform:translateY(-50%) rotate(45deg)}
+body.th-cute #todayWord b{font-family:"Nunito",sans-serif;font-weight:900;color:#2F8C35}
+body.th-cute #todayWord:hover{border-color:#cfcfcf}
+body.th-cute #gearBtn{font-size:20px!important;border:2px solid #E5E5E5;border-bottom-width:4px;border-radius:14px;background:#fff;padding:6px 11px!important}
+body.th-cute .tabs{gap:8px}
+body.th-cute .tabs button{font-family:"Nunito","Jua",sans-serif;font-weight:800;font-size:15px;border-radius:14px;padding:8px 16px;background:#fff;color:#4B4B4B;border:2px solid #E5E5E5;border-bottom-width:4px;display:inline-flex;align-items:center;gap:6px;transition:transform .06s}
+body.th-cute .tabs button:active{transform:translateY(2px);border-bottom-width:2px;margin-top:2px}
+body.th-cute .tabs .ti{display:inline-flex}
+body.th-cute .tabs .ti svg{width:20px;height:20px}
+body.th-cute .tabs button.deck{--c:#4CC552;--d:#38A23E}
+body.th-cute .tabs button.s-tcse{--c:#1CA7F5;--d:#1189CF}
+body.th-cute .tabs button.s-rc{--c:#A66BF0;--d:#8550CC}
+body.th-cute .tabs button.s-writing{--c:#FF9B1F;--d:#E07F00}
+body.th-cute .tabs button.s-cal{--c:#FF5C8D;--d:#E03E70}
+body.th-cute .tabs button[class*=s-],body.th-cute .tabs button.deck{color:var(--c)}
+body.th-cute .tabs button.on{background:var(--c);border-color:var(--d);color:#fff}
+body.th-cute .tabs button.add{color:#AFAFAF}
+body.th-cute button.primary{background:#4CC552;border:2px solid #38A23E;border-bottom-width:4px;border-radius:12px;font-weight:700}
+body.th-cute button.primary:active{transform:translateY(2px);border-bottom-width:2px}
+body.th-cute .card{border:2px solid #EFEFEF;border-radius:16px}
+@media(max-width:640px){body.th-cute #todayWord{display:none}body.th-cute .th-cat svg{width:48px;height:38px}body.th-cute #appHeader .wm{font-size:28px}}
+.plan-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:-4px 0 12px;padding:8px 10px;border:1px dashed var(--line);border-radius:10px}
+.plan-lab{font-weight:700;font-size:13px}
+.plan-dday{font-weight:800;color:#e05555;font-size:15px}
+.cal-cell.exam{border-color:#e05555;box-shadow:0 0 0 1px #e05555 inset}
+.exam-tag{font-size:10px;font-weight:800;color:#fff;background:#e05555;border-radius:4px;padding:0 4px;vertical-align:1px}
+.plan-line{font-size:10.5px;line-height:1.35;border-radius:4px;padding:0 4px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.plan-line.done{background:#f2f3f5!important;color:#9aa0a6!important;text-decoration:line-through}
+.plan-box{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0 12px}
+.plan-list{margin-top:6px}
+.plan-item{display:flex;align-items:center;gap:8px;padding:6px 2px;border-bottom:1px solid var(--line);cursor:pointer}
+.plan-item:last-child{border-bottom:none}
+.plan-item.done .plan-txt{text-decoration:line-through;color:var(--sub)}
+.plan-txt{flex:1}
+.plan-del{border:none;background:none;color:var(--sub);font-size:15px;padding:0 6px}
+.plan-del:hover{color:var(--red)}
+.plan-type{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:1px 8px;margin-right:4px}
+.t-vocab{background:#eaf7ec;color:#2f8c35}.t-tcse{background:#e6f5fe;color:#1189cf}.t-rc{background:#f3ecfe;color:#8550cc}.t-writing{background:#fff3e3;color:#c46a00}.t-memo{background:#f1f2f4;color:#555}
+.plan-auto{font-size:10px;color:var(--sub);border:1px solid var(--line);border-radius:4px;padding:0 4px}
+.plan-add{margin-top:8px;flex-wrap:wrap;gap:6px}
+.pa-grid{display:grid;grid-template-columns:80px 1fr;gap:10px 10px;align-items:center;font-size:13px}
+.pa-lab{font-weight:700;color:var(--sub)}
+.pa-row{font-size:13px;padding:5px 0;border-bottom:1px solid var(--line)}
+.pa-d{display:inline-block;width:110px;color:var(--sub)}
+@media(max-width:640px){.pa-grid{grid-template-columns:1fr}.pa-d{display:block;width:auto}}
 </style>
 </head>
 <body>
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-<h2 style="margin:0">VOCA <span id="total" class="count"></span></h2>
+<div id="appHeader" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<div class="brand"><span class="th-only th-cat" id="thCat"></span><h2 style="margin:0"><span class="wm">VOCA</span> <span id="total" class="count"></span></h2><button type="button" id="todayWord" class="th-only" onclick="twNext()" title="누르면 다른 단어"></button></div>
 <button id="gearBtn" onclick="toggleSettings(true)" title="설정" style="font-size:18px;padding:6px 12px;line-height:1">⚙</button>
 </div>
 
@@ -570,9 +627,11 @@ details.wr-guide>summary,details.wr-help>summary{font-weight:700;cursor:pointer;
         <button onclick="nextMonth()">다음달 ›</button>
         <button onclick="goToday()">오늘</button>
       </div>
+      <div id="planBar" class="plan-bar"></div>
       <div class="cal-weekdays"><div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div></div>
       <div class="cal-grid" id="calGrid"></div>
     </div>
+    <div class="card hide" id="planAuto"></div>
     <div class="card" id="calDetail"></div>
   </div>
   <div id="calQuizArea" class="card hide"></div>
@@ -603,6 +662,14 @@ details.wr-guide>summary,details.wr-help>summary{font-weight:700;cursor:pointer;
       <h3 style="margin:0">설정</h3>
       <button class="small" onclick="toggleSettings(false)">✕ 닫기</button>
     </div>
+    <details class="set-sec" open>
+      <summary>🎨 테마</summary>
+      <div class="set-body">
+        <div class="row" style="gap:18px"><label class="tog"><input type="radio" name="themeSel" value="basic" onchange="thSet('basic')">기본</label>
+        <label class="tog"><input type="radio" name="themeSel" value="cute" onchange="thSet('cute')">말랑</label></div>
+        <p class="study-tip" style="margin-top:6px">말랑 테마는 배너·탭·주요 버튼 모양이 바뀌고, 위쪽에 오늘의 단어가 나옵니다. 데이터는 그대로예요.</p>
+      </div>
+    </details>
     <details class="set-sec" open>
       <summary>🔍 호버 사전</summary>
       <div class="set-body">
@@ -806,18 +873,82 @@ function switchTab(t){
   else if(t==='rc'){ renderRc(); }
   else render();
 }
+/* ================= 테마 ================= */
+const THEME_KEY='voca_theme';
+const TH_ICON={
+  deck:'<i class="ti"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="13" height="15" rx="3" fill="currentColor" opacity=".35"/><rect x="7" y="3" width="13" height="15" rx="3" fill="currentColor"/><path d="M10.5 9h6M10.5 12.5h4" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></i>',
+  tcse:'<i class="ti"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4" fill="currentColor"/><path d="M6 14.5h5" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><path d="M14 9.5l1.6 5 1.6-5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></i>',
+  rc:'<i class="ti"><svg viewBox="0 0 24 24"><path d="M3 6.5C6 5 9 5 12 7c3-2 6-2 9-.5V19c-3-1.5-6-1.5-9 .5-3-2-6-2-9-.5z" fill="currentColor"/><path d="M12 7v12.5" stroke="#fff" stroke-width="1.8"/></svg></i>',
+  writing:'<i class="ti"><svg viewBox="0 0 24 24"><path d="M15.5 3.5l5 5L9 20H4v-5z" fill="currentColor"/><path d="M13.5 5.5l5 5" stroke="#fff" stroke-width="1.8"/></svg></i>',
+  cal:'<i class="ti"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="4" fill="currentColor"/><path d="M8 3v4M16 3v4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="15" r="2.2" fill="#fff"/></svg></i>'
+};
+function thGet(){try{return localStorage.getItem(THEME_KEY)||'basic'}catch(e){return 'basic'}}
+function thApply(t){
+  document.body.classList.toggle('th-cute',t==='cute');
+  if(t==='cute'&&!document.getElementById('thFonts')){
+    const l=document.createElement('link');l.id='thFonts';l.rel='stylesheet';
+    l.href='https://fonts.googleapis.com/css2?family=Jua&family=Nunito:wght@800;900&display=swap';document.head.appendChild(l);
+  }
+  document.querySelectorAll('input[name="themeSel"]').forEach(r=>{r.checked=(r.value===t);});
+  if(t==='cute')twRender();
+}
+function thSet(t){try{localStorage.setItem(THEME_KEY,t);}catch(e){}thApply(t);}
+/* 식빵냥 표정: base(기본) · sleepy(졸림) · blank(멍) */
+const CAT_BODY='<path d="M14 58 C10 40 14 22 22 14 L27 4 L34 13 C40 11 50 11 56 13 L63 4 L68 14 C77 22 80 40 76 58 C74 63 70 64 45 64 C20 64 16 63 14 58 Z" fill="#fff" stroke="#2B2B2B" stroke-width="3" stroke-linejoin="round"/><path d="M26 64 v-4 M64 64 v-4" stroke="#2B2B2B" stroke-width="2.4" stroke-linecap="round"/>';
+const CAT_LINE='stroke="#2B2B2B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none"';
+const CAT_FACE={
+  base:'<circle cx="31" cy="34" r="2.6" fill="#2B2B2B"/><circle cx="59" cy="34" r="2.6" fill="#2B2B2B"/><path d="M41 39 l4 3.5 l4 -3.5" '+CAT_LINE+'/>',
+  sleepy:'<path d="M26 35 h10 M54 35 h10" '+CAT_LINE+'/><ellipse cx="45" cy="45" rx="2.6" ry="3.2" fill="#2B2B2B"/><text x="70" y="14" font-family="Nunito,sans-serif" font-weight="900" font-size="12" fill="#2B2B2B">z</text><text x="78" y="7" font-family="Nunito,sans-serif" font-weight="900" font-size="9" fill="#2B2B2B">z</text>',
+  blank:'<circle cx="31" cy="35" r="1.5" fill="#2B2B2B"/><circle cx="59" cy="35" r="1.5" fill="#2B2B2B"/><circle cx="45" cy="44" r="2.2" fill="none" stroke="#2B2B2B" stroke-width="2"/><circle cx="74" cy="10" r="1.6" fill="#2B2B2B"/><circle cx="80" cy="10" r="1.6" fill="#2B2B2B"/><circle cx="86" cy="10" r="1.6" fill="#2B2B2B"/>'
+};
+function catSVG(face){return '<svg viewBox="-6 -6 102 76" aria-hidden="true">'+CAT_BODY+(CAT_FACE[face]||CAT_FACE.base)+'</svg>';}
+/* 테스트 정답률 → 표정: 100% 기본 · 80% 이하 졸림 · 70% 이하 멍 · 그 사이(81~99%)는 그대로 */
+const CAT_MOOD_KEY='voca_cat_mood';
+function catMoodGet(){try{const v=localStorage.getItem(CAT_MOOD_KEY);return (v==='sleepy'||v==='blank')?v:'base';}catch(e){return 'base';}}
+function catMood(pct){
+  if(!(pct>=0))return;
+  let m=catMoodGet();
+  if(pct>=100)m='base'; else if(pct<=70)m='blank'; else if(pct<=80)m='sleepy';
+  try{localStorage.setItem(CAT_MOOD_KEY,m);}catch(e){}
+  if(document.body.classList.contains('th-cute'))twRender();
+}
+function twWake(){}
+/* 오늘의 단어 (말랑 테마 말풍선) */
+var twOffset=0;
+function twPool(){
+  let pool=[];
+  try{pool=(typeof tcGreWords==='function'?tcGreWords():[]);}catch(e){}
+  if(!pool.length)pool=data||[];
+  return pool.filter(w=>w&&w.word&&w.mean);
+}
+function twShortMean(m){
+  m=String(m||'').replace(/\s+/g,' ').trim();
+  m=m.replace(/^\s*1[.)]\s*/,'').split(/\s+\d[.)]\s|[;,/·]|\n/)[0].trim();
+  return m.length>18?m.slice(0,18)+'…':m;
+}
+function twRender(){
+  const el=document.getElementById('todayWord');if(!el)return;
+  const cat=document.getElementById('thCat');
+  const pool=twPool();
+  if(cat)cat.innerHTML=catSVG(catMoodGet());
+  if(!pool.length){el.innerHTML='단어장을 불러오면 오늘의 단어를 보여드려요';return;}
+  const d=new Date();const seed=d.getFullYear()*372+d.getMonth()*31+d.getDate();
+  const w=pool[(seed*7919+twOffset)%pool.length];
+  el.innerHTML='오늘의 단어 <b>'+esc(w.word)+'</b><span class="twm">'+esc(twShortMean(w.mean))+'</span>';
+}
+function twNext(){twOffset++;twRender();}
 function renderTabs(){
   const el=document.getElementById('mainTabs');if(!el)return;
   let h='';
   decks.forEach(function(d){
     const on=(mainTab==='gre'&&d.id===CUR);
-    h+='<button class="'+(on?'on':'')+'" onclick="switchDeck(\''+d.id+'\')" ondblclick="renameDeck(\''+d.id+'\')" title="더블클릭: 이름 변경/삭제">'+esc(d.name)+'</button>';
+    h+='<button class="deck'+(on?' on':'')+'" onclick="switchDeck(\''+d.id+'\')" ondblclick="renameDeck(\''+d.id+'\')" title="더블클릭: 이름 변경/삭제">'+TH_ICON.deck+esc(d.name)+'</button>';
   });
-  h+='<button onclick="addDeck()" title="단어장 추가">＋</button>';
-  h+='<button id="tabTCSE" class="'+(mainTab==='tcse'?'on':'')+'" onclick="switchTab(\'tcse\')" style="margin-left:auto">TCSE</button>';
-  h+='<button id="tabRC" class="'+(mainTab==='rc'?'on':'')+'" onclick="switchTab(\'rc\')">RC</button>';
-  h+='<button id="tabWRITING" class="'+(mainTab==='writing'?'on':'')+'" onclick="switchTab(\'writing\')">Writing</button>';
-  h+='<button id="tabCAL" class="'+(mainTab==='cal'?'on':'')+'" onclick="switchTab(\'cal\')">캘린더</button>';
+  h+='<button class="add" onclick="addDeck()" title="단어장 추가">＋</button>';
+  h+='<button id="tabTCSE" class="s-tcse'+(mainTab==='tcse'?' on':'')+'" onclick="switchTab(\'tcse\')" style="margin-left:auto">'+TH_ICON.tcse+'TCSE</button>';
+  h+='<button id="tabRC" class="s-rc'+(mainTab==='rc'?' on':'')+'" onclick="switchTab(\'rc\')">'+TH_ICON.rc+'RC</button>';
+  h+='<button id="tabWRITING" class="s-writing'+(mainTab==='writing'?' on':'')+'" onclick="switchTab(\'writing\')">'+TH_ICON.writing+'Writing</button>';
+  h+='<button id="tabCAL" class="s-cal'+(mainTab==='cal'?' on':'')+'" onclick="switchTab(\'cal\')">'+TH_ICON.cal+'캘린더</button>';
   el.innerHTML=h;
 }
 function syncSettingsUI(){
@@ -951,6 +1082,7 @@ function render(){
   const arr=visible();
   document.getElementById('listCount').textContent=arr.length;
   document.getElementById('total').textContent='· '+data.length+'단어';
+  if(document.body.classList.contains('th-cute'))twRender();
   document.getElementById('wrongCnt').textContent=data.filter(x=>(x.wrong||0)>0).length;
   document.getElementById('selCnt').textContent=selected.size;
   document.getElementById('list').innerHTML=arr.slice(0,600).map(x=>{
@@ -1836,7 +1968,7 @@ function pick(arr,n,ex){const r=[];const c=arr.filter(x=>x!==ex);while(r.length<
 function showQ(){
   const a=document.getElementById(quiz.target);
   if(quiz.i>=quiz.pool.length){
-    if(!quiz.recorded){ if(quiz.official)recordOfficial(); else recordPractice(); quiz.recorded=true; }
+    if(!quiz.recorded){ if(quiz.official)recordOfficial(); else recordPractice(); quiz.recorded=true; catMood(Math.round(quiz.score/quiz.pool.length*100)); }
     const wl=[...(quiz.wrongList||[])].sort((a,b)=>(a.day-b.day)||(a.no-b.no));
     const wrongHtml = wl.length
       ? '<h3 style="margin-top:14px;color:var(--red)">틀린 단어 '+wl.length+'개</h3>'+
@@ -1935,12 +2067,148 @@ function renderCalendar(){
       if(rec.studiedDays&&rec.studiedDays.length)brief+='<div class="cal-brief study">학습: '+rec.studiedDays.slice().sort((a,b)=>a-b).join(',')+'일차</div>';
       if(rec.tests&&rec.tests.length){const tt=rec.tests;const last=tt[tt.length-1];const tdays=[...new Set(tt.map(x=>x.greDay))].sort((a,b)=>a-b);brief+='<div class="cal-brief test">'+tdays.join(',')+'일차 '+last.score+'/'+last.total+(tt.length>1?' ('+tt.length+')':'')+'</div>';}
     }
-    cells+='<div class="cal-cell'+(key===tk?' today':'')+(key===calSel?' sel':'')+'" onclick="selectDate(\''+key+'\')"><div class="cal-date">'+d+'</div>'+brief+'</div>';
+    brief=planCellBrief(key)+brief;
+    const isExam=PLAN.exam&&PLAN.exam===key;
+    cells+='<div class="cal-cell'+(key===tk?' today':'')+(key===calSel?' sel':'')+(isExam?' exam':'')+'" onclick="selectDate(\''+key+'\')"><div class="cal-date">'+d+(isExam?' <span class="exam-tag">GRE</span>':'')+'</div>'+brief+'</div>';
   }
   document.getElementById('calGrid').innerHTML=cells;
+  renderPlanBar();
   renderDayDetail();
 }
 
+/* ================= 계획 (GRE 시험일 · 날짜별 계획 · 자동 분배) ================= */
+const PLAN_KEY='voca_plan';
+function planLoad(){try{const o=JSON.parse(localStorage.getItem(PLAN_KEY))||{};o.days=o.days||{};return o;}catch(e){return {days:{}};}}
+function planSave(){try{localStorage.setItem(PLAN_KEY,JSON.stringify(PLAN));}catch(e){alert('저장 공간이 부족합니다.');}}
+var PLAN=planLoad();
+const PLAN_TYPES={vocab:'단어',tcse:'TCSE',rc:'RC',writing:'Writing',memo:'메모'};
+function planId(){return 'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function keyToDate(k){const p=k.split('-').map(Number);return new Date(p[0],p[1]-1,p[2]);}
+function daysBetween(a,b){return Math.round((keyToDate(b)-keyToDate(a))/86400000);}
+function planDday(){if(!PLAN.exam)return null;return daysBetween(todayKey(),PLAN.exam);}
+function planDdayText(){const d=planDday();if(d===null)return '';return d>0?'D-'+d:(d===0?'D-DAY':'D+'+(-d));}
+function planLabel(it){
+  if(it.type==='vocab')return (it.round?it.round+'회독 ':'')+(it.from===it.to?it.from+'일차':it.from+'–'+it.to+'일차');
+  if(it.type==='tcse')return it.n+'문제';
+  if(it.type==='rc')return it.n+'문제';
+  if(it.type==='writing')return it.n+'편';
+  return it.text||'';
+}
+function planCellBrief(key){
+  const arr=PLAN.days[key];if(!arr||!arr.length)return '';
+  const short=it=>it.type==='vocab'?'단어 '+(it.round?it.round+'회 ':'')+(it.from===it.to?it.from:it.from+'–'+it.to):it.type==='memo'?(it.text||''):PLAN_TYPES[it.type]+' '+it.n;
+  return arr.slice(0,3).map(it=>'<div class="plan-line t-'+it.type+(it.done?' done':'')+'">'+esc(short(it))+'</div>').join('')+(arr.length>3?'<div class="count" style="font-size:10px">외 '+(arr.length-3)+'</div>':'');
+}
+function renderPlanBar(){
+  const el=document.getElementById('planBar');if(!el)return;
+  const dd=planDdayText();
+  el.innerHTML='<span class="plan-lab">GRE 시험일</span><input type="date" id="planExam" value="'+(PLAN.exam||'')+'" onchange="planSetExam(this.value)">'+
+    (dd?'<span class="plan-dday">'+dd+'</span>':'<span class="count">날짜를 넣으면 D-day가 표시됩니다</span>')+
+    '<button class="small" style="margin-left:auto" onclick="planAutoOpen()">📋 자동 계획 만들기</button>';
+}
+function planSetExam(v){PLAN.exam=v||'';planSave();if(v){const d=keyToDate(v);calY=d.getFullYear();calM=d.getMonth();}renderCalendar();}
+function planDayHTML(key){
+  const arr=PLAN.days[key]||[];
+  let h='<div class="plan-box"><div class="row" style="justify-content:space-between;align-items:baseline"><b>계획</b>'+
+    (arr.length?'<span class="count">'+arr.filter(x=>x.done).length+'/'+arr.length+' 완료</span>':'')+'</div>';
+  h+=arr.length?'<div class="plan-list">'+arr.map(it=>'<label class="plan-item'+(it.done?' done':'')+'"><input type="checkbox" '+(it.done?'checked':'')+' onchange="planToggle(\''+key+'\',\''+it.id+'\')">'+
+      (it.type!=='memo'?'<span class="plan-type t-'+it.type+'">'+PLAN_TYPES[it.type]+'</span>':'')+
+      '<span class="plan-txt">'+esc(planLabel(it))+(it.note?' <span class="count">· '+esc(it.note)+'</span>':'')+'</span>'+
+      (it.auto?'<span class="plan-auto" title="자동 계획으로 만든 항목">자동</span>':'')+
+      '<button class="small plan-del" onclick="event.preventDefault();planDel(\''+key+'\',\''+it.id+'\')" title="삭제">×</button></label>').join('')+'</div>'
+    :'<p class="count" style="margin:6px 0">이 날 계획이 없습니다.</p>';
+  h+='<div class="row plan-add"><select id="planType" onchange="planTypeUI()">'+Object.keys(PLAN_TYPES).map(k=>'<option value="'+k+'">'+PLAN_TYPES[k]+'</option>').join('')+'</select>'+
+     '<span id="planFields"></span><button class="small primary" onclick="planAdd(\''+key+'\')">추가</button></div></div>';
+  setTimeout(planTypeUI,0);
+  return h;
+}
+function planTypeUI(){
+  const t=(document.getElementById('planType')||{}).value;const f=document.getElementById('planFields');if(!f)return;
+  if(t==='vocab')f.innerHTML='<input type="number" id="pfRound" min="1" placeholder="회독" style="width:58px"> <input type="number" id="pfFrom" min="1" placeholder="일차" style="width:64px"> ~ <input type="number" id="pfTo" min="1" placeholder="일차" style="width:64px">';
+  else if(t==='memo')f.innerHTML='<input type="text" id="pfText" placeholder="할 일" style="width:200px">';
+  else f.innerHTML='<input type="number" id="pfN" min="1" placeholder="'+(t==='writing'?'편':'문제')+' 수" style="width:80px"> <input type="text" id="pfNote" placeholder="메모 (선택)" style="width:130px">';
+}
+function planAdd(key){
+  const t=document.getElementById('planType').value;const g=id=>((document.getElementById(id)||{}).value||'').trim();
+  const it={id:planId(),type:t,done:false};
+  if(t==='vocab'){it.from=+g('pfFrom');it.to=+g('pfTo')||it.from;it.round=+g('pfRound')||0;if(!it.from)return alert('일차를 입력하세요.');if(it.to<it.from){const x=it.from;it.from=it.to;it.to=x;}}
+  else if(t==='memo'){it.text=g('pfText');if(!it.text)return alert('할 일을 입력하세요.');}
+  else{it.n=+g('pfN');it.note=g('pfNote');if(!it.n)return alert('숫자를 입력하세요.');}
+  (PLAN.days[key]=PLAN.days[key]||[]).push(it);planSave();renderCalendar();
+}
+function planToggle(key,id){const it=(PLAN.days[key]||[]).find(x=>x.id===id);if(!it)return;it.done=!it.done;planSave();renderCalendar();}
+function planDel(key,id){PLAN.days[key]=(PLAN.days[key]||[]).filter(x=>x.id!==id);if(!PLAN.days[key].length)delete PLAN.days[key];planSave();renderCalendar();}
+
+/* ---- 자동 분배 ---- */
+function planGreMaxDay(){const w=tcGreWords();return w.length?Math.max.apply(null,w.map(x=>+x.day||0)):0;}
+function planTcseLeft(){try{return TCSE.filter(q=>!(tcProg[q.id]&&tcProg[q.id].attempts)).length;}catch(e){return 0;}}
+function planRcLeft(){try{const pr=rcLoadProg();return (RC_DATA||[]).filter(q=>!pr[q.id]).length;}catch(e){return 0;}}
+function planAutoOpen(){
+  const box=document.getElementById('planAuto');
+  if(!PLAN.exam){alert('먼저 GRE 시험일을 입력하세요.');const i=document.getElementById('planExam');if(i)i.focus();return;}
+  if(daysBetween(todayKey(),PLAN.exam)<1)return alert('시험일이 오늘 이후여야 합니다.');
+  const md=planGreMaxDay();
+  box.classList.remove('hide');
+  box.innerHTML='<div class="row" style="justify-content:space-between"><h3 style="margin:0">📋 자동 계획 만들기</h3><button class="small" onclick="planAutoClose()">닫기</button></div>'+
+   '<p class="study-tip" style="margin:6px 0 10px">오늘부터 시험일까지 남은 분량을 날짜별로 고르게 나눕니다. 직접 쓴 계획은 그대로 두고, 이전에 만든 자동 계획만 새로 바뀝니다.</p>'+
+   '<div class="pa-grid">'+
+   '<div class="pa-lab">기간</div><div><input type="date" id="paStart" value="'+todayKey()+'"> ~ 시험일 전날 · 마지막 <input type="number" id="paBuffer" value="2" min="0" style="width:52px">일은 복습용으로 비우기</div>'+
+   '<div class="pa-lab">쉬는 요일</div><div>'+['일','월','화','수','목','금','토'].map((d,i)=>'<label class="tog"><input type="checkbox" class="paRest" value="'+i+'">'+d+'</label>').join(' ')+'</div>'+
+   '<div class="pa-lab">단어</div><div><label class="tog"><input type="checkbox" id="paV" checked>포함</label> <input type="number" id="paVFrom" value="1" min="1" style="width:58px">~<input type="number" id="paVTo" value="'+(md||1)+'" min="1" style="width:58px">일차 · <input type="number" id="paVRounds" value="1" min="1" max="5" style="width:48px">회독 <span class="count">(GRE 단어장 '+md+'일차까지)</span></div>'+
+   '<div class="pa-lab">TCSE</div><div><label class="tog"><input type="checkbox" id="paT" checked>포함</label> <input type="number" id="paTN" value="'+planTcseLeft()+'" min="0" style="width:70px">문제 <span class="count">(안 푼 문제 '+planTcseLeft()+')</span></div>'+
+   '<div class="pa-lab">RC</div><div><label class="tog"><input type="checkbox" id="paR" checked>포함</label> <input type="number" id="paRN" value="'+planRcLeft()+'" min="0" style="width:70px">문제 <span class="count">(안 푼 문제 '+planRcLeft()+')</span></div>'+
+   '<div class="pa-lab">Writing</div><div><label class="tog"><input type="checkbox" id="paW" checked>포함</label> 주 <input type="number" id="paWN" value="2" min="0" max="7" style="width:48px">편</div>'+
+   '</div><div class="row" style="margin-top:12px"><button onclick="planAutoPreview()">미리보기</button><button class="primary" onclick="planAutoApply()">계획에 적용</button></div><div id="paPreview"></div>';
+  const o=PLAN.autoOpt;
+  if(o){const g=id=>document.getElementById(id);
+    ['paBuffer','paVRounds','paWN'].forEach(id=>{if(o[id]!=null)g(id).value=o[id];});
+    ['paV','paT','paR','paW'].forEach(id=>{if(o[id]!=null)g(id).checked=o[id];});
+    document.querySelectorAll('.paRest').forEach(c=>{c.checked=(o.rest||[]).indexOf(+c.value)>=0;});}
+  box.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function planAutoClose(){const b=document.getElementById('planAuto');b.classList.add('hide');b.innerHTML='';}
+function planSplit(total,n){const base=Math.floor(total/n),extra=total%n;return Array.from({length:n},(_,i)=>base+(i<extra?1:0));}
+function planAutoBuild(){
+  const g=id=>document.getElementById(id);const num=id=>+(g(id).value)||0;
+  const start=g('paStart').value||todayKey();const buf=Math.max(0,num('paBuffer'));
+  const rest=[...document.querySelectorAll('.paRest:checked')].map(x=>+x.value);
+  const end=keyToDate(PLAN.exam);end.setDate(end.getDate()-1-buf);
+  const days=[];for(let d=keyToDate(start);d<=end;d.setDate(d.getDate()+1)){if(rest.indexOf(d.getDay())<0)days.push(dateKey(d));}
+  if(!days.length)return {err:'계획을 넣을 날이 없습니다. 기간이나 쉬는 요일을 확인하세요.'};
+  const out={};days.forEach(k=>out[k]=[]);const n=days.length;
+  if(g('paV').checked){
+    let a=num('paVFrom'),b=num('paVTo'),R=Math.max(1,num('paVRounds'));if(b<a){const x=a;a=b;b=x;}
+    const units=[];for(let r=1;r<=R;r++)for(let d=a;d<=b;d++)units.push([r,d]);
+    if(units.length){const per=planSplit(units.length,n);let p=0;
+      days.forEach((k,i)=>{const seg=units.slice(p,p+per[i]);p+=per[i];
+        let cur=null,curR=0;seg.forEach(u=>{if(cur&&curR===u[0]&&u[1]===cur.to+1)cur.to=u[1];else{curR=u[0];cur={id:planId(),type:'vocab',round:R>1?u[0]:0,from:u[1],to:u[1],done:false,auto:true};out[k].push(cur);}});});}
+  }
+  [['paT','paTN','tcse'],['paR','paRN','rc']].forEach(([c,f,t])=>{if(!g(c).checked)return;const tot=num(f);if(!tot)return;
+    planSplit(tot,n).forEach((q,i)=>{if(q>0)out[days[i]].push({id:planId(),type:t,n:q,done:false,auto:true});});});
+  if(g('paW').checked&&num('paWN')>0){
+    const span=daysBetween(days[0],days[n-1])+1;const total=Math.max(1,Math.round(span/7*num('paWN')));
+    for(let j=0;j<Math.min(total,n);j++){const idx=Math.min(n-1,Math.floor((j+0.5)*n/Math.min(total,n)));out[days[idx]].push({id:planId(),type:'writing',n:1,done:false,auto:true});}
+  }
+  return {days:days,out:out,start:start};
+}
+function planAutoPreview(){
+  const r=planAutoBuild();const el=document.getElementById('paPreview');
+  if(r.err){el.innerHTML='<p class="count" style="color:var(--red);margin-top:8px">'+esc(r.err)+'</p>';return;}
+  const show=r.days.slice(0,10);
+  el.innerHTML='<div class="count" style="margin:12px 0 6px">'+r.days.length+'일에 나눠 넣습니다. 앞의 '+show.length+'일 미리보기:</div>'+
+    show.map(k=>'<div class="pa-row"><span class="pa-d">'+fmtDateK(k).replace(/^\d+년 /,'')+'</span>'+(r.out[k].map(it=>'<span class="plan-type t-'+it.type+'">'+PLAN_TYPES[it.type]+'</span>'+esc(planLabel(it))).join(' &nbsp; ')||'<span class="count">—</span>')+'</div>').join('')+
+    (r.days.length>show.length?'<div class="count" style="margin-top:4px">… 이후 '+(r.days.length-show.length)+'일</div>':'');
+}
+function planAutoApply(){
+  const r=planAutoBuild();if(r.err)return alert(r.err);
+  const old=Object.keys(PLAN.days).filter(k=>k>=r.start&&PLAN.days[k].some(x=>x.auto)).length;
+  if(old&&!confirm(r.start+' 이후의 기존 자동 계획을 새로 만든 계획으로 바꿀까요?\n(직접 쓴 계획은 그대로 둡니다)'))return;
+  Object.keys(PLAN.days).forEach(k=>{if(k>=r.start){PLAN.days[k]=PLAN.days[k].filter(x=>!x.auto);if(!PLAN.days[k].length)delete PLAN.days[k];}});
+  Object.keys(r.out).forEach(k=>{if(r.out[k].length)(PLAN.days[k]=PLAN.days[k]||[]).push(...r.out[k]);});
+  {const g=id=>document.getElementById(id);PLAN.autoOpt={paBuffer:g('paBuffer').value,paVRounds:g('paVRounds').value,paWN:g('paWN').value,paV:g('paV').checked,paT:g('paT').checked,paR:g('paR').checked,paW:g('paW').checked,rest:[...document.querySelectorAll('.paRest:checked')].map(x=>+x.value)};}
+  planSave();planAutoClose();renderCalendar();
+  alert(r.days.length+'일에 계획을 넣었습니다.');
+}
 function renderDayDetail(){
   const el=document.getElementById('calDetail');
   const key=calSel;
@@ -1948,7 +2216,8 @@ function renderDayDetail(){
   const rec=calendar[key]||{studiedDays:[],tests:[]};
   const studied=(rec.studiedDays||[]).slice().sort((a,b)=>a-b);
   const isToday=key===todayKey();
-  let h='<h3>'+fmtDateK(key)+(isToday?' <span class="today-badge">오늘</span>':'')+'</h3>';
+  let h='<h3>'+fmtDateK(key)+(isToday?' <span class="today-badge">오늘</span>':'')+(PLAN.exam===key?' <span class="exam-tag">GRE 시험일</span>':'')+'</h3>';
+  h+=planDayHTML(key);
   h+='<div class="count" style="margin-top:8px">학습한 일차</div><div class="chipwrap">';
   h+= studied.length? studied.map(d=>'<span class="chip on">'+d+'일차 <span onclick="event.stopPropagation();removeStudied(\''+key+'\','+d+')" style="cursor:pointer">×</span></span>').join('') : '<span class="count">기록 없음</span>';
   h+='</div>';
@@ -2294,6 +2563,7 @@ function vHead(){
 }
 function vDoneHTML(){
   const pct=vs.total?Math.round(vs.score/vs.total*100):0;
+  if(vs.total&&!vs.moodDone){vs.moodDone=true;catMood(pct);}
   let h='<h3>훈련 완료</h3>';
   {h+='<div class="statgrid"><div class="stat"><b>'+vs.score+'/'+vs.total+'</b><span class="count">정답</span></div><div class="stat"><b>'+pct+'%</b><span class="count">정답률</span></div><div class="stat"><b>'+vs.wrong.length+'</b><span class="count">틀린 항목</span></div></div>';}
   h+='<button class="primary" onclick="endVerbs()">닫기</button>';
@@ -3211,6 +3481,7 @@ function tcDoneHTML(){
   // 히스토리 저장
   const hist=tcLoadHist();hist.push({at:new Date().toISOString(),total:s.total,score:s.score,pct:pct,byType:s.byType});
   if(hist.length>200)hist.splice(0,hist.length-200);tcSaveHist(hist);
+  if(s.total)catMood(pct);
   let h='<h3>TCSE 세션 완료</h3><div class="statgrid"><div class="stat"><b>'+s.score+'/'+s.total+'</b><span class="count">점수</span></div><div class="stat"><b>'+pct+'%</b><span class="count">정답률</span></div><div class="stat"><b>'+s.wrong.length+'</b><span class="count">틀린 문제</span></div></div>';
   h+='<div class="count" style="margin-top:4px">유형별: '+['TC1','TC2','TC3','SE'].map(t=>{const b=s.byType[t];return b[0]?t+' '+b[1]+'/'+b[0]:null;}).filter(Boolean).join(' · ')+'</div>';
   h+='<div class="row" style="margin-top:12px"><button class="primary" onclick="tcRetry()">다시 풀기</button><button onclick="endTcse()">TCSE 홈으로</button></div>';
@@ -3788,6 +4059,7 @@ function rcFinish(){
   rcS.finished=true;
   // 정오 기록 저장
   rcS.pool.forEach(function(id){const q=rcById(id);if(rcIsAnswered(q))rcMarkProg(id,rcGradeOne(q));});
+  {const tot=rcS.pool.length,ok=rcS.pool.filter(function(id){const q=rcById(id);return rcIsAnswered(q)&&rcGradeOne(q);}).length;if(tot)catMood(Math.round(ok/tot*100));}
   rcSaveSession();
   rcResultsScreen();
 }
@@ -4900,6 +5172,7 @@ VIEWMAP.forEach(([id,k])=>{const el=document.getElementById(id);if(!el)return;
   el.onchange=function(){settings.view[k]=el.checked?1:0;saveSettings();render();};});
 syncViewUI();
 syncSettingsUI();
+thApply(thGet());
 {const hc=document.getElementById('optHover');if(hc){hc.checked=hdOn;hc.onchange=function(){hdOn=hc.checked;try{localStorage.setItem(HD_KEY,hdOn?'1':'0');}catch(e){}if(!hdOn)hdHide();hdSyncOptUI();};}
   document.querySelectorAll('#hdOptBox input[data-hd]').forEach(function(cb){const k=cb.getAttribute('data-hd');cb.checked=!!hdOpt[k];
     cb.onchange=function(){hdOpt[k]=cb.checked?1:0;hdSaveOpt();hdHide();hdSyncOptUI();};});
