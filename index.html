@@ -490,6 +490,7 @@ body.th-cute .card{border:2px solid #EFEFEF;border-radius:16px}
 @media(max-width:640px){body.th-cute #todayWord{display:none}body.th-cute .th-cat svg{width:48px;height:38px}body.th-cute #appHeader .wm{font-size:28px}}
 .plan-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:-4px 0 12px;padding:8px 10px;border:1px dashed var(--line);border-radius:10px}
 .plan-lab{font-weight:700;font-size:13px}
+.plan-clear{display:flex;flex-basis:100%;align-items:center;gap:6px;flex-wrap:wrap;padding-top:6px;border-top:1px dashed var(--line)}
 .plan-dday{font-weight:800;color:#e05555;font-size:15px}
 .cal-cell.exam{border-color:#e05555;box-shadow:0 0 0 1px #e05555 inset}
 .exam-tag{font-size:10px;font-weight:800;color:#fff;background:#e05555;border-radius:4px;padding:0 4px;vertical-align:1px}
@@ -505,6 +506,8 @@ body.th-cute .card{border:2px solid #EFEFEF;border-radius:16px}
 .plan-del:hover{color:var(--red)}
 .plan-type{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:1px 8px;margin-right:4px}
 .t-vocab{background:#eaf7ec;color:#2f8c35}.t-tcse{background:#e6f5fe;color:#1189cf}.t-rc{background:#f3ecfe;color:#8550cc}.t-writing{background:#fff3e3;color:#c46a00}.t-memo{background:#f1f2f4;color:#555}
+.plan-prog{font-size:11px;color:var(--sub)}
+.plan-ok{font-size:10.5px;font-weight:700;color:#2f8c35;background:#eaf7ec;border-radius:4px;padding:0 5px}
 .plan-auto{font-size:10px;color:var(--sub);border:1px solid var(--line);border-radius:4px;padding:0 4px}
 .plan-add{margin-top:8px;flex-wrap:wrap;gap:6px}
 .pa-grid{display:grid;grid-template-columns:80px 1fr;gap:10px 10px;align-items:center;font-size:13px}
@@ -2096,26 +2099,50 @@ function planLabel(it){
 }
 function planCellBrief(key){
   const arr=PLAN.days[key];if(!arr||!arr.length)return '';
+  const st=planStatus(key);
   const short=it=>it.type==='vocab'?'단어 '+(it.round?it.round+'회 ':'')+(it.from===it.to?it.from:it.from+'–'+it.to):it.type==='memo'?(it.text||''):PLAN_TYPES[it.type]+' '+it.n;
-  return arr.slice(0,3).map(it=>'<div class="plan-line t-'+it.type+(it.done?' done':'')+'">'+esc(short(it))+'</div>').join('')+(arr.length>3?'<div class="count" style="font-size:10px">외 '+(arr.length-3)+'</div>':'');
+  return arr.slice(0,3).map(it=>'<div class="plan-line t-'+it.type+(planIsDone(it,st)?' done':'')+'">'+esc(short(it))+'</div>').join('')+(arr.length>3?'<div class="count" style="font-size:10px">외 '+(arr.length-3)+'</div>':'');
 }
 function renderPlanBar(){
   const el=document.getElementById('planBar');if(!el)return;
   const dd=planDdayText();
   el.innerHTML='<span class="plan-lab">GRE 시험일</span><input type="date" id="planExam" value="'+(PLAN.exam||'')+'" onchange="planSetExam(this.value)">'+
     (dd?'<span class="plan-dday">'+dd+'</span>':'<span class="count">날짜를 넣으면 D-day가 표시됩니다</span>')+
-    '<button class="small" style="margin-left:auto" onclick="planAutoOpen()">📋 자동 계획 만들기</button>';
+    '<button class="small" style="margin-left:auto" onclick="planAutoOpen()">📋 자동 계획 만들기</button>'+
+    '<button class="small danger" onclick="planClearToggle()">계획 삭제</button>'+
+    '<div id="planClearBox" class="plan-clear hide"><span class="count">어떤 계획을 지울까요? (시험일은 그대로)</span>'+
+      '<button class="small" onclick="planClear(\'auto\')">자동 계획만</button>'+
+      '<button class="small" onclick="planClear(\'future\')">오늘부터 전부</button>'+
+      '<button class="small danger" onclick="planClear(\'all\')">전체 삭제</button>'+
+      '<button class="small" onclick="planClearToggle()">취소</button></div>';
+}
+function planClearToggle(){const b=document.getElementById('planClearBox');if(b)b.classList.toggle('hide');}
+function planClear(mode){
+  const tk=todayKey();let n=0;
+  const keep=it=>mode==='auto'?!it.auto:false;
+  Object.keys(PLAN.days).forEach(k=>{
+    if(mode==='future'&&k<tk)return;
+    const before=PLAN.days[k].length;const after=PLAN.days[k].filter(keep);n+=before-after.length;
+    if(after.length)PLAN.days[k]=after;else delete PLAN.days[k];
+  });
+  if(!n){alert('지울 계획이 없습니다.');return;}
+  PLAN.days=PLAN.days;
+  const label={auto:'자동 계획',future:'오늘부터의 계획',all:'모든 계획'}[mode];
+  if(!confirm(label+' '+n+'개를 삭제할까요? (되돌릴 수 없음)')){PLAN=planLoad();return;}
+  planSave();renderCalendar();
 }
 function planSetExam(v){PLAN.exam=v||'';planSave();if(v){const d=keyToDate(v);calY=d.getFullYear();calM=d.getMonth();}renderCalendar();}
 function planDayHTML(key){
-  const arr=PLAN.days[key]||[];
+  const arr=PLAN.days[key]||[];const st=planStatus(key);
   let h='<div class="plan-box"><div class="row" style="justify-content:space-between;align-items:baseline"><b>계획</b>'+
-    (arr.length?'<span class="count">'+arr.filter(x=>x.done).length+'/'+arr.length+' 완료</span>':'')+'</div>';
-  h+=arr.length?'<div class="plan-list">'+arr.map(it=>'<label class="plan-item'+(it.done?' done':'')+'"><input type="checkbox" '+(it.done?'checked':'')+' onchange="planToggle(\''+key+'\',\''+it.id+'\')">'+
+    (arr.length?'<span class="count">'+arr.filter(x=>planIsDone(x,st)).length+'/'+arr.length+' 완료</span>':'')+'</div>';
+  h+=arr.length?'<div class="plan-list">'+arr.map(it=>{const s0=st[it.id]||{};const auto=s0.auto&&!it.done;return '<label class="plan-item'+(planIsDone(it,st)?' done':'')+'"><input type="checkbox" '+(planIsDone(it,st)?'checked':'')+(auto?' disabled title="앱 기록으로 자동 완료됨"':'')+' onchange="planToggle(\''+key+'\',\''+it.id+'\')">'+
       (it.type!=='memo'?'<span class="plan-type t-'+it.type+'">'+PLAN_TYPES[it.type]+'</span>':'')+
       '<span class="plan-txt">'+esc(planLabel(it))+(it.note?' <span class="count">· '+esc(it.note)+'</span>':'')+'</span>'+
+      (s0.prog&&!planIsDone(it,st)?'<span class="plan-prog">'+esc(s0.prog)+'</span>':'')+
+      (auto?'<span class="plan-ok">자동 완료</span>':'')+
       (it.auto?'<span class="plan-auto" title="자동 계획으로 만든 항목">자동</span>':'')+
-      '<button class="small plan-del" onclick="event.preventDefault();planDel(\''+key+'\',\''+it.id+'\')" title="삭제">×</button></label>').join('')+'</div>'
+      '<button class="small plan-del" onclick="event.preventDefault();planDel(\''+key+'\',\''+it.id+'\')" title="삭제">×</button></label>';}).join('')+'</div>'
     :'<p class="count" style="margin:6px 0">이 날 계획이 없습니다.</p>';
   h+='<div class="row plan-add"><select id="planType" onchange="planTypeUI()">'+Object.keys(PLAN_TYPES).map(k=>'<option value="'+k+'">'+PLAN_TYPES[k]+'</option>').join('')+'</select>'+
      '<span id="planFields"></span><button class="small primary" onclick="planAdd(\''+key+'\')">추가</button></div></div>';
@@ -2139,6 +2166,30 @@ function planAdd(key){
 function planToggle(key,id){const it=(PLAN.days[key]||[]).find(x=>x.id===id);if(!it)return;it.done=!it.done;planSave();renderCalendar();}
 function planDel(key,id){PLAN.days[key]=(PLAN.days[key]||[]).filter(x=>x.id!==id);if(!PLAN.days[key].length)delete PLAN.days[key];planSave();renderCalendar();}
 
+function paOrderUI(){
+  const o=(document.getElementById('paVOrder')||{}).value;const box=document.getElementById('paMixBox');if(!box)return;
+  box.classList.toggle('hide',o!=='mix');
+  const f=+((document.getElementById('paVFront')||{}).value)||0;const bk=document.getElementById('paVBack');if(bk)bk.textContent=Math.max(0,100-f);
+}
+/* ---- 활동 기록 (계획 자동 체크용) ---- */
+const ACT_KEY='voca_activity';
+function actLoad(){try{return JSON.parse(localStorage.getItem(ACT_KEY))||{}}catch(e){return{}}}
+function actBump(type,n){if(!n)return;const a=actLoad();const k=todayKey();a[k]=a[k]||{};a[k][type]=(a[k][type]||0)+n;try{localStorage.setItem(ACT_KEY,JSON.stringify(a));}catch(e){}}
+function planGreCal(key){try{const c=JSON.parse(localStorage.getItem('voca_calendar_GRE'))||{};return c[key]||{};}catch(e){return{};}}
+/* 그날 실제로 한 것과 계획을 비교: 항목별 {auto:true/false, prog:'5/8'} */
+function planStatus(key){
+  const arr=PLAN.days[key]||[];const act=actLoad()[key]||{};const gc=planGreCal(key);
+  const studied=new Set([].concat(gc.studiedDays||[],(gc.tests||[]).map(t=>+t.greDay)).map(Number));
+  const left={tcse:act.tcse||0,rc:act.rc||0,writing:act.writing||0};
+  const st={};
+  arr.forEach(it=>{
+    if(it.type==='vocab'){let ok=true,c=0;for(let d=it.from;d<=it.to;d++){if(studied.has(d))c++;else ok=false;}st[it.id]={auto:ok,prog:c+'/'+(it.to-it.from+1)+'일차'};}
+    else if(left[it.type]!=null){const got=Math.min(it.n,left[it.type]);left[it.type]-=got;st[it.id]={auto:got>=it.n,prog:got+'/'+it.n};}
+    else st[it.id]={auto:false};
+  });
+  return st;
+}
+function planIsDone(it,st){return !!(it.done||(st[it.id]&&st[it.id].auto));}
 /* ---- 자동 분배 ---- */
 function planGreMaxDay(){const w=tcGreWords();return w.length?Math.max.apply(null,w.map(x=>+x.day||0)):0;}
 function planTcseLeft(){try{return TCSE.filter(q=>!(tcProg[q.id]&&tcProg[q.id].attempts)).length;}catch(e){return 0;}}
@@ -2154,16 +2205,20 @@ function planAutoOpen(){
    '<div class="pa-grid">'+
    '<div class="pa-lab">기간</div><div><input type="date" id="paStart" value="'+todayKey()+'"> ~ 시험일 전날 · 마지막 <input type="number" id="paBuffer" value="2" min="0" style="width:52px">일은 복습용으로 비우기</div>'+
    '<div class="pa-lab">쉬는 요일</div><div>'+['일','월','화','수','목','금','토'].map((d,i)=>'<label class="tog"><input type="checkbox" class="paRest" value="'+i+'">'+d+'</label>').join(' ')+'</div>'+
-   '<div class="pa-lab">단어</div><div><label class="tog"><input type="checkbox" id="paV" checked>포함</label> <input type="number" id="paVFrom" value="1" min="1" style="width:58px">~<input type="number" id="paVTo" value="'+(md||1)+'" min="1" style="width:58px">일차 · <input type="number" id="paVRounds" value="1" min="1" max="5" style="width:48px">회독 <span class="count">(GRE 단어장 '+md+'일차까지)</span></div>'+
+   '<div class="pa-lab">단어</div><div><label class="tog"><input type="checkbox" id="paV" checked>포함</label> <input type="number" id="paVFrom" value="1" min="1" style="width:58px">~<input type="number" id="paVTo" value="'+(md||1)+'" min="1" style="width:58px">일차 · <input type="number" id="paVRounds" value="1" min="1" max="5" style="width:48px">회독 <span class="count">(GRE 단어장 '+md+'일차까지)</span>'+
+     '<div style="margin-top:6px">순서 <select id="paVOrder" onchange="paOrderUI()"><option value="front">앞에서부터</option><option value="back">뒤에서부터</option><option value="mix">앞뒤 섞기</option></select>'+
+     ' <span id="paMixBox" class="hide">앞 <input type="number" id="paVFront" value="50" min="0" max="100" step="5" style="width:56px">% · 뒤 <span id="paVBack">50</span>%</span></div></div>'+
    '<div class="pa-lab">TCSE</div><div><label class="tog"><input type="checkbox" id="paT" checked>포함</label> <input type="number" id="paTN" value="'+planTcseLeft()+'" min="0" style="width:70px">문제 <span class="count">(안 푼 문제 '+planTcseLeft()+')</span></div>'+
    '<div class="pa-lab">RC</div><div><label class="tog"><input type="checkbox" id="paR" checked>포함</label> <input type="number" id="paRN" value="'+planRcLeft()+'" min="0" style="width:70px">문제 <span class="count">(안 푼 문제 '+planRcLeft()+')</span></div>'+
    '<div class="pa-lab">Writing</div><div><label class="tog"><input type="checkbox" id="paW" checked>포함</label> 주 <input type="number" id="paWN" value="2" min="0" max="7" style="width:48px">편</div>'+
    '</div><div class="row" style="margin-top:12px"><button onclick="planAutoPreview()">미리보기</button><button class="primary" onclick="planAutoApply()">계획에 적용</button></div><div id="paPreview"></div>';
   const o=PLAN.autoOpt;
   if(o){const g=id=>document.getElementById(id);
-    ['paBuffer','paVRounds','paWN'].forEach(id=>{if(o[id]!=null)g(id).value=o[id];});
+    ['paBuffer','paVRounds','paWN','paVOrder','paVFront'].forEach(id=>{if(o[id]!=null)g(id).value=o[id];});
     ['paV','paT','paR','paW'].forEach(id=>{if(o[id]!=null)g(id).checked=o[id];});
     document.querySelectorAll('.paRest').forEach(c=>{c.checked=(o.rest||[]).indexOf(+c.value)>=0;});}
+  paOrderUI();
+  {const f=document.getElementById('paVFront');if(f)f.oninput=paOrderUI;}
   box.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function planAutoClose(){const b=document.getElementById('planAuto');b.classList.add('hide');b.innerHTML='';}
@@ -2178,10 +2233,28 @@ function planAutoBuild(){
   const out={};days.forEach(k=>out[k]=[]);const n=days.length;
   if(g('paV').checked){
     let a=num('paVFrom'),b=num('paVTo'),R=Math.max(1,num('paVRounds'));if(b<a){const x=a;a=b;b=x;}
-    const units=[];for(let r=1;r<=R;r++)for(let d=a;d<=b;d++)units.push([r,d]);
-    if(units.length){const per=planSplit(units.length,n);let p=0;
-      days.forEach((k,i)=>{const seg=units.slice(p,p+per[i]);p+=per[i];
-        let cur=null,curR=0;seg.forEach(u=>{if(cur&&curR===u[0]&&u[1]===cur.to+1)cur.to=u[1];else{curR=u[0];cur={id:planId(),type:'vocab',round:R>1?u[0]:0,from:u[1],to:u[1],done:false,auto:true};out[k].push(cur);}});});}
+    const order=g('paVOrder').value, fp=Math.min(100,Math.max(0,num('paVFront')));
+    const len=b-a+1;
+    // 하루 분량(u)을 고정: 회독마다 하루씩 앞 f개 + 뒤 b개를 가져가며 가운데서 만남
+    const dpr=Math.max(1,Math.floor(n/R));
+    const u=Math.max(1,Math.ceil(len/dpr));
+    let f,bk;
+    if(order==='front'){f=u;bk=0;}else if(order==='back'){f=0;bk=u;}
+    else{f=Math.round(u*fp/100);if(fp>0&&f<1)f=1;if(fp<100&&u>1&&f>=u)f=u-1;bk=u-f;}
+    let di=0,acc=100-fp;
+    for(let r=1;r<=R;r++){
+      const rr=R>1?r:0;let lo=a,hi=b;
+      if(n<R)di=Math.floor((r-1)*n/R);
+      while(lo<=hi&&di<n){
+        const k=days[di];const rem=hi-lo+1;
+        let tf=Math.min(f,rem),tb=Math.min(bk,rem-tf);
+        if(order==='mix'&&u===1){acc+=fp;if(acc>=100){acc-=100;tf=1;tb=0;}else{tf=0;tb=1;}}
+        if(tf+tb<Math.min(u,rem)){const extra=Math.min(u,rem)-tf-tb;if(f>0)tf+=extra;else tb+=extra;}
+        if(tf>0){out[k].push({id:planId(),type:'vocab',round:rr,from:lo,to:lo+tf-1,done:false,auto:true});lo+=tf;}
+        if(tb>0){out[k].push({id:planId(),type:'vocab',round:rr,from:hi-tb+1,to:hi,done:false,auto:true});hi-=tb;}
+        di++;
+      }
+    }
   }
   [['paT','paTN','tcse'],['paR','paRN','rc']].forEach(([c,f,t])=>{if(!g(c).checked)return;const tot=num(f);if(!tot)return;
     planSplit(tot,n).forEach((q,i)=>{if(q>0)out[days[i]].push({id:planId(),type:t,n:q,done:false,auto:true});});});
@@ -2205,7 +2278,7 @@ function planAutoApply(){
   if(old&&!confirm(r.start+' 이후의 기존 자동 계획을 새로 만든 계획으로 바꿀까요?\n(직접 쓴 계획은 그대로 둡니다)'))return;
   Object.keys(PLAN.days).forEach(k=>{if(k>=r.start){PLAN.days[k]=PLAN.days[k].filter(x=>!x.auto);if(!PLAN.days[k].length)delete PLAN.days[k];}});
   Object.keys(r.out).forEach(k=>{if(r.out[k].length)(PLAN.days[k]=PLAN.days[k]||[]).push(...r.out[k]);});
-  {const g=id=>document.getElementById(id);PLAN.autoOpt={paBuffer:g('paBuffer').value,paVRounds:g('paVRounds').value,paWN:g('paWN').value,paV:g('paV').checked,paT:g('paT').checked,paR:g('paR').checked,paW:g('paW').checked,rest:[...document.querySelectorAll('.paRest:checked')].map(x=>+x.value)};}
+  {const g=id=>document.getElementById(id);PLAN.autoOpt={paVOrder:g('paVOrder').value,paVFront:g('paVFront').value,paBuffer:g('paBuffer').value,paVRounds:g('paVRounds').value,paWN:g('paWN').value,paV:g('paV').checked,paT:g('paT').checked,paR:g('paR').checked,paW:g('paW').checked,rest:[...document.querySelectorAll('.paRest:checked')].map(x=>+x.value)};}
   planSave();planAutoClose();renderCalendar();
   alert(r.days.length+'일에 계획을 넣었습니다.');
 }
@@ -3397,6 +3470,7 @@ function tcGrade(q,selected,viaDunno){
   tcSaveProg();
   // 세션 집계
   s.total++;if(correct)s.score++;else s.wrong.push(q);
+  actBump('tcse',1);
   s.picks=s.picks||{};s.picks[q.id]={sel:selected.slice(),dunno:!!viaDunno};
   if(s.byType[q.type]){s.byType[q.type][0]++;if(correct)s.byType[q.type][1]++;}
   // GRE 단어 통계
@@ -4059,6 +4133,7 @@ function rcFinish(){
   rcS.finished=true;
   // 정오 기록 저장
   rcS.pool.forEach(function(id){const q=rcById(id);if(rcIsAnswered(q))rcMarkProg(id,rcGradeOne(q));});
+  actBump('rc',rcS.pool.filter(function(id){return rcIsAnswered(rcById(id));}).length);
   {const tot=rcS.pool.length,ok=rcS.pool.filter(function(id){const q=rcById(id);return rcIsAnswered(q)&&rcGradeOne(q);}).length;if(tot)catMood(Math.round(ok/tot*100));}
   rcSaveSession();
   rcResultsScreen();
@@ -4789,6 +4864,7 @@ function wrSubmit(){
   if(a.wordCount<10&&!confirm('에세이가 너무 짧습니다 ('+a.wordCount+' words). 그래도 완료할까요?'))return;
   a.submittedAt=new Date().toISOString();
   a.elapsedSec=Math.floor((Date.now()-writingSession.startTs)/1000)+writingSession.baseElapsed;
+  if(!a.parentAttemptId)actBump('writing',1);
   a.status='submitted';
   wrFlushSave();
   clearWrTimer();
