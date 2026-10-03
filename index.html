@@ -2,6 +2,258 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+<script>
+/* ================= 계정 · 클라우드 동기화 (Supabase) =================
+   - 앱은 지금처럼 localStorage를 쓰고, 'voca'로 시작하는 키가 바뀌면 서버(user_kv 테이블)에 올린다.
+   - 로그인 시 서버 기록을 내려받아 localStorage에 넣고 새로고침한다.
+   - 라이브러리 없이 Supabase REST(Auth/PostgREST)를 직접 호출한다. */
+(function(){
+  var SB_URL='https://cwevuqyzntnhzwefcvfl.supabase.co';
+  var SB_KEY='sb_publishable_ESB4E3nId0iOwheau8H1ng_WuS1WIXs';
+  var ID_DOMAIN='voca.study';
+  var SESS_KEY='__sync_session', META_KEY='__sync_meta', SKIP_KEY='__sync_skip', RELOAD_KEY='__sync_reloaded';
+  var NO_SYNC=/^voca_(hover_cache|last_seen)/;
+  var rawSet=Storage.prototype.setItem, rawRemove=Storage.prototype.removeItem, rawGet=Storage.prototype.getItem;
+  function lsGet(k){try{return rawGet.call(localStorage,k);}catch(e){return null;}}
+  function lsSet(k,v){try{rawSet.call(localStorage,k,v);}catch(e){}}
+  function lsDel(k){try{rawRemove.call(localStorage,k);}catch(e){}}
+  function syncable(k){return typeof k==='string'&&k.indexOf('voca')===0&&!NO_SYNC.test(k);}
+  function jget(k,d){try{return JSON.parse(lsGet(k))||d;}catch(e){return d;}}
+  var S={session:jget(SESS_KEY,null),meta:jget(META_KEY,{}),dirty:{},timer:null,pushing:false,status:'',lastSync:0,lastPull:0};
+  window.VSync=S;
+  function saveMeta(){lsSet(META_KEY,JSON.stringify(S.meta));}
+  function saveSess(){if(S.session)lsSet(SESS_KEY,JSON.stringify(S.session));else lsDel(SESS_KEY);}
+
+  /* localStorage 쓰기를 가로채서 바뀐 키 표시 */
+  Storage.prototype.setItem=function(k,v){
+    rawSet.call(this,k,v);
+    if(this===localStorage&&syncable(k)&&S.session){S.dirty[k]=1;schedule();}
+  };
+  Storage.prototype.removeItem=function(k){
+    rawRemove.call(this,k);
+    if(this===localStorage&&syncable(k)&&S.session){S.dirty[k]=1;schedule();}
+  };
+
+  /* ---------- REST ---------- */
+  function hdr(auth,extra){var h={'apikey':SB_KEY,'Content-Type':'application/json'};if(auth&&S.session)h['Authorization']='Bearer '+S.session.access_token;for(var x in (extra||{}))h[x]=extra[x];return h;}
+  function authErr(j,status){
+    var m=(j&&(j.error_description||j.msg||j.message||j.error))||('HTTP '+status);var code=(j&&(j.error_code||j.code))||'';
+    if(/invalid.*(credential|grant)|invalid_credentials/i.test(m+code))return '아이디 또는 비밀번호가 맞지 않습니다.';
+    if(/already.*registered|user_already_exists|exists/i.test(m+code))return '이미 있는 아이디입니다.';
+    if(/password.*(6|short|weak)|weak_password/i.test(m+code))return '비밀번호는 6자 이상으로 해주세요.';
+    if(/not.*confirmed|email_not_confirmed/i.test(m+code))return '이메일 인증이 꺼져 있지 않습니다. (관리자: Supabase에서 Confirm email 끄기)';
+    if(/signups? not allowed|signup_disabled/i.test(m+code))return '지금은 회원가입이 막혀 있습니다.';
+    return m;
+  }
+  function setSession(j){
+    if(!j||!j.access_token)return false;
+    S.session={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||(Math.floor(Date.now()/1000)+(j.expires_in||3600)),user:{id:j.user&&j.user.id,email:j.user&&j.user.email}};
+    saveSess();return true;
+  }
+  function authPost(path,body){
+    return fetch(SB_URL+'/auth/v1/'+path,{method:'POST',headers:hdr(false),body:JSON.stringify(body)})
+      .then(function(r){return r.json().catch(function(){return {};}).then(function(j){if(!r.ok)throw new Error(authErr(j,r.status));return j;});});
+  }
+  function ensureFresh(){
+    if(!S.session)return Promise.reject(new Error('로그인이 필요합니다.'));
+    if(S.session.expires_at-60>Date.now()/1000)return Promise.resolve();
+    return authPost('token?grant_type=refresh_token',{refresh_token:S.session.refresh_token}).then(function(j){setSession(j);})
+      .catch(function(e){if(/HTTP 4|invalid|refresh/i.test(e.message)){S.session=null;saveSess();showLogin('다시 로그인해주세요.');}throw e;});
+  }
+  function rest(method,query,body,extra,keepalive){
+    return ensureFresh().then(function(){
+      return fetch(SB_URL+'/rest/v1/user_kv'+(query||''),{method:method,headers:hdr(true,extra),body:body?JSON.stringify(body):undefined,keepalive:!!keepalive});
+    }).then(function(r){if(r.status===401){S.session.expires_at=0;}if(!r.ok)return r.text().then(function(t){throw new Error('서버 오류 '+r.status+(t?': '+t.slice(0,120):''));});return r.status===204?[]:r.json().catch(function(){return [];});});
+  }
+
+  /* ---------- 올리기 ---------- */
+  function schedule(){clearTimeout(S.timer);S.timer=setTimeout(push,1500);setStatus('저장 대기');}
+  function push(){
+    if(!S.session||S.pushing)return Promise.resolve();
+    var keys=Object.keys(S.dirty);if(!keys.length)return Promise.resolve();
+    S.pushing=true;S.dirty={};
+    var ups=[],dels=[];
+    keys.forEach(function(k){var v=lsGet(k);if(v===null)dels.push(k);else ups.push({user_id:S.session.user.id,key:k,value:v});});
+    var jobs=[];
+    if(ups.length)jobs.push(rest('POST','?on_conflict=user_id,key',ups,{'Prefer':'resolution=merge-duplicates,return=representation'}).then(function(rows){(rows||[]).forEach(function(r){S.meta[r.key]=r.updated_at;});}));
+    if(dels.length)jobs.push(rest('DELETE','?key=in.('+dels.map(function(k){return '"'+k.replace(/"/g,'')+'"';}).join(',')+')').then(function(){dels.forEach(function(k){delete S.meta[k];});}));
+    setStatus('저장 중…');
+    return Promise.all(jobs).then(function(){saveMeta();S.lastSync=Date.now();setStatus('저장됨');})
+      .catch(function(e){keys.forEach(function(k){S.dirty[k]=1;});setStatus('저장 실패 (다시 시도함)');console.warn('[sync]',e);clearTimeout(S.timer);S.timer=setTimeout(push,15000);})
+      .then(function(){S.pushing=false;if(Object.keys(S.dirty).length)schedule();});
+  }
+  function pushAllLocal(){
+    var n=0;for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(syncable(k)){S.dirty[k]=1;n++;}}
+    return push().then(function(){return n;});
+  }
+  /* 창을 닫거나 숨길 때 남은 변경을 최대한 보냄 */
+  document.addEventListener('visibilitychange',function(){
+    if(document.visibilityState==='hidden'&&S.session&&Object.keys(S.dirty).length){
+      var ups=Object.keys(S.dirty).map(function(k){return {user_id:S.session.user.id,key:k,value:lsGet(k)};}).filter(function(x){return x.value!==null;});
+      var body=JSON.stringify(ups);
+      if(body.length<60000&&S.session.expires_at-30>Date.now()/1000){
+        try{fetch(SB_URL+'/rest/v1/user_kv?on_conflict=user_id,key',{method:'POST',keepalive:true,headers:hdr(true,{'Prefer':'resolution=merge-duplicates'}),body:body});S.dirty={};}catch(e){}
+      }else push();
+    }
+    if(document.visibilityState==='visible'&&S.session&&Date.now()-S.lastPull>60000)checkRemote();
+  });
+
+  /* ---------- 내려받기 ---------- */
+  function localKeys(){var a=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(syncable(k))a.push(k);}return a;}
+  function fetchAll(){return rest('GET','?select=key,value,updated_at');}
+  function applyRows(rows,replaceAll){
+    var changed=0,seen={};
+    rows.forEach(function(r){seen[r.key]=1;if(lsGet(r.key)!==r.value){lsSet(r.key,r.value);changed++;}S.meta[r.key]=r.updated_at;});
+    localKeys().forEach(function(k){
+      if(seen[k])return;
+      if(replaceAll||S.meta[k]){lsDel(k);delete S.meta[k];changed++;}   /* 다른 기기에서 지워진 키 */
+    });
+    saveMeta();return changed;
+  }
+  function busyNow(){try{return !!((typeof quiz!=='undefined'&&quiz)||(typeof tcseSession!=='undefined'&&tcseSession)||(typeof writingSession!=='undefined'&&writingSession)||(typeof rcS!=='undefined'&&rcS&&!rcS.finished));}catch(e){return false;}}
+  function reloadOnce(){if(sessionStorage.getItem(RELOAD_KEY)&&Date.now()-(+sessionStorage.getItem(RELOAD_KEY))<8000)return;sessionStorage.setItem(RELOAD_KEY,String(Date.now()));location.reload();}
+  /* 이미 동기화하던 기기: 서버가 더 새 것만 반영 */
+  function checkRemote(){
+    S.lastPull=Date.now();
+    return fetchAll().then(function(rows){
+      var newer=rows.filter(function(r){return S.meta[r.key]!==r.updated_at&&!S.dirty[r.key];});
+      var gone=localKeys().filter(function(k){return S.meta[k]&&!rows.some(function(r){return r.key===k;});});
+      var localOnly=localKeys().filter(function(k){return !S.meta[k]&&!rows.some(function(r){return r.key===k;});});
+      localOnly.forEach(function(k){S.dirty[k]=1;});if(localOnly.length)schedule();
+      if(!newer.length&&!gone.length){S.lastSync=Date.now();setStatus('최신 상태');return;}
+      if(busyNow()){showBanner();return;}
+      newer.forEach(function(r){lsSet(r.key,r.value);S.meta[r.key]=r.updated_at;});
+      gone.forEach(function(k){lsDel(k);delete S.meta[k];});
+      saveMeta();reloadOnce();
+    }).catch(function(e){setStatus('동기화 실패');console.warn('[sync]',e);});
+  }
+  /* 로그인 직후: 이 기기 기록과 계정 기록 합치기 */
+  function firstSync(){
+    setStatus('불러오는 중…');
+    return fetchAll().then(function(rows){
+      var local=localKeys();
+      if(!rows.length){
+        if(!local.length){S.lastSync=Date.now();setStatus('저장됨');return;}
+        if(confirm('새 계정입니다.\n이 기기에 있던 학습 기록('+local.length+'개 항목)을 이 계정으로 옮길까요?\n\n확인: 옮기기 (추천)\n취소: 빈 계정으로 새로 시작 (이 기기 기록은 백업 파일로 내려받고 지움)'))
+          return pushAllLocal().then(function(n){alert('기록 '+n+'개 항목을 계정에 저장했습니다.');});
+        downloadLocalBackup();local.forEach(lsDel);S.meta={};saveMeta();reloadOnce();return;
+      }
+      if(local.length&&!Object.keys(S.meta).length){
+        if(confirm('이 계정에 저장된 기록을 불러옵니다.\n이 기기에 있던 기록은 계정 기록으로 바뀝니다.\n\n바뀌기 전에 이 기기 기록을 백업 파일로 내려받을까요?'))downloadLocalBackup();
+      }
+      applyRows(rows,true);S.lastSync=Date.now();
+      reloadOnce();
+    });
+  }
+  function downloadLocalBackup(){
+    var store={};localKeys().forEach(function(k){store[k]=lsGet(k);});
+    var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({app:'voca',type:'full-backup',ver:1,savedAt:new Date().toISOString(),store:store})],{type:'application/json'}));
+    a.download='voca_backup_before_login.json';document.body.appendChild(a);a.click();a.remove();
+  }
+
+  /* ---------- 로그인 화면 ---------- */
+  function idToEmail(id){id=String(id||'').trim().toLowerCase();return id.indexOf('@')>=0?id:id+'@'+ID_DOMAIN;}
+  function emailToId(e){e=String(e||'');return e.slice(-ID_DOMAIN.length-1)==='@'+ID_DOMAIN?e.slice(0,-ID_DOMAIN.length-1):e;}
+  function el(html){var d=document.createElement('div');d.innerHTML=html;return d.firstElementChild;}
+  var mode='login';
+  function showLogin(msg){
+    var o=document.getElementById('syncLogin');
+    if(!o){
+      o=el('<div id="syncLogin" class="sync-ov"><form class="sync-box" onsubmit="return false">'+
+        '<div class="sync-title">VOCA</div><div class="sync-sub">로그인하면 어느 기기에서든 같은 기록으로 이어집니다.</div>'+
+        '<div class="sync-tabs"><button type="button" data-m="login">로그인</button><button type="button" data-m="signup">회원가입</button></div>'+
+        '<label class="sync-lab">아이디<input id="syncId" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="영문·숫자 3자 이상"></label>'+
+        '<label class="sync-lab">비밀번호<input id="syncPw" type="password" autocomplete="current-password" placeholder="6자 이상"></label>'+
+        '<label class="sync-lab sync-pw2">비밀번호 확인<input id="syncPw2" type="password" autocomplete="new-password"></label>'+
+        '<div id="syncMsg" class="sync-msg"></div>'+
+        '<button type="submit" id="syncGo" class="primary sync-go">로그인</button>'+
+        '<button type="button" id="syncSkip" class="sync-skip">로그인 없이 쓰기 (이 기기에만 저장)</button>'+
+        '</form></div>');
+      document.body.appendChild(o);
+      o.querySelectorAll('.sync-tabs button').forEach(function(b){b.onclick=function(){mode=b.dataset.m;paint();};});
+      o.querySelector('#syncGo').onclick=submit;
+      o.querySelector('#syncSkip').onclick=function(){sessionStorage.setItem(SKIP_KEY,'1');o.remove();renderAccount();};
+    }
+    paint();o.querySelector('#syncMsg').textContent=msg||'';
+    setTimeout(function(){var i=document.getElementById('syncId');if(i)i.focus();},50);
+  }
+  function paint(){
+    var o=document.getElementById('syncLogin');if(!o)return;
+    o.querySelectorAll('.sync-tabs button').forEach(function(b){b.classList.toggle('on',b.dataset.m===mode);});
+    o.querySelector('.sync-pw2').style.display=mode==='signup'?'':'none';
+    o.querySelector('#syncGo').textContent=mode==='signup'?'가입하고 시작':'로그인';
+    o.querySelector('#syncPw').setAttribute('autocomplete',mode==='signup'?'new-password':'current-password');
+    o.querySelector('#syncMsg').textContent='';
+  }
+  function submit(){
+    var id=document.getElementById('syncId').value.trim(),pw=document.getElementById('syncPw').value,pw2=document.getElementById('syncPw2').value;
+    var msg=document.getElementById('syncMsg'),btn=document.getElementById('syncGo');
+    if(id.indexOf('@')<0&&!/^[a-zA-Z0-9._-]{3,30}$/.test(id)){msg.textContent='아이디는 영문·숫자·점·밑줄·하이픈으로 3자 이상 써주세요.';return;}
+    if(pw.length<6){msg.textContent='비밀번호는 6자 이상으로 해주세요.';return;}
+    if(mode==='signup'&&pw!==pw2){msg.textContent='비밀번호 확인이 다릅니다.';return;}
+    btn.disabled=true;msg.textContent=mode==='signup'?'가입하는 중…':'로그인하는 중…';
+    var email=idToEmail(id);
+    var p=mode==='signup'
+      ?authPost('signup',{email:email,password:pw}).then(function(j){if(j.access_token)return j;return authPost('token?grant_type=password',{email:email,password:pw});})
+      :authPost('token?grant_type=password',{email:email,password:pw});
+    p.then(function(j){
+      if(!setSession(j))throw new Error('로그인 응답이 올바르지 않습니다.');
+      S.meta={};saveMeta();
+      var o=document.getElementById('syncLogin');if(o)o.remove();
+      return firstSync();
+    }).then(function(){renderAccount();})
+      .catch(function(e){msg.textContent=(e&&e.message==='Failed to fetch')?'서버에 연결할 수 없습니다. 인터넷 연결을 확인해주세요.':(e.message||String(e));})
+      .then(function(){btn.disabled=false;});
+  }
+  function logout(){
+    var wipe=confirm('로그아웃할까요?\n\n확인: 이 기기에 남은 기록도 지웁니다 (계정에는 그대로 있어요)\n취소: 로그아웃하지 않음');
+    if(!wipe)return;
+    var go=function(){
+      try{fetch(SB_URL+'/auth/v1/logout',{method:'POST',headers:hdr(true)});}catch(e){}
+      localKeys().forEach(lsDel);S.session=null;saveSess();S.meta={};saveMeta();S.dirty={};
+      location.reload();
+    };
+    if(Object.keys(S.dirty).length)push().then(go,go);else go();
+  }
+
+  /* ---------- 상태 표시 (설정 > 계정) ---------- */
+  function setStatus(t){S.status=t;var e=document.getElementById('syncStatus');if(e)e.textContent=t+(S.lastSync&&/저장됨|최신/.test(t)?' · '+new Date(S.lastSync).toTimeString().slice(0,5):'');}
+  function renderAccount(){
+    var box=document.getElementById('syncAccount');if(!box)return;
+    if(S.session){
+      box.innerHTML='<div class="row" style="justify-content:space-between;align-items:center"><div><b>'+emailToId(S.session.user.email).replace(/[<>&]/g,'')+'</b> <span class="count" id="syncStatus"></span></div>'+
+        '<div class="row" style="gap:6px"><button class="small" id="syncNow">지금 동기화</button><button class="small danger" id="syncOut">로그아웃</button></div></div>'+
+        '<p class="study-tip" style="margin-top:6px">기록은 자동으로 계정에 저장되고, 다른 기기에서 로그인하면 이어서 쓸 수 있어요.</p>';
+      box.querySelector('#syncNow').onclick=function(){push().then(checkRemote);};
+      box.querySelector('#syncOut').onclick=logout;
+      setStatus(S.status||'저장됨');
+    }else{
+      box.innerHTML='<div class="row" style="justify-content:space-between;align-items:center"><span class="count">로그인하지 않음 · 이 기기에만 저장 중</span><button class="small primary" id="syncIn">로그인</button></div>';
+      box.querySelector('#syncIn').onclick=function(){if(typeof toggleSettings==='function')toggleSettings(false);showLogin();};
+    }
+  }
+  function showBanner(){
+    if(document.getElementById('syncBanner'))return;
+    var b=el('<div id="syncBanner" class="sync-banner">다른 기기에서 바뀐 기록이 있어요 <button class="small">지금 반영</button><button class="small">나중에</button></div>');
+    b.querySelectorAll('button')[0].onclick=function(){b.remove();S.meta={};fetchAll().then(function(rows){applyRows(rows,false);reloadOnce();});};
+    b.querySelectorAll('button')[1].onclick=function(){b.remove();};
+    document.body.appendChild(b);
+  }
+  window.VSyncUI={renderAccount:renderAccount,showLogin:showLogin,push:push,check:checkRemote};
+
+  document.addEventListener('DOMContentLoaded',function(){
+    renderAccount();
+    if(S.session){
+      var justReloaded=sessionStorage.getItem(RELOAD_KEY)&&Date.now()-(+sessionStorage.getItem(RELOAD_KEY))<8000;
+      if(Object.keys(S.meta).length){ if(!justReloaded)checkRemote(); else {S.lastSync=Date.now();setStatus('최신 상태');} }
+      else firstSync().then(renderAccount).catch(function(e){setStatus('동기화 실패');console.warn('[sync]',e);});
+    }else if(!sessionStorage.getItem(SKIP_KEY)){
+      showLogin();
+    }
+  });
+})();
+
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VOCA</title>
 <style>
@@ -521,6 +773,21 @@ body.th-cute .card{border:2px solid #EFEFEF;border-radius:16px}
 .pa-row{font-size:13px;padding:5px 0;border-bottom:1px solid var(--line)}
 .pa-d{display:inline-block;width:110px;color:var(--sub)}
 @media(max-width:640px){.pa-grid{grid-template-columns:1fr}.pa-d{display:block;width:auto}}
+/* ===== 로그인 · 동기화 ===== */
+.sync-ov{position:fixed;inset:0;z-index:500;background:rgba(246,247,251,.96);display:flex;align-items:center;justify-content:center;padding:16px}
+.sync-box{width:100%;max-width:360px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px 22px;box-shadow:0 10px 30px rgba(20,30,60,.08)}
+.sync-title{font-size:26px;font-weight:900;letter-spacing:-.5px}
+body.th-cute .sync-title{font-family:"Nunito","Jua",sans-serif;color:#4CC552;text-transform:lowercase}
+.sync-sub{font-size:13px;color:var(--sub);margin:4px 0 16px}
+.sync-tabs{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:14px}
+.sync-tabs button{flex:1;border:none;border-radius:0;background:#fff;padding:9px 0;font-weight:700;color:var(--sub)}
+.sync-tabs button.on{background:var(--acc);color:#fff}
+.sync-lab{display:block;font-size:13px;font-weight:700;margin-bottom:10px}
+.sync-lab input{display:block;width:100%;margin-top:4px;padding:10px 12px;font-size:15px;border:1px solid var(--line);border-radius:10px}
+.sync-msg{min-height:18px;font-size:13px;color:var(--red);margin:2px 0 8px}
+.sync-go{width:100%;padding:11px 0;font-size:15px;font-weight:700}
+.sync-skip{width:100%;margin-top:8px;border:none;background:none;color:var(--sub);font-size:12.5px;text-decoration:underline}
+.sync-banner{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:400;background:#1f2328;color:#fff;border-radius:12px;padding:10px 14px;font-size:13px;display:flex;gap:8px;align-items:center;box-shadow:0 6px 18px rgba(0,0,0,.25)}
 </style>
 </head>
 <body>
@@ -671,6 +938,10 @@ body.th-cute .card{border:2px solid #EFEFEF;border-radius:16px}
       <h3 style="margin:0">설정</h3>
       <button class="small" onclick="toggleSettings(false)">✕ 닫기</button>
     </div>
+    <details class="set-sec" open>
+      <summary>☁️ 계정</summary>
+      <div class="set-body" id="syncAccount"></div>
+    </details>
     <details class="set-sec" open>
       <summary>🎨 테마</summary>
       <div class="set-body">
