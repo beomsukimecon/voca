@@ -458,9 +458,13 @@ details.wr-guide>summary,details.wr-help>summary{font-weight:700;cursor:pointer;
 /* ===== 테마: 기본에서는 숨김 ===== */
 .th-only,.ti{display:none}
 .brand{display:flex;align-items:center;gap:10px;min-width:0}
-/* ===== 테마: 말랑 ===== */
+/* ===== 테마: 고영희 ===== */
 body.th-cute{--acc:#4CC552;--accD:#38A23E;--bg:#fff}
 body.th-cute .th-only{display:inline-flex}
+body.th-cute .res-cat{display:flex;align-items:center;gap:14px;margin:4px 0 12px}
+body.th-cute .res-cat svg{width:110px;height:82px;flex:none}
+body.th-cute .res-bub{position:relative;font-family:"Jua",sans-serif;font-size:17px;color:#3C3C3C;background:#fff;border:2px solid #E5E5E5;border-radius:14px;padding:8px 14px}
+body.th-cute .res-bub::before{content:'';position:absolute;left:-8px;top:50%;width:12px;height:12px;background:#fff;border-left:2px solid #E5E5E5;border-bottom:2px solid #E5E5E5;transform:translateY(-50%) rotate(45deg)}
 body.th-cute .th-cat{cursor:default}body.th-cute .th-cat svg{width:70px;height:52px;display:block}
 body.th-cute #appHeader h2{display:flex;align-items:baseline;gap:6px}
 body.th-cute #appHeader .wm{font-family:"Nunito","Jua",sans-serif;font-weight:900;font-size:34px;letter-spacing:-.5px;color:#4CC552;text-transform:lowercase;line-height:1}
@@ -669,8 +673,8 @@ body.th-cute .card{border:2px solid #EFEFEF;border-radius:16px}
       <summary>🎨 테마</summary>
       <div class="set-body">
         <div class="row" style="gap:18px"><label class="tog"><input type="radio" name="themeSel" value="basic" onchange="thSet('basic')">기본</label>
-        <label class="tog"><input type="radio" name="themeSel" value="cute" onchange="thSet('cute')">말랑</label></div>
-        <p class="study-tip" style="margin-top:6px">말랑 테마는 배너·탭·주요 버튼 모양이 바뀌고, 위쪽에 오늘의 단어가 나옵니다. 데이터는 그대로예요.</p>
+        <label class="tog"><input type="radio" name="themeSel" value="cute" onchange="thSet('cute')">고영희</label></div>
+        <p class="study-tip" style="margin-top:6px">고영희 테마는 배너·탭·주요 버튼 모양이 바뀌고, 위쪽에 오늘의 단어가 나옵니다. 데이터는 그대로예요.</p>
       </div>
     </details>
     <details class="set-sec" open>
@@ -896,27 +900,36 @@ function thApply(t){
   if(t==='cute')twRender();
 }
 function thSet(t){try{localStorage.setItem(THEME_KEY,t);}catch(e){}thApply(t);}
-/* 식빵냥 표정: base(기본) · sleepy(졸림) · blank(멍) */
+/* 고양이 표정: 테스트 점수대(10% 단위)별 p100~p0 */
 const CAT_BODY='<path d="M14 58 C10 40 14 22 22 14 L27 4 L34 13 C40 11 50 11 56 13 L63 4 L68 14 C77 22 80 40 76 58 C74 63 70 64 45 64 C20 64 16 63 14 58 Z" fill="#fff" stroke="#2B2B2B" stroke-width="3" stroke-linejoin="round"/><path d="M26 64 v-4 M64 64 v-4" stroke="#2B2B2B" stroke-width="2.4" stroke-linecap="round"/>';
 const CAT_LINE='stroke="#2B2B2B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none"';
 const CAT_FACE={
-  base:'<circle cx="31" cy="34" r="2.6" fill="#2B2B2B"/><circle cx="59" cy="34" r="2.6" fill="#2B2B2B"/><path d="M41 39 l4 3.5 l4 -3.5" '+CAT_LINE+'/>',
-  sleepy:'<path d="M26 35 h10 M54 35 h10" '+CAT_LINE+'/><ellipse cx="45" cy="45" rx="2.6" ry="3.2" fill="#2B2B2B"/><text x="70" y="14" font-family="Nunito,sans-serif" font-weight="900" font-size="12" fill="#2B2B2B">z</text><text x="78" y="7" font-family="Nunito,sans-serif" font-weight="900" font-size="9" fill="#2B2B2B">z</text>',
-  blank:'<circle cx="31" cy="35" r="1.5" fill="#2B2B2B"/><circle cx="59" cy="35" r="1.5" fill="#2B2B2B"/><circle cx="45" cy="44" r="2.2" fill="none" stroke="#2B2B2B" stroke-width="2"/><circle cx="74" cy="10" r="1.6" fill="#2B2B2B"/><circle cx="80" cy="10" r="1.6" fill="#2B2B2B"/><circle cx="86" cy="10" r="1.6" fill="#2B2B2B"/>'
+  p100:"<circle cx=\"31\" cy=\"34\" r=\"2.6\" fill=\"#2B2B2B\"/><circle cx=\"59\" cy=\"34\" r=\"2.6\" fill=\"#2B2B2B\"/><path d=\"M41 39 l4 3.5 l4 -3.5\" stroke=\"#2B2B2B\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/>",
+  p90:"<circle cx=\"31\" cy=\"34\" r=\"2.6\" fill=\"#2B2B2B\"/><circle cx=\"59\" cy=\"34\" r=\"2.6\" fill=\"#2B2B2B\"/><path d=\"M40 40 q5 5 10 0\" stroke=\"#2B2B2B\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/><ellipse cx=\"25\" cy=\"42\" rx=\"3.5\" ry=\"2\" fill=\"#FFB3C0\"/><ellipse cx=\"65\" cy=\"42\" rx=\"3.5\" ry=\"2\" fill=\"#FFB3C0\"/>",
+  p80:"<circle cx=\"31\" cy=\"34\" r=\"2.6\" fill=\"#2B2B2B\"/><circle cx=\"59\" cy=\"34\" r=\"2.6\" fill=\"#2B2B2B\"/><path d=\"M41 42 h8\" stroke=\"#2B2B2B\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/>",
+  p70:"<path d=\"M26 35 h10 M54 35 h10\" stroke=\"#2B2B2B\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/><ellipse cx=\"45\" cy=\"45\" rx=\"2.6\" ry=\"3.2\" fill=\"#2B2B2B\"/><text x=\"70\" y=\"14\" font-family=\"Nunito,sans-serif\" font-weight=\"900\" font-size=\"12\" fill=\"#2B2B2B\">z</text><text x=\"78\" y=\"7\" font-family=\"Nunito,sans-serif\" font-weight=\"900\" font-size=\"9\" fill=\"#2B2B2B\">z</text>",
+  p60:"<circle cx=\"31\" cy=\"35\" r=\"1.5\" fill=\"#2B2B2B\"/><circle cx=\"59\" cy=\"35\" r=\"1.5\" fill=\"#2B2B2B\"/><circle cx=\"45\" cy=\"44\" r=\"2.2\" fill=\"none\" stroke=\"#2B2B2B\" stroke-width=\"2\"/><circle cx=\"74\" cy=\"10\" r=\"1.6\" fill=\"#2B2B2B\"/><circle cx=\"80\" cy=\"10\" r=\"1.6\" fill=\"#2B2B2B\"/><circle cx=\"86\" cy=\"10\" r=\"1.6\" fill=\"#2B2B2B\"/>",
+  p50:"<circle cx=\"31\" cy=\"34\" r=\"2.6\" fill=\"#2B2B2B\"/><circle cx=\"59\" cy=\"34\" r=\"2.6\" fill=\"#2B2B2B\"/><path d=\"M39 44 q2 -3 4 0 q2 3 4 0 q2 -3 4 0\" stroke=\"#2B2B2B\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/><path d=\"M72 20 q4 6 0 9 q-4 -3 0 -9z\" fill=\"#8FD3FF\" stroke=\"#2B2B2B\" stroke-width=\"1.6\"/>",
+  p40:"<path d=\"M27 33 q4 3 8 0 M55 33 q4 3 8 0\" stroke=\"#2B2B2B\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/><path d=\"M40 45 q5 -5 10 0\" stroke=\"#2B2B2B\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/>",
+  p30:"<circle cx=\"31\" cy=\"34\" r=\"3.6\" fill=\"#2B2B2B\"/><circle cx=\"59\" cy=\"34\" r=\"3.6\" fill=\"#2B2B2B\"/><circle cx=\"32.2\" cy=\"32.8\" r=\"1.2\" fill=\"#fff\"/><circle cx=\"60.2\" cy=\"32.8\" r=\"1.2\" fill=\"#fff\"/><path d=\"M41 45 q4 -4 8 0\" stroke=\"#2B2B2B\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/><path d=\"M30 40 q-2 4 0 6 q2 -2 0 -6z\" fill=\"#8FD3FF\" stroke=\"#2B2B2B\" stroke-width=\"1.6\"/>",
+  p20:"<path d=\"M26 32 h10 M54 32 h10\" stroke=\"#2B2B2B\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/><path d=\"M29 34 v12 M33 34 v9 M57 34 v9 M61 34 v12\" stroke=\"#8FD3FF\" stroke-width=\"3\" stroke-linecap=\"round\"/><ellipse cx=\"45\" cy=\"45\" rx=\"4\" ry=\"3\" fill=\"#2B2B2B\"/>",
+  p10:"<path d=\"M28 52 h8 M54 52 h8\" stroke=\"#2B2B2B\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/><path d=\"M42 57 q3 -2 6 0\" stroke=\"#2B2B2B\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/><path d=\"M4 63 q-3 0 -2 -3 M86 63 q3 0 2 -3\" stroke=\"#2B2B2B\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/>",
+  p0:"<path d=\"M27 32 l8 4 M27 36 l8 -4 M55 32 l8 4 M55 36 l8 -4\" stroke=\"#2B2B2B\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/><ellipse cx=\"45\" cy=\"45\" rx=\"3\" ry=\"3.4\" fill=\"#2B2B2B\"/><path d=\"M47 43 C60 40 66 30 74 22\" stroke=\"#B9C3D6\" stroke-width=\"2\" fill=\"none\" stroke-dasharray=\"2 3\" stroke-linecap=\"round\"/><path d=\"M70 22 C66 14 70 2 80 2 C90 2 93 12 90 20 C88 24 86 20 84 24 C82 20 80 24 78 20 C76 24 73 20 70 22 Z\" fill=\"#F3F6FF\" stroke=\"#2B2B2B\" stroke-width=\"2\" stroke-linejoin=\"round\"/><circle cx=\"77\" cy=\"11\" r=\"1.4\" fill=\"#2B2B2B\"/><circle cx=\"84\" cy=\"11\" r=\"1.4\" fill=\"#2B2B2B\"/>"
 };
-function catSVG(face){return '<svg viewBox="-6 -6 102 76" aria-hidden="true">'+CAT_BODY+(CAT_FACE[face]||CAT_FACE.base)+'</svg>';}
-/* 테스트 정답률 → 표정: 100% 기본 · 80% 이하 졸림 · 70% 이하 멍 · 그 사이(81~99%)는 그대로 */
+CAT_FACE.base=CAT_FACE.p100;CAT_FACE.sleepy=CAT_FACE.p70;CAT_FACE.blank=CAT_FACE.p60;
+const CAT_FLAT='<path d="M6 62 C6 50 14 42 24 40 L27 31 L34 38 C40 37 50 37 56 38 L63 31 L66 40 C76 42 84 50 84 62 C84 64 80 64 45 64 C10 64 6 64 6 62 Z" fill="#fff" stroke="#2B2B2B" stroke-width="3" stroke-linejoin="round"/>';
+function catSVG(face){return '<svg viewBox="-6 -6 102 76" aria-hidden="true">'+(face==='p10'?CAT_FLAT:CAT_BODY)+(CAT_FACE[face]||CAT_FACE.p100)+'</svg>';}
+/* 테스트 정답률 → 표정: 마지막 테스트 점수대(10% 단위)의 표정 */
 const CAT_MOOD_KEY='voca_cat_mood';
-function catMoodGet(){try{const v=localStorage.getItem(CAT_MOOD_KEY);return (v==='sleepy'||v==='blank')?v:'base';}catch(e){return 'base';}}
+function catMoodGet(){try{const v=localStorage.getItem(CAT_MOOD_KEY)||'';if(CAT_FACE[v]&&/^p\d+$/.test(v))return v;return {sleepy:'p70',blank:'p60'}[v]||'p100';}catch(e){return 'p100';}}
 function catMood(pct){
   if(!(pct>=0))return;
-  let m=catMoodGet();
-  if(pct>=100)m='base'; else if(pct<=70)m='blank'; else if(pct<=80)m='sleepy';
-  try{localStorage.setItem(CAT_MOOD_KEY,m);}catch(e){}
+  const band=pct>=100?100:Math.max(0,Math.min(90,Math.floor(pct/10)*10));
+  try{localStorage.setItem(CAT_MOOD_KEY,'p'+band);}catch(e){}
   if(document.body.classList.contains('th-cute'))twRender();
 }
 function twWake(){}
-/* 오늘의 단어 (말랑 테마 말풍선) */
+/* 오늘의 단어 (고양이 테마 말풍선) */
 var twOffset=0;
 function twPool(){
   let pool=[];
@@ -1983,7 +1996,8 @@ function showQ(){
         '<p class="count" style="color:#176b43">✔ 오늘('+todayKey()+') 날짜 캘린더에 기록되었습니다.</p>'+
         '<button class="primary" onclick="backToCalendar()">캘린더로 돌아가기</button>'+wrongHtml;
     }else{
-      a.innerHTML='<h3>완료! '+quiz.score+'/'+quiz.pool.length+' ('+pct+'%)</h3><button class="primary" onclick="endQuiz()">닫기</button>'+wrongHtml;
+      const resCat=quiz.chunk?'<div class="th-only res-cat">'+catSVG(catMoodGet())+'<div class="res-bub">'+quiz.pool.length+'개 중 '+quiz.score+'개 맞았어요</div></div>':'';
+      a.innerHTML=resCat+'<h3>완료! '+quiz.score+'/'+quiz.pool.length+' ('+pct+'%)</h3><button class="primary" onclick="endQuiz()">닫기</button>'+wrongHtml;
     }
     return;
   }
