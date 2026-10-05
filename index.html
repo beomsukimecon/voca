@@ -295,6 +295,9 @@ input,select{border:1px solid var(--line);border-radius:8px;padding:6px 10px;fon
 .quiz-choice{display:block;width:100%;text-align:left;margin:6px 0;padding:10px;white-space:pre-line;line-height:1.5}
 .quiz-choice.correct{background:#e6f7ee;border-color:var(--green)}
 .quiz-choice.wrong{background:#fdeaea;border-color:var(--red)}
+.quiz-choice.tri{background:#fff8db;border-color:#e0b100}
+.tri-mark{display:block;font-size:12px;font-weight:700;color:#a07800;margin-bottom:2px}
+.tri-entry{border-left:3px solid #e0b100;padding-left:10px}
 .dunno-wrong{background:#fdeaea!important;border-color:var(--red)!important;color:#b42323!important;font-weight:700}
 .qc-sub{color:var(--sub);font-style:italic;font-size:12px}
 .quiz-word{font-size:24px;font-weight:700}
@@ -2273,15 +2276,19 @@ function showQ(){twSync();
     const wrongHtml = wl.length
       ? '<h3 style="margin-top:14px;color:var(--red)">틀린 단어 '+wl.length+'개</h3>'+
         wl.map(x=>'<div class="entry"><div class="e-top"><span class="e-day">'+x.day+'일차</span><span class="e-word">'+esc(x.word)+'</span>'+(x.pron?'<span class="e-pron">'+esc(x.pron)+'</span>':'')+'</div>'+(x.mean?'<div class="e-mean">'+esc(breakNumbered(x.mean))+'</div>':'')+(x.etym?'<div class="etym"><b>어근·어원</b> · '+esc(x.etym)+'</div>':'')+(x.sent?'<div class="e-sent">'+esc(breakNumbered(x.sent))+'</div>':'')+'</div>').join('')
-      : '<p class="count" style="margin-top:10px">틀린 단어 없이 전부 맞혔어요! 🎉</p>';
+      : ((quiz.triList||[]).length?'<p class="count" style="margin-top:10px">완전히 틀린 단어는 없어요.</p>':'<p class="count" style="margin-top:10px">틀린 단어 없이 전부 맞혔어요! 🎉</p>');
+    const tl=quiz.triList||[];
+    const triHtml=tl.length?'<h3 style="margin-top:14px;color:#b7791f">△ 뜻이 거의 같은 선택 '+tl.length+'개 <span class="count" style="font-weight:400">(각 0.5점)</span></h3>'+
+      tl.map(t=>'<div class="entry tri-entry"><div class="e-top"><span class="e-word">'+esc(t.q.word)+'</span><span class="count">정답</span></div>'+(t.q.mean?'<div class="e-mean">'+esc(breakNumbered(t.q.mean))+'</div>':'')+
+        '<div class="e-top" style="margin-top:6px"><span class="e-word" style="font-size:14px">'+esc(t.pick.word)+'</span><span class="count">내가 고른 것</span></div>'+(t.pick.mean?'<div class="e-mean">'+esc(breakNumbered(t.pick.mean))+'</div>':'')+'</div>').join(''):'';
     const pct=Math.round(quiz.score/quiz.pool.length*100);
     if(quiz.official){
       a.innerHTML='<h3>공식 TEST 완료</h3><div class="statgrid"><div class="stat"><b>'+quiz.score+'/'+quiz.pool.length+'</b><span class="count">점수</span></div><div class="stat"><b>'+pct+'%</b><span class="count">정답률</span></div><div class="stat"><b>'+quiz.greDay+'일차</b><span class="count">'+(quiz.mode==='mean'?'뜻 고르기':'단어 고르기')+'</span></div></div>'+
         '<p class="count" style="color:#176b43">✔ 오늘('+todayKey()+') 날짜 캘린더에 기록되었습니다.</p>'+
-        '<button class="primary" onclick="backToCalendar()">캘린더로 돌아가기</button>'+wrongHtml;
+        '<button class="primary" onclick="backToCalendar()">캘린더로 돌아가기</button>'+triHtml+wrongHtml;
     }else{
-      const resCat=quiz.chunk?'<div class="th-only res-cat">'+catSVG(catMoodGet())+'<div class="res-bub">'+quiz.pool.length+'개 중 '+quiz.score+'개 맞았어요</div></div>':'';
-      a.innerHTML=resCat+'<h3>완료! '+quiz.score+'/'+quiz.pool.length+' ('+pct+'%)</h3><button class="primary" onclick="endQuiz()">닫기</button>'+wrongHtml;
+      const resCat=quiz.chunk?'<div class="th-only res-cat">'+catSVG(catMoodGet())+'<div class="res-bub">'+quiz.pool.length+'개 중 '+quiz.score+((quiz.triList||[]).length?'점이에요':'개 맞았어요')+'</div></div>':'';
+      a.innerHTML=resCat+'<h3>완료! '+quiz.score+'/'+quiz.pool.length+' ('+pct+'%)'+(tl.length?' <span class="count" style="font-weight:400">· △ '+tl.length+'개는 0.5점씩</span>':'')+'</h3><button class="primary" onclick="endQuiz()">닫기</button>'+triHtml+wrongHtml;
     }
     return;
   }
@@ -2310,13 +2317,52 @@ function qAnsMatch(ai,qi){
   if(quiz.mode==='mean'){ return !!a.mean && a.mean===b.mean; }   /* 뜻 고르기: 같은 뜻이면 정답 */
   else { return !!a.mean && a.mean===b.mean; }                    /* 단어 고르기: 뜻이 같은 단어면 정답 */
 }
+/* 두 뜻이 얼마나 겹치는지 (0~1). 2/3 이상이면 세모(△) 처리 */
+function msUnits(m){
+  m=String(m||'').replace(/\([^)]*\)|\[[^\]]*\]/g,' ');
+  return m.split(/(?:^|\s)\d+\s*[.)]\s*|[,;/·\n]|、/).map(function(u){
+    u=u.replace(/[^가-힣a-zA-Z0-9]/g,'');
+    u=u.replace(/(하다|하는|하게|하기|한|적인|적으로|적|스러운|스럽게|되다|되는|된|의|함|임)$/,'');
+    return u;
+  }).filter(function(u){return u.length>=1;});
+}
+function msBigrams(s){const a=[];for(let i=0;i<s.length-1;i++)a.push(s.slice(i,i+2));return a;}
+function msDice(x,y){
+  if(x===y)return 1;if(x.length<2||y.length<2)return 0;
+  const A=msBigrams(x),B=msBigrams(y).slice();let n=0;
+  A.forEach(function(g){const k=B.indexOf(g);if(k>=0){n++;B.splice(k,1);}});
+  return 2*n/(A.length+msBigrams(y).length);
+}
+function msUnitSame(x,y){
+  if(x===y)return true;
+  if(x.length>=2&&y.length>=2&&(x.indexOf(y)>=0||y.indexOf(x)>=0))return true;
+  return msDice(x,y)>=0.75;
+}
+function meanSim(a,b){
+  const A=msUnits(a),B=msUnits(b);if(!A.length||!B.length)return 0;
+  const ma=A.filter(function(x){return B.some(function(y){return msUnitSame(x,y);});}).length;
+  const mb=B.filter(function(y){return A.some(function(x){return msUnitSame(x,y);});}).length;
+  const unitSim=(ma+mb)/(A.length+B.length);
+  const whole=msDice(A.join(''),B.join(''));
+  return Math.max(unitSim,whole);
+}
 function answer(ci,qi,btn){
   clearQuizTimer();
   const correct=qAnsMatch(ci,qi);
+  const tri=!correct&&data[ci]&&data[qi]&&meanSim(data[ci].mean,data[qi].mean)>=2/3-1e-9;
   document.querySelectorAll('#'+quiz.target+' .quiz-choice').forEach(b=>b.disabled=true);
   document.querySelectorAll('#'+quiz.target+' .qc-sub').forEach(s=>s.classList.remove('hide'));
-  btn.classList.add(correct?'correct':'wrong');
+  btn.classList.add(correct?'correct':(tri?'tri':'wrong'));
   document.querySelectorAll('#'+quiz.target+' .quiz-choice').forEach(b=>{if(qAnsMatch(+b.dataset.di,qi))b.classList.add('correct')});
+  if(tri){
+    const cq=data[qi];cq.tLast='tri';saveWords();quiz.score+=0.5;
+    (quiz.triList=quiz.triList||[]).push({q:cq,pick:data[ci]});
+    btn.insertAdjacentHTML('afterbegin','<span class="tri-mark">△ 뜻이 거의 같아요 · 0.5점</span>');
+    const ex=document.getElementById('qExpl');if(ex)ex.classList.remove('hide');
+    if(document.getElementById('optAutoWrong').checked){setTimeout(()=>{if(quiz)nextQ()},Math.max(0,settings.wrongDelay*1000));}
+    else{const nx=document.getElementById('qNext');if(nx)nx.classList.remove('hide');}
+    return;
+  }
   if(correct){const cq=data[qi];cq.tLast='correct';cq.tStreak=(cq.tStreak||0)+1;saveWords();quiz.score++;setTimeout(()=>{if(quiz)nextQ()},Math.max(0,settings.correctDelay*1000));}
   else{
     const q=data[qi];q.wrong=(q.wrong||0)+1;q.tLast='wrong';q.tStreak=0;quiz.wrongList.push(q);if(quiz.official)q.flag=true;saveWords();
