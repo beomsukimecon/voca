@@ -327,7 +327,11 @@
     b.querySelectorAll('button')[1].onclick=function(){b.remove();};
     document.body.appendChild(b);
   }
-  window.VSyncUI={renderAccount:renderAccount,showLogin:showLogin,push:push,check:checkRemote};
+  function api(method,path,body,extra){
+    return ensureFresh().then(function(){return fetch(SB_URL+'/rest/v1/'+path,{method:method,headers:hdr(true,extra),body:body?JSON.stringify(body):undefined});})
+      .then(function(r){if(!r.ok)return r.text().then(function(t){var m=t;try{m=JSON.parse(t).message||t;}catch(e){}throw new Error((r.status===401||r.status===403||/row-level security/i.test(m))?'권한이 없어요.':('서버 오류 '+r.status+': '+String(m).slice(0,120)));});return (r.status===204||r.status===201&&!/representation/.test((extra||{}).Prefer||''))?[]:r.json().catch(function(){return [];});});
+  }
+  window.VSyncUI={renderAccount:renderAccount,showLogin:showLogin,push:push,check:checkRemote,api:api,user:function(){return S.session&&S.session.user;}};
 
   document.addEventListener('DOMContentLoaded',function(){
     var st=document.getElementById('syncStamp');if(st)st.onclick=stampClick;
@@ -1037,7 +1041,7 @@ body.th-cute .sync-title{font-family:"Nunito","Jua",sans-serif;color:#4CC552;tex
   <div class="card" id="writingBody"></div>
 </div>
 
-<footer id="appFooter"><details><summary>VOCA v2026.10.06 · 업데이트 기록</summary><ul><li><b>2026.10.06</b> 아이패드·아이폰에서 RC·테스트 기록이 안 받아지던 문제 수정 (저장 공간이 모자라면 자동 압축 저장) · 맨 위에 마지막 동기화 시간, 맨 아래에 버전 기록 표시</li><li><b>2026.10.05</b> 단어 테스트: 뜻이 2/3 이상 겹치는 선택은 △ (0.5점) · 고양이 100%/90% 표정 교체</li><li><b>2026.10.03</b> 로그인 · 계정별 클라우드 동기화 (어느 기기에서든 같은 기록)</li><li><b>이전</b> 캘린더 시험일·계획·자동 분배 · 고영희 테마와 점수별 표정 · 호버 사전 · TCSE 실전 화면과 AI 분석 프롬프트 복사 · Writing 예시 CSV 가져오기 · 틀린 단어 어근 표시</li></ul></details></footer>
+<footer id="appFooter"><details><summary>VOCA v2026.10.06 · 업데이트 기록</summary><ul><li><b>2026.10.06</b> 설정 > 학습 자료 받기: 암호로 잠근 GRE 단어·TCSE·RC·Writing 자료를 받아오기 · 아이패드·아이폰에서 RC·테스트 기록이 안 받아지던 문제 수정 (저장 공간이 모자라면 자동 압축 저장) · 맨 위에 마지막 동기화 시간, 맨 아래에 버전 기록 표시</li><li><b>2026.10.05</b> 단어 테스트: 뜻이 2/3 이상 겹치는 선택은 △ (0.5점) · 고양이 100%/90% 표정 교체</li><li><b>2026.10.03</b> 로그인 · 계정별 클라우드 동기화 (어느 기기에서든 같은 기록)</li><li><b>이전</b> 캘린더 시험일·계획·자동 분배 · 고영희 테마와 점수별 표정 · 호버 사전 · TCSE 실전 화면과 AI 분석 프롬프트 복사 · Writing 예시 CSV 가져오기 · 틀린 단어 어근 표시</li></ul></details></footer>
 
 <div id="settingsModal" class="hide" onclick="if(event.target===this)toggleSettings(false)" style="position:fixed;inset:0;background:rgba(20,25,40,.35);z-index:200;display:flex;justify-content:flex-end">
   <div style="background:var(--card);width:380px;max-width:92vw;height:100%;overflow-y:auto;padding:18px 20px">
@@ -1048,6 +1052,10 @@ body.th-cute .sync-title{font-family:"Nunito","Jua",sans-serif;color:#4CC552;tex
     <details class="set-sec" open>
       <summary>☁️ 계정</summary>
       <div class="set-body" id="syncAccount"></div>
+    </details>
+    <details class="set-sec" id="pkSec">
+      <summary>📦 학습 자료 받기</summary>
+      <div class="set-body" id="pkBox"></div>
     </details>
     <details class="set-sec" open>
       <summary>🎨 테마</summary>
@@ -5712,6 +5720,124 @@ document.getElementById('qDayFrom').addEventListener('input',renderTestChunkRow)
 ['freqMin','freqDayFrom','freqDayTo'].forEach(function(id){var e=document.getElementById(id);if(e)e.addEventListener('input',updateFreqAvail);});
 updateFreqAvail();
 roundState=roundLoad();renderTabs();renderAll();syncStudySettings();updatePracticeCount();
+
+/* ================= 학습 자료 팩 (암호로 잠가 서버에 보관) =================
+   GRE 단어(뜻·예문·어근 등 내용만), TCSE·RC 문제, Writing 주제·예시를
+   암호로 암호화(AES-GCM, PBKDF2)해서 Supabase content_pack 테이블에 둔다.
+   서버에는 암호문만 있고, 암호를 아는 사람만 풀어서 받을 수 있다. */
+const PK_OWNER='d4db9c0d-8f16-4476-8e4c-5a6acb8c3227';
+const PK_PARTS=[
+  {id:'gre',label:'GRE 단어장'},
+  {id:'tcse',label:'TCSE 문제'},
+  {id:'rc',label:'RC 문제'},
+  {id:'writing',label:'Writing 주제·예시'}];
+const PK_WORD_FIELDS=['day','no','word','pron','mean','sent','syn','etym'];
+let pkInfo=null;
+function pkJ(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v;}catch(e){return d;}}
+function pkBuild(id){
+  if(id==='gre'){const w=pkJ('voca_GRE',[]).map(x=>{const o={};PK_WORD_FIELDS.forEach(f=>{if(x[f]!=null&&x[f]!=='')o[f]=x[f];});return o;}).filter(o=>o.word);return {payload:w,count:w.length+'단어'};}
+  if(id==='tcse'){const a=pkJ('voca_tcse_data',[]);return {payload:a,count:a.length+'문제'};}
+  if(id==='rc'){const a=pkJ('voca_rc_data',[]);return {payload:a,count:a.length+'문제'};}
+  if(id==='writing'){const t=pkJ('voca_writing_topics',[]),e=pkJ('voca_writing_examples',[]);return {payload:{topics:t,examples:e},count:'주제 '+t.length+' · 예시 '+e.length};}
+}
+function pkEmpty(id,p){return id==='writing'?!(p.topics.length||p.examples.length):!p.length;}
+function pkB64(u8){let s='';for(let i=0;i<u8.length;i+=0x8000)s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000));return btoa(s);}
+function pkUnB64(s){const b=atob(s),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;}
+async function pkKey(pw,salt){
+  const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt:salt,iterations:200000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+}
+async function pkEncrypt(obj,pw){
+  const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12));
+  const key=await pkKey(pw,salt);
+  const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv:iv},key,LZString.compressToUint8Array(JSON.stringify(obj))));
+  return {salt:pkB64(salt),iv:pkB64(iv),data:pkB64(ct)};
+}
+async function pkDecrypt(row,pw){
+  const key=await pkKey(pw,pkUnB64(row.salt));let pt;
+  try{pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:pkUnB64(row.iv)},key,pkUnB64(row.data));}catch(e){throw new Error('암호가 맞지 않아요.');}
+  return JSON.parse(LZString.decompressFromUint8Array(new Uint8Array(pt)));
+}
+function pkApply(id,p){
+  if(id==='gre'){
+    const cur=pkJ('voca_GRE',[]);const map={};cur.forEach(w=>{map[(w.word||'').toLowerCase().trim()]=w;});
+    let add=0,upd=0;
+    p.forEach(n=>{const k=(n.word||'').toLowerCase().trim();const w=map[k];
+      if(w){PK_WORD_FIELDS.forEach(f=>{if(n[f]!=null)w[f]=n[f];});upd++;}
+      else{const o=Object.assign({pron:'',sent:'',syn:'',etym:''},n,{wrong:0,unknown:0,ambiguous:0,known:0,studied:0,flag:false});cur.push(o);map[k]=o;add++;}});
+    cur.sort((a,b)=>(a.day-b.day)||(a.no-b.no));
+    localStorage.setItem('voca_GRE',JSON.stringify(cur));
+    const decks=pkJ('voca_decks',[]);if(!decks.some(d=>d.id==='GRE')){decks.unshift({id:'GRE',name:'GRE'});localStorage.setItem('voca_decks',JSON.stringify(decks));}
+    return 'GRE 단어 '+add+'개 추가'+(upd?', '+upd+'개 내용 갱신':'');
+  }
+  if(id==='tcse'){localStorage.setItem('voca_tcse_data',JSON.stringify(p));return 'TCSE '+p.length+'문제';}
+  if(id==='rc'){localStorage.setItem('voca_rc_data',JSON.stringify(p));return 'RC '+p.length+'문제';}
+  if(id==='writing'){
+    localStorage.setItem('voca_writing_topics',JSON.stringify(p.topics||[]));
+    const ex=pkJ('voca_writing_examples',[]);const ix={};ex.forEach((e,i)=>{ix[e.id]=i;});
+    (p.examples||[]).forEach(e=>{if(e.id in ix)ex[ix[e.id]]=e;else ex.push(e);});
+    localStorage.setItem('voca_writing_examples',JSON.stringify(ex));
+    return 'Writing 주제 '+(p.topics||[]).length+'개 · 예시 '+(p.examples||[]).length+'개';
+  }
+}
+let pkLast=['',false];
+function pkMsg(t,bad){pkLast=[t,!!bad];const e=document.getElementById('pkMsg');if(e){e.textContent=t;e.style.color=bad?'var(--red)':'var(--sub)';}}
+function pkRender(){
+  const box=document.getElementById('pkBox');if(!box)return;
+  const u=window.VSyncUI&&VSyncUI.user();
+  if(!u){box.innerHTML='<p class="study-tip">로그인하면 암호로 학습 자료(GRE 단어·TCSE·RC·Writing)를 받을 수 있어요.</p>';return;}
+  const rows=PK_PARTS.map(p=>{const i=pkInfo&&pkInfo[p.id];
+    return '<label class="tog" style="display:flex;gap:6px;align-items:center;margin:3px 0"><input type="checkbox" class="pkChk" value="'+p.id+'"'+(i?' checked':' disabled')+'>'+p.label+
+      ' <span class="count">'+(i?esc((i.info&&i.info.count)||'')+' · '+(i.updated_at||'').slice(0,10):(pkInfo?'없음':'확인 중…'))+'</span></label>';}).join('');
+  box.innerHTML='<p class="study-tip" style="margin-top:0">암호를 넣으면 서버에 잠가둔 자료를 받아와요. 내 테스트 기록·오답·아는/모르는 체크는 그대로 두고 자료만 채워요. (TCSE·RC·Writing 주제는 받은 것으로 바뀌어요)</p>'+rows+
+    '<div class="row" style="gap:6px;margin-top:6px"><input id="pkPw" type="password" placeholder="자료 암호" autocomplete="off" style="flex:1;min-width:0"><button class="small primary" onclick="pkPull()">받기</button></div>'+
+    '<div id="pkMsg" class="count" style="margin-top:6px;min-height:16px"></div>'+
+    (u.id===PK_OWNER?'<details style="margin-top:8px"><summary class="count" style="cursor:pointer">관리자: 지금 이 기기 자료로 팩 올리기</summary>'+
+      '<p class="study-tip">이 기기의 GRE 단어(내용만)·TCSE·RC·Writing을 새 암호로 잠가 올려요. 이미 있는 팩은 덮어써요. 진행 기록은 올라가지 않아요.</p>'+
+      '<div class="row" style="gap:6px"><input id="pkNew1" type="password" placeholder="새 암호 (8자 이상)" autocomplete="new-password" style="flex:1;min-width:0"><input id="pkNew2" type="password" placeholder="한 번 더" autocomplete="new-password" style="flex:1;min-width:0"></div>'+
+      '<button class="small" style="margin-top:6px" onclick="pkPush()">팩 올리기</button></details>':'');
+  if(pkLast[0])pkMsg(pkLast[0],pkLast[1]);
+  if(!pkInfo)pkLoadInfo();
+}
+async function pkLoadInfo(){
+  try{const rows=await VSyncUI.api('GET','content_pack?select=part,info,updated_at');pkInfo={};(rows||[]).forEach(r=>{pkInfo[r.part]=r;});}
+  catch(e){pkInfo={};pkMsg('자료 목록을 못 불러왔어요: '+e.message,true);return;}
+  const keep=document.getElementById('pkPw');const v=keep?keep.value:'';pkRender();const n=document.getElementById('pkPw');if(n)n.value=v;
+}
+async function pkPull(){
+  const pw=(document.getElementById('pkPw')||{}).value||'';
+  const ids=[...document.querySelectorAll('.pkChk:checked')].map(c=>c.value);
+  if(!pw)return pkMsg('암호를 넣어주세요.',true);
+  if(!ids.length)return pkMsg('받을 자료를 골라주세요.',true);
+  pkMsg('받는 중…');
+  try{
+    const rows=await VSyncUI.api('GET','content_pack?select=part,salt,iv,data&part=in.('+ids.join(',')+')');
+    const got=[];
+    for(const r of rows){got.push([r.part,await pkDecrypt(r,pw)]);}   /* 전부 풀린 다음에만 반영 */
+    const done=got.map(([id,p])=>pkApply(id,p));
+    pkMsg('반영했어요: '+done.join(' / ')+' · 저장하고 새로고침합니다…');
+    await VSyncUI.push();
+    setTimeout(()=>location.reload(),600);
+  }catch(e){pkMsg(e.message||String(e),true);}
+}
+async function pkPush(){
+  const a=document.getElementById('pkNew1').value,b=document.getElementById('pkNew2').value;
+  if(a.length<8)return pkMsg('암호는 8자 이상으로 해주세요.',true);
+  if(a!==b)return pkMsg('두 암호가 달라요.',true);
+  if(!confirm('지금 이 기기 자료로 팩을 만들어 올릴까요?\n(서버에 있던 팩은 새 암호로 덮어써요)'))return;
+  try{
+    const out=[];
+    for(const p of PK_PARTS){
+      const b=pkBuild(p.id);if(pkEmpty(p.id,b.payload))continue;
+      pkMsg(p.label+' 잠그는 중…');
+      const enc=await pkEncrypt(b.payload,a);
+      await VSyncUI.api('POST','content_pack?on_conflict=part',[{part:p.id,salt:enc.salt,iv:enc.iv,data:enc.data,info:{count:b.count}}],{'Prefer':'resolution=merge-duplicates,return=minimal'});
+      out.push(p.label+' '+b.count);
+    }
+    pkInfo=null;pkRender();pkMsg(out.length?'올렸어요: '+out.join(' / '):'올릴 자료가 없어요.');
+  }catch(e){pkMsg('올리기 실패: '+(e.message||e),true);}
+}
+document.getElementById('pkSec').addEventListener('toggle',function(){if(this.open)pkRender();});
 </script>
 </body>
 </html>
