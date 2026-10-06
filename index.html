@@ -83,7 +83,7 @@
   function lsDel(k){sdel(k);}
   function syncable(k){return typeof k==='string'&&k.indexOf('voca')===0&&!NO_SYNC.test(k);}
   function jget(k,d){try{return JSON.parse(lsGet(k))||d;}catch(e){return d;}}
-  var S={session:jget(SESS_KEY,null),meta:jget(META_KEY,{}),dirty:{},timer:null,pushing:false,status:'',lastSync:0,lastPull:0};
+  var S={session:jget(SESS_KEY,null),meta:jget(META_KEY,{}),dirty:{},timer:null,pushing:false,status:'',lastSync:+(rget('__sync_last')||0),lastPull:0};
   window.VSync=S;
   function saveMeta(){lsSet(META_KEY,JSON.stringify(S.meta));}
   function saveSess(){if(S.session)lsSet(SESS_KEY,JSON.stringify(S.session));else lsDel(SESS_KEY);}
@@ -288,7 +288,24 @@
   }
 
   /* ---------- 상태 표시 (설정 > 계정) ---------- */
-  function setStatus(t){S.status=t;var e=document.getElementById('syncStatus');if(e)e.textContent=t+(S.lastSync&&/저장됨|최신/.test(t)?' · '+new Date(S.lastSync).toTimeString().slice(0,5):'');}
+  function hm(t){var d=new Date(t),n=new Date(),p=function(x){return (x<10?'0':'')+x;};var s=p(d.getHours())+':'+p(d.getMinutes());return d.toDateString()===n.toDateString()?s:(d.getMonth()+1)+'/'+d.getDate()+' '+s;}
+  function setStatus(t){
+    S.status=t;
+    if(S.lastSync&&S.lastSync!==S._savedLast){S._savedLast=S.lastSync;try{rawSet.call(localStorage,'__sync_last',String(S.lastSync));}catch(e){}}
+    var e=document.getElementById('syncStatus');if(e)e.textContent=t+(S.lastSync&&/저장됨|최신/.test(t)?' · '+hm(S.lastSync):'');
+    paintStamp();
+  }
+  function paintStamp(){
+    var e=document.getElementById('syncStamp');if(!e)return;
+    e.classList.remove('bad');
+    if(!S.session){e.textContent='로그인 안 함 · 이 기기에만 저장';e.title='눌러서 로그인';return;}
+    var t=S.status||'';
+    if(/중|대기/.test(t)){e.textContent='☁ '+(/대기/.test(t)?'저장 대기':t);}
+    else if(/실패/.test(t)){e.textContent='☁ '+t;e.classList.add('bad');}
+    else e.textContent=S.lastSync?'☁ 마지막 동기화 '+hm(S.lastSync):'☁ 동기화 전';
+    e.title='눌러서 지금 동기화';
+  }
+  function stampClick(){if(!S.session){showLogin();return;}setStatus('동기화 중…');push().then(checkRemote).then(function(){paintStamp();});}
   function renderAccount(){
     var box=document.getElementById('syncAccount');if(!box)return;
     if(S.session){
@@ -313,7 +330,8 @@
   window.VSyncUI={renderAccount:renderAccount,showLogin:showLogin,push:push,check:checkRemote};
 
   document.addEventListener('DOMContentLoaded',function(){
-    renderAccount();
+    var st=document.getElementById('syncStamp');if(st)st.onclick=stampClick;
+    renderAccount();paintStamp();
     if(S.session){
       /* 기록상 받았다고 돼 있는데 이 기기에 없는 항목은 다시 받도록 표시 지움 (저장 공간 부족으로 빠졌던 것 복구) */
       var fixed=0;Object.keys(S.meta).forEach(function(k){if(lsGet(k)===null){delete S.meta[k];fixed++;}});
@@ -865,9 +883,19 @@ body.th-cute .sync-title{font-family:"Nunito","Jua",sans-serif;color:#4CC552;tex
 .sync-go{width:100%;padding:11px 0;font-size:15px;font-weight:700}
 .sync-skip{width:100%;margin-top:8px;border:none;background:none;color:var(--sub);font-size:12.5px;text-decoration:underline}
 .sync-banner{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:400;background:#1f2328;color:#fff;border-radius:12px;padding:10px 14px;font-size:13px;display:flex;gap:8px;align-items:center;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.sync-stamp{display:block;margin:-6px 0 4px auto;border:none;background:none;padding:2px 0;font-size:11px;line-height:1.2;color:var(--sub);cursor:pointer}
+.sync-stamp:hover{color:var(--ink);text-decoration:underline}
+.sync-stamp.bad{color:var(--red)}
+#syncStampRow{display:flex;justify-content:flex-end}
+#appFooter{margin:28px 0 8px;padding-top:10px;border-top:1px solid var(--line);font-size:12px;color:var(--sub)}
+#appFooter summary{cursor:pointer;list-style:none;text-align:center}
+#appFooter summary::-webkit-details-marker{display:none}
+#appFooter ul{margin:10px 0 0;padding-left:18px;line-height:1.6}
+#appFooter li b{color:var(--ink);font-weight:700;margin-right:4px}
 </style>
 </head>
 <body>
+<div id="syncStampRow"><button type="button" id="syncStamp" class="sync-stamp"></button></div>
 <div id="appHeader" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
 <div class="brand"><span class="th-only th-cat" id="thCat"></span><h2 style="margin:0"><span class="wm">VOCA</span> <span id="total" class="count"></span></h2><button type="button" id="todayWord" class="th-only" onclick="twNext()" title="누르면 다른 단어"></button></div>
 <button id="gearBtn" onclick="toggleSettings(true)" title="설정" style="font-size:18px;padding:6px 12px;line-height:1">⚙</button>
@@ -1008,6 +1036,8 @@ body.th-cute .sync-title{font-family:"Nunito","Jua",sans-serif;color:#4CC552;tex
 <div id="writingView" class="hide">
   <div class="card" id="writingBody"></div>
 </div>
+
+<footer id="appFooter"><details><summary>VOCA v2026.10.06 · 업데이트 기록</summary><ul><li><b>2026.10.06</b> 아이패드·아이폰에서 RC·테스트 기록이 안 받아지던 문제 수정 (저장 공간이 모자라면 자동 압축 저장) · 맨 위에 마지막 동기화 시간, 맨 아래에 버전 기록 표시</li><li><b>2026.10.05</b> 단어 테스트: 뜻이 2/3 이상 겹치는 선택은 △ (0.5점) · 고양이 100%/90% 표정 교체</li><li><b>2026.10.03</b> 로그인 · 계정별 클라우드 동기화 (어느 기기에서든 같은 기록)</li><li><b>이전</b> 캘린더 시험일·계획·자동 분배 · 고영희 테마와 점수별 표정 · 호버 사전 · TCSE 실전 화면과 AI 분석 프롬프트 복사 · Writing 예시 CSV 가져오기 · 틀린 단어 어근 표시</li></ul></details></footer>
 
 <div id="settingsModal" class="hide" onclick="if(event.target===this)toggleSettings(false)" style="position:fixed;inset:0;background:rgba(20,25,40,.35);z-index:200;display:flex;justify-content:flex-end">
   <div style="background:var(--card);width:380px;max-width:92vw;height:100%;overflow-y:auto;padding:18px 20px">
