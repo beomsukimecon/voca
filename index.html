@@ -1041,7 +1041,7 @@ body.th-cute .sync-title{font-family:"Nunito","Jua",sans-serif;color:#4CC552;tex
   <div class="card" id="writingBody"></div>
 </div>
 
-<footer id="appFooter"><details><summary>VOCA v2026.10.14 · 업데이트 기록</summary><ul><li><b>2026.10.14</b> 3회독부터 연습 테스트를 50개씩 묶기 · 설정창 정리 (학습 설정 하나로 합치고, 나머지는 ‘표시 · 세부 설정’으로) · 회독 진도를 연습 테스트 완료 일차 기준으로 · 3회독부터 색 기준 2회 파랑/뜻2+단어1 빨강/4회 무지개</li><li><b>2026.10.06</b> 설정 > 학습 자료 받기: 암호로 잠근 GRE 단어·TCSE·RC·Writing 자료를 받아오기 · 아이패드·아이폰에서 RC·테스트 기록이 안 받아지던 문제 수정 (저장 공간이 모자라면 자동 압축 저장) · 맨 위에 마지막 동기화 시간, 맨 아래에 버전 기록 표시</li><li><b>2026.10.05</b> 단어 테스트: 뜻이 2/3 이상 겹치는 선택은 △ (0.5점) · 고양이 100%/90% 표정 교체</li><li><b>2026.10.03</b> 로그인 · 계정별 클라우드 동기화 (어느 기기에서든 같은 기록)</li><li><b>이전</b> 캘린더 시험일·계획·자동 분배 · 고영희 테마와 점수별 표정 · 호버 사전 · TCSE 실전 화면과 AI 분석 프롬프트 복사 · Writing 예시 CSV 가져오기 · 틀린 단어 어근 표시</li></ul></details></footer>
+<footer id="appFooter"><details><summary>VOCA v2026.10.14 · 업데이트 기록</summary><ul><li><b>2026.10.14</b> 3회독부터 연습 테스트를 50개씩 묶기 · 설정창 정리 (학습 설정 하나로 합치고, 나머지는 ‘표시 · 세부 설정’으로) · 회독 진도를 연습 테스트 완료 일차 기준으로 · 3회독부터 묶음 테스트 순서 ①전체 ②전체 ③오답복습 ④전체 ⑤오답복습 ⑥전체 (3회 파랑·5회 빨강·6회 무지개)</li><li><b>2026.10.06</b> 설정 > 학습 자료 받기: 암호로 잠근 GRE 단어·TCSE·RC·Writing 자료를 받아오기 · 아이패드·아이폰에서 RC·테스트 기록이 안 받아지던 문제 수정 (저장 공간이 모자라면 자동 압축 저장) · 맨 위에 마지막 동기화 시간, 맨 아래에 버전 기록 표시</li><li><b>2026.10.05</b> 단어 테스트: 뜻이 2/3 이상 겹치는 선택은 △ (0.5점) · 고양이 100%/90% 표정 교체</li><li><b>2026.10.03</b> 로그인 · 계정별 클라우드 동기화 (어느 기기에서든 같은 기록)</li><li><b>이전</b> 캘린더 시험일·계획·자동 분배 · 고영희 테마와 점수별 표정 · 호버 사전 · TCSE 실전 화면과 AI 분석 프롬프트 복사 · Writing 예시 CSV 가져오기 · 틀린 단어 어근 표시</li></ul></details></footer>
 
 <div id="settingsModal" class="hide" onclick="if(event.target===this)toggleSettings(false)" style="position:fixed;inset:0;background:rgba(20,25,40,.35);z-index:200;display:flex;justify-content:flex-end">
   <div style="background:var(--card);width:380px;max-width:92vw;height:100%;overflow-y:auto;padding:18px 20px">
@@ -1651,9 +1651,22 @@ function loadPractice(){try{return JSON.parse(localStorage.getItem(PR_KEY()))||[
 function savePractice(arr){try{localStorage.setItem(PR_KEY(),JSON.stringify(arr));return true;}catch(e){var a=arr.slice();while(a.length>30){a=a.slice(Math.max(1,Math.ceil(a.length*0.2)));try{localStorage.setItem(PR_KEY(),JSON.stringify(a));return true;}catch(e2){}}try{localStorage.setItem(PR_KEY(),JSON.stringify(arr.slice(-30)));}catch(e3){}return false;}}
 /* 연습 테스트 구간별 완료 횟수 — 연습 기록에서 직접 집계 (3회 이상 = 완료) */
 const TEST_MEAN_GOAL=3, TEST_WORD_GOAL=1, TEST_GOAL=TEST_MEAN_GOAL+TEST_WORD_GOAL;
-/* 회독별 색 기준: 1·2회독 = 3회↑ 파랑 · 뜻3+단어1 빨강 · 6회↑ 무지개
-                   3회독부터 = 2회↑ 파랑 · 뜻2+단어1 빨강 · 4회↑ 무지개 */
-function testGoals(r){return r>=3?{mean:2,word:1,blue:2,sup:4}:{mean:TEST_MEAN_GOAL,word:TEST_WORD_GOAL,blue:3,sup:6};}
+/* 3회독부터 50개 묶음 순서 (3/2/1): ①전체 ②전체 ③오답복습 → ④전체 ⑤오답복습 → ⑥전체
+   오답복습 = 직전 전체 테스트들에서 틀린 단어 + 나머지를 채워 25문제. 2개 이상 틀리면 인정 안 됨(다시). */
+const SEQ_STEPS=['full','full','review','full','review','full'];
+function testGoals(r){return {mean:TEST_MEAN_GOAL,word:TEST_WORD_GOAL,blue:3,sup:6};}
+function chunkSeqFrom(recs){
+  let n=0,pend={},lastFail=false;
+  recs.forEach(x=>{
+    if(x.review){ if((x.wrong||[]).length<=1){n++;pend={};lastFail=false;} else {lastFail=true;(x.wrong||[]).forEach(w=>{pend[w.day+'_'+w.no]=w;});} }
+    else{ n++;lastFail=false;(x.wrong||[]).forEach(w=>{pend[w.day+'_'+w.no]=w;}); }
+  });
+  const next=n<SEQ_STEPS.length?SEQ_STEPS[n]:'full';
+  return {n:n,next:next,wrong:Object.values(pend),lastFail:lastFail};
+}
+function chunkSeq(day,from,r,prac){
+  return chunkSeqFrom((prac||loadPractice()).filter(x=>x.chunk&&+x.chunk.day===+day&&+x.chunk.from===+from&&(x.round||1)===r));
+}
 /* 연습 테스트 묶음 크기: 1·2회독은 설정값(기본 25), 3회독부터 50 */
 function TQ(){var r=1;try{roundEnsure();r=(roundState&&roundState.cur)||1;}catch(e){}return r>=3?50:QSIZE;}
 function testChunkCounts(day,q){
@@ -1667,6 +1680,7 @@ function testChunkCounts(day,q){
 function testChunkProgress(day,q){
   const c=testChunkCounts(day,q);
   let _r=1;try{roundEnsure();_r=(roundState&&roundState.cur)||1;}catch(e){}const g=testGoals(_r);
+  if(_r>=3){const sq=chunkSeq(day,q*TQ()+1,_r);return {seq:sq,prog:sq.n,goal:6,done:sq.n>=5,sup:sq.n>=6,blue:sq.n>=3,g:g,total:sq.n,mean:c.mean,word:c.word};}
   const prog=Math.min(c.mean,g.mean)+Math.min(c.word,g.word);
   const total=c.mean+c.word;
   return {prog:prog, goal:g.mean+g.word, done:(c.mean>=g.mean&&c.word>=g.word), sup:total>=g.sup, blue:total>=g.blue, g:g, total:total, mean:c.mean, word:c.word};
@@ -1679,7 +1693,7 @@ function recordPractice(){
     label:quiz.label||'',mode:quiz.mode,score:quiz.score,total:quiz.pool.length,
     pct:Math.round(quiz.score/quiz.pool.length*100),
     round:(quiz.round||1),roundTest:!!quiz.roundTest,cover:(quiz.coverDays||null),rtSession:(quiz.rtSession!=null?quiz.rtSession:null),
-    chunk:quiz.chunk||null,
+    chunk:quiz.chunk||null,review:!!quiz.review,
     freqDay:(quiz.freqDay!=null?quiz.freqDay:null),
     wrong:[...(quiz.wrongList||[])].sort((a,b)=>(a.day-b.day)||(a.no-b.no)).map(w=>({word:w.word,mean:w.mean,day:w.day,no:w.no}))});
   if(arr.length>2000)arr.splice(0,arr.length-2000);
@@ -1968,12 +1982,12 @@ function syncStudySettings(){
 }
 /* 회독 진도 = 연습 테스트를 다 끝낸 일차 수 (그 일차의 모든 묶음이 뜻 고르기 3회 + 단어 고르기 1회) */
 function testDoneDays(r){
-  var size=r>=3?50:QSIZE, cnt={}, tg=testGoals(r);
-  loadPractice().forEach(function(x){if(!x.chunk||(x.round||1)!==r)return;var k=x.chunk.day+'_'+x.chunk.from;var c=cnt[k]||(cnt[k]={m:0,w:0});if(x.mode==='word')c.w++;else c.m++;});
+  var size=r>=3?50:QSIZE, cnt={}, tg=testGoals(r), prac=loadPractice();
+  prac.forEach(function(x){if(!x.chunk||(x.round||1)!==r)return;var k=x.chunk.day+'_'+x.chunk.from;var c=cnt[k]||(cnt[k]={m:0,w:0});if(x.mode==='word')c.w++;else c.m++;});
   var maxNo={};data.forEach(function(w){var d=+w.day||0;maxNo[d]=Math.max(maxNo[d]||0,+w.no||0);});
   var out=[];
   Object.keys(maxNo).forEach(function(dk){var d=+dk,nq=Math.ceil(maxNo[d]/size);if(!nq)return;var ok=true;
-    for(var q=0;q<nq;q++){var c=cnt[d+'_'+(q*size+1)];if(!c||c.m<tg.mean||c.w<tg.word){ok=false;break;}}
+    for(var q=0;q<nq;q++){if(r>=3){if(chunkSeq(d,q*size+1,r,prac).n<5){ok=false;break;}continue;}var c=cnt[d+'_'+(q*size+1)];if(!c||c.m<tg.mean||c.w<tg.word){ok=false;break;}}
     if(ok)out.push(d);});
   return out.sort(function(a,b){return a-b});
 }
@@ -2214,7 +2228,9 @@ function renderTestChunkRow(){
     const a=q*TQ()+1,b=Math.min(q*TQ()+TQ(),maxNo);
     const p=testChunkProgress(day,q);
     const cls=p.sup?' tc-super':(p.done?' tc-done':(p.blue?' on':''));
-    h+='<button class="chip'+cls+'" title="뜻 고르기 '+p.mean+'회 · 단어 고르기 '+p.word+'회 (총 '+p.total+'회 · '+p.g.blue+'↑ 파랑 · 뜻'+p.g.mean+'+단어'+p.g.word+' 빨강 · '+p.g.sup+'회↑ 무지개)" onclick="startTestChunk('+day+','+q+')">'+a+'–'+b+' <b>'+p.total+'/3</b></button>';
+    if(p.seq){const sq=p.seq,nx=sq.n>=6?'추가 연습 (전체)':((sq.n+1)+'번째 '+(sq.next==='review'?'오답 복습 25문제':'전체'));
+      h+='<button class="chip'+cls+'" title="완료 '+sq.n+'/6 · 다음: '+nx+(sq.lastFail?' (지난 오답 복습 미통과)':'')+' · 순서 ①전체 ②전체 ③오답복습 ④전체 ⑤오답복습 ⑥전체 · 3회 파랑 · 5회 빨강 · 6회 무지개" onclick="startTestChunk('+day+','+q+')">'+a+'–'+b+' <b>'+sq.n+'/6</b>'+(sq.n<6&&sq.next==='review'?' <span style="font-size:11px">복습'+(sq.lastFail?'↺':'')+'</span>':'')+'</button>';}
+    else h+='<button class="chip'+cls+'" title="뜻 고르기 '+p.mean+'회 · 단어 고르기 '+p.word+'회 (총 '+p.total+'회 · 3↑ 파랑 · 뜻3+단어1 빨강 · 6회↑ 무지개)" onclick="startTestChunk('+day+','+q+')">'+a+'–'+b+' <b>'+p.total+'/3</b></button>';
   }
   el.innerHTML=h;
 }
@@ -2225,7 +2241,13 @@ function startTestChunk(day,q){
   if(pool.length<4)return alert(day+'일차 '+a+'–'+b+' 구간 단어가 4개 미만입니다.');
   pool=[...pool].sort(()=>Math.random()-.5);
   roundEnsure();
-  quiz={pool,i:0,mode:document.getElementById('qMode').value,score:0,wrongList:[],official:false,target:'quizArea',round:(roundState?roundState.cur:1),chunk:{day:day,q:q,from:a,to:Math.min(b,Math.max.apply(null,pool.map(w=>+w.no||0)))},label:day+'일차 '+a+'–'+Math.min(b,Math.max.apply(null,pool.map(w=>+w.no||0)))};
+  const _rr=(roundState?roundState.cur:1);let review=false,sq=null;
+  if(_rr>=3){sq=chunkSeq(day,a,_rr);
+    if(sq.next==='review'){review=true;
+      const wk=new Set(sq.wrong.map(w=>w.day+'_'+w.no));
+      const wr=pool.filter(w=>wk.has(w.day+'_'+w.no)), rest=pool.filter(w=>!wk.has(w.day+'_'+w.no));
+      pool=wr.concat(rest.slice(0,Math.max(0,25-wr.length))).sort(()=>Math.random()-.5);}}
+  quiz={review:review,seqStep:sq?sq.n+1:0,pool,i:0,mode:document.getElementById('qMode').value,score:0,wrongList:[],official:false,target:'quizArea',round:(roundState?roundState.cur:1),chunk:{day:day,q:q,from:a,to:Math.min(b,Math.max.apply(null,pool.map(w=>+w.no||0)))},label:day+'일차 '+a+'–'+Math.min(b,Math.max.apply(null,data.filter(w=>+w.day===day&&+w.no>=a&&+w.no<=b).map(w=>+w.no||0)))+(sq?' · '+(sq.n+1)+'번째'+(review?' 오답 복습':''):'')};
   setQuizMode(true);showQ();
 }
 function startQuiz(){
@@ -2420,7 +2442,8 @@ function showQ(){twSync();
         '<button class="primary" onclick="backToCalendar()">캘린더로 돌아가기</button>'+triHtml+wrongHtml;
     }else{
       const resCat=quiz.chunk?'<div class="th-only res-cat">'+catSVG(catMoodGet())+'<div class="res-bub">'+quiz.pool.length+'개 중 '+quiz.score+((quiz.triList||[]).length?'점이에요':'개 맞았어요')+'</div></div>':'';
-      a.innerHTML=resCat+'<h3>완료! '+quiz.score+'/'+quiz.pool.length+' ('+pct+'%)'+(tl.length?' <span class="count" style="font-weight:400">· △ '+tl.length+'개는 0.5점씩</span>':'')+'</h3><button class="primary" onclick="endQuiz()">닫기</button>'+triHtml+wrongHtml;
+      const revMsg=quiz.review?((quiz.wrongList||[]).length>=2?'<p class="study-tip" style="color:var(--red);font-weight:700;margin:4px 0 8px">오답 복습은 틀린 게 1개 이하여야 인정돼요. 이번엔 '+quiz.wrongList.length+'개 틀려서 다시 해야 해요.</p>':'<p class="study-tip" style="color:#176b43;font-weight:700;margin:4px 0 8px">오답 복습 통과! 다음은 전체 테스트예요.</p>'):'';
+      a.innerHTML=resCat+revMsg+'<h3>완료! '+quiz.score+'/'+quiz.pool.length+' ('+pct+'%)'+(tl.length?' <span class="count" style="font-weight:400">· △ '+tl.length+'개는 0.5점씩</span>':'')+'</h3><button class="primary" onclick="endQuiz()">닫기</button>'+triHtml+wrongHtml;
     }
     return;
   }
