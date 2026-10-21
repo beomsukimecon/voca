@@ -2536,7 +2536,7 @@ function showQ(){twSync();
       const main=qmode==='mean'?esc(c.mean):esc(c.word);
       const sub=qmode==='mean'?esc(c.word):esc(c.mean);
       return '<button class="quiz-choice" data-di="'+di+'" onclick="answer('+di+','+ansIdx+',this)"><span>'+main+'</span><span class="qc-sub hide"> — '+sub+'</span></button>';
-    }).join('')+(useNone?'<button class="quiz-choice qc-none" id="qNone" data-di="-1" onclick="answerNone('+ansIdx+',this)"><span>답 없음</span><span class="qc-sub hide"> — 위 보기 중에 정답이 없음</span></button>':'')+'<div id="qExpl" class="hide" style="margin-top:8px">'+(q.etym?'<div class="etym"><b>어근·어원</b> · '+esc(q.etym)+'</div>':'')+(q.sent?'<div class="e-sent">'+esc(q.sent)+'</div>':'')+(q.syn?'<div class="e-syn">≈ '+esc(q.syn)+'</div>':'')+'</div><div id="qNext" class="hide" style="margin-top:8px"><button class="primary" onclick="nextQ()">다음 →</button></div><div class="study-tip">키보드: 1~'+nch+' 선택 · Enter 다음 · Esc 종료</div>';
+    }).join('')+(useNone?'<button class="quiz-choice qc-none" id="qNone" data-di="-1" onclick="answerNone('+ansIdx+',this)"><span>답 없음</span></button>':'')+'<div id="qExpl" class="hide" style="margin-top:8px">'+(q.etym?'<div class="etym"><b>어근·어원</b> · '+esc(q.etym)+'</div>':'')+(q.sent?'<div class="e-sent">'+esc(q.sent)+'</div>':'')+(q.syn?'<div class="e-syn">≈ '+esc(q.syn)+'</div>':'')+'</div><div id="qNext" class="hide" style="margin-top:8px"><button class="primary" onclick="nextQ()">다음 →</button></div><div class="study-tip">키보드: 1~'+nch+' 선택 · Enter 다음 · Esc 종료</div>';
   startQuizTimer();
 }
 function qAnsMatch(ai,qi){
@@ -2603,8 +2603,8 @@ function answer(ci,qi,btn){
 }
 function noneReveal(qi){
   const nb=document.getElementById('qNone');if(!nb||!quiz._none)return;
-  const q=data[qi];nb.classList.add('correct','none-open');
-  nb.innerHTML='<span class="none-tag">답 없음 ✓ 보기에 정답이 없었어요</span><span class="none-real"><b>'+esc(q.word)+'</b> — '+esc(breakNumbered(q.mean))+'</span>';
+  const q=data[qi];nb.classList.add('correct');
+  nb.innerHTML='<span>답 없음 — <b>'+esc(q.word)+'</b> '+esc(q.mean)+'</span>';
 }
 function answerNone(qi,btn){
   clearQuizTimer();
