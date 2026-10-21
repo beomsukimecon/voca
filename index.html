@@ -917,6 +917,10 @@ body.th-cute .sync-title{font-family:"Nunito","Jua",sans-serif;color:#4CC552;tex
 .quiz-choice.qc-none{border-style:dashed;color:var(--sub)}
 .quiz-choice.qc-none.correct,.quiz-choice.qc-none.wrong{color:inherit}
 .none-ans{background:#eef7f1;border:1px solid #bfe3cc;border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:14px;white-space:pre-line}
+
+.quiz-choice.none-open{display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+.none-tag{font-size:12px;font-weight:700;color:#176b43}
+.none-real{font-size:15px;color:var(--ink);white-space:pre-line}
 </style>
 </head>
 <body>
@@ -1062,7 +1066,7 @@ body.th-cute .sync-title{font-family:"Nunito","Jua",sans-serif;color:#4CC552;tex
   <div class="card" id="writingBody"></div>
 </div>
 
-<footer id="appFooter"><details><summary>VOCA v2026.10.21 · 업데이트 기록</summary><ul><li><b>2026.10.21</b> 연습 테스트에 ‘답 없음’ 보기 (정답을 빼는 비율 설정 가능) · 테스트 결과: 전체 단어 결과 펼쳐보기(TCSE 빈출 표시) · 틀린 단어마다 내가 고른 것·헷갈리기 쉬운 단어 함께 보기</li><li><b>2026.10.14</b> 3회독부터 연습 테스트를 50개씩 묶기 · 설정창 정리 (학습 설정 하나로 합치고, 나머지는 ‘표시 · 세부 설정’으로) · 회독 진도를 연습 테스트 완료 일차 기준으로 (빨강 또는 무지개 = 완료) · 3회독부터 묶음 테스트 순서 ①전체 ②전체 ③오답복습 ④전체 ⑤오답복습 ⑥전체 (3회 파랑·5회 빨강·6회 무지개) · 오답 복습 25문제 = 오답 → TCSE 빈출 → 랜덤 순으로 채움</li><li><b>2026.10.06</b> 설정 > 학습 자료 받기: 암호로 잠근 GRE 단어·TCSE·RC·Writing 자료를 받아오기 · 아이패드·아이폰에서 RC·테스트 기록이 안 받아지던 문제 수정 (저장 공간이 모자라면 자동 압축 저장) · 맨 위에 마지막 동기화 시간, 맨 아래에 버전 기록 표시</li><li><b>2026.10.05</b> 단어 테스트: 뜻이 2/3 이상 겹치는 선택은 △ (0.5점) · 고양이 100%/90% 표정 교체</li><li><b>2026.10.03</b> 로그인 · 계정별 클라우드 동기화 (어느 기기에서든 같은 기록)</li><li><b>이전</b> 캘린더 시험일·계획·자동 분배 · 고영희 테마와 점수별 표정 · 호버 사전 · TCSE 실전 화면과 AI 분석 프롬프트 복사 · Writing 예시 CSV 가져오기 · 틀린 단어 어근 표시</li></ul></details></footer>
+<footer id="appFooter"><details><summary>VOCA v2026.10.21 · 업데이트 기록</summary><ul><li><b>2026.10.21</b> 연습 테스트에 ‘답 없음’ 보기 (정답을 빼는 비율 설정 가능, 정답은 ‘답 없음’ 칸에 표시) · ‘모르겠어요’ 버튼 없앰 · 테스트 결과: 전체 단어 결과 펼쳐보기(TCSE 빈출 표시) · 틀린 단어마다 내가 고른 것·헷갈리기 쉬운 단어 함께 보기</li><li><b>2026.10.14</b> 3회독부터 연습 테스트를 50개씩 묶기 · 설정창 정리 (학습 설정 하나로 합치고, 나머지는 ‘표시 · 세부 설정’으로) · 회독 진도를 연습 테스트 완료 일차 기준으로 (빨강 또는 무지개 = 완료) · 3회독부터 묶음 테스트 순서 ①전체 ②전체 ③오답복습 ④전체 ⑤오답복습 ⑥전체 (3회 파랑·5회 빨강·6회 무지개) · 오답 복습 25문제 = 오답 → TCSE 빈출 → 랜덤 순으로 채움</li><li><b>2026.10.06</b> 설정 > 학습 자료 받기: 암호로 잠근 GRE 단어·TCSE·RC·Writing 자료를 받아오기 · 아이패드·아이폰에서 RC·테스트 기록이 안 받아지던 문제 수정 (저장 공간이 모자라면 자동 압축 저장) · 맨 위에 마지막 동기화 시간, 맨 아래에 버전 기록 표시</li><li><b>2026.10.05</b> 단어 테스트: 뜻이 2/3 이상 겹치는 선택은 △ (0.5점) · 고양이 100%/90% 표정 교체</li><li><b>2026.10.03</b> 로그인 · 계정별 클라우드 동기화 (어느 기기에서든 같은 기록)</li><li><b>이전</b> 캘린더 시험일·계획·자동 분배 · 고영희 테마와 점수별 표정 · 호버 사전 · TCSE 실전 화면과 AI 분석 프롬프트 복사 · Writing 예시 CSV 가져오기 · 틀린 단어 어근 표시</li></ul></details></footer>
 
 <div id="settingsModal" class="hide" onclick="if(event.target===this)toggleSettings(false)" style="position:fixed;inset:0;background:rgba(20,25,40,.35);z-index:200;display:flex;justify-content:flex-end">
   <div style="background:var(--card);width:380px;max-width:92vw;height:100%;overflow-y:auto;padding:18px 20px">
@@ -2219,9 +2223,6 @@ document.addEventListener('keydown',e=>{
     const btns=document.querySelectorAll('#'+quiz.target+' .quiz-choice');
     const b=btns[+e.key-1];
     if(b&&!b.disabled)b.click();
-  }else if(e.key==='0'){
-    const dn=document.getElementById('qDunno');
-    if(dn&&!dn.disabled)dn.click();
   }else if(e.key==='Enter'){
     const nx=document.getElementById('qNext');
     if(nx&&!nx.classList.contains('hide'))nextQ();
@@ -2444,8 +2445,8 @@ function startQuizTimer(){
     if(e2){e2.textContent='⏱ '+rem+'초';if(rem<=3)e2.style.color='var(--red)';}
     if(rem<=0){
       clearQuizTimer();
-      const dn=document.getElementById('qDunno');
-      if(dn&&!dn.disabled)dn.click();
+      const c0=document.querySelector('#'+quiz.target+' .quiz-choice');
+      if(quiz&&quiz._ans!=null&&c0&&!c0.disabled)dontKnow(quiz._ans);
     }
   },1000);
 }
@@ -2521,7 +2522,7 @@ function showQ(){twSync();
   /* ‘답 없음’ 보기: 연습 테스트에서만. 일정 확률로 정답을 빼고 ‘답 없음’이 정답이 됨 */
   const useNone=!quiz.official&&settings.noneOpt!==false;
   const hideAns=useNone&&Math.random()<Math.max(0,Math.min(100,+settings.nonePct||0))/100;
-  quiz._none=hideAns;
+  quiz._none=hideAns;quiz._ans=ansIdx;
   const src=(quiz.distractSrc?quiz.distractSrc:(quiz.pool.length>=nch+2?quiz.pool:data)).filter(x=>x===q||!qAnsMatch(data.indexOf(x),ansIdx));
   const nReal=useNone?nch-1:nch;
   const others=pick(src,hideAns?nReal:nReal-1,q);
@@ -2535,7 +2536,7 @@ function showQ(){twSync();
       const main=qmode==='mean'?esc(c.mean):esc(c.word);
       const sub=qmode==='mean'?esc(c.word):esc(c.mean);
       return '<button class="quiz-choice" data-di="'+di+'" onclick="answer('+di+','+ansIdx+',this)"><span>'+main+'</span><span class="qc-sub hide"> — '+sub+'</span></button>';
-    }).join('')+(useNone?'<button class="quiz-choice qc-none" id="qNone" data-di="-1" onclick="answerNone('+ansIdx+',this)"><span>답 없음</span><span class="qc-sub hide"> — 위 보기 중에 정답이 없음</span></button>':'')+'<button class="btn" id="qDunno" onclick="dontKnow('+ansIdx+')" style="width:100%;margin-top:8px;color:var(--sub)">모르겠어요</button>'+'<div id="qExpl" class="hide" style="margin-top:8px">'+(hideAns?'<div class="none-ans">정답: <b>'+esc(q.word)+'</b> — '+esc(breakNumbered(q.mean))+'</div>':'')+(q.etym?'<div class="etym"><b>어근·어원</b> · '+esc(q.etym)+'</div>':'')+(q.sent?'<div class="e-sent">'+esc(q.sent)+'</div>':'')+(q.syn?'<div class="e-syn">≈ '+esc(q.syn)+'</div>':'')+'</div><div id="qNext" class="hide" style="margin-top:8px"><button class="primary" onclick="nextQ()">다음 →</button></div><div class="study-tip">키보드: 1~'+nch+' 선택 · 0 모르겠어요 · Enter 다음 · Esc 종료</div>';
+    }).join('')+(useNone?'<button class="quiz-choice qc-none" id="qNone" data-di="-1" onclick="answerNone('+ansIdx+',this)"><span>답 없음</span><span class="qc-sub hide"> — 위 보기 중에 정답이 없음</span></button>':'')+'<div id="qExpl" class="hide" style="margin-top:8px">'+(q.etym?'<div class="etym"><b>어근·어원</b> · '+esc(q.etym)+'</div>':'')+(q.sent?'<div class="e-sent">'+esc(q.sent)+'</div>':'')+(q.syn?'<div class="e-syn">≈ '+esc(q.syn)+'</div>':'')+'</div><div id="qNext" class="hide" style="margin-top:8px"><button class="primary" onclick="nextQ()">다음 →</button></div><div class="study-tip">키보드: 1~'+nch+' 선택 · Enter 다음 · Esc 종료</div>';
   startQuizTimer();
 }
 function qAnsMatch(ai,qi){
@@ -2582,7 +2583,7 @@ function answer(ci,qi,btn){
   document.querySelectorAll('#'+quiz.target+' .qc-sub').forEach(s=>s.classList.remove('hide'));
   btn.classList.add(correct?'correct':(tri?'tri':'wrong'));
   document.querySelectorAll('#'+quiz.target+' .quiz-choice').forEach(b=>{if(+b.dataset.di>=0&&qAnsMatch(+b.dataset.di,qi))b.classList.add('correct')});
-  if(quiz._none){const nb=document.getElementById('qNone');if(nb)nb.classList.add('correct');}
+  if(quiz._none)noneReveal(qi);
   if(tri){
     const cq=data[qi];cq.tLast='tri';saveWords();quiz.score+=0.5;
     (quiz.triList=quiz.triList||[]).push({q:cq,pick:data[ci]});
@@ -2600,6 +2601,11 @@ function answer(ci,qi,btn){
     else{const nx=document.getElementById('qNext');if(nx)nx.classList.remove('hide');}
   }
 }
+function noneReveal(qi){
+  const nb=document.getElementById('qNone');if(!nb||!quiz._none)return;
+  const q=data[qi];nb.classList.add('correct','none-open');
+  nb.innerHTML='<span class="none-tag">답 없음 ✓ 보기에 정답이 없었어요</span><span class="none-real"><b>'+esc(q.word)+'</b> — '+esc(breakNumbered(q.mean))+'</span>';
+}
 function answerNone(qi,btn){
   clearQuizTimer();
   const t=quiz.target;
@@ -2607,9 +2613,8 @@ function answerNone(qi,btn){
   document.querySelectorAll('#'+t+' .qc-sub').forEach(s=>s.classList.remove('hide'));
   const q=data[qi];
   if(quiz._none){
-    btn.classList.add('correct');
+    noneReveal(qi);
     q.tLast='correct';q.tStreak=(q.tStreak||0)+1;saveWords();quiz.score++;
-    const ex=document.getElementById('qExpl');if(ex)ex.classList.remove('hide');
     setTimeout(()=>{if(quiz)nextQ()},Math.max(1.2,settings.correctDelay)*1000);
     return;
   }
@@ -2627,7 +2632,7 @@ function dontKnow(qi){
   document.querySelectorAll('#'+t+' .quiz-choice').forEach(b=>b.disabled=true);
   document.querySelectorAll('#'+t+' .qc-sub').forEach(s=>s.classList.remove('hide'));
   document.querySelectorAll('#'+t+' .quiz-choice').forEach(b=>{if(+b.dataset.di>=0&&qAnsMatch(+b.dataset.di,qi))b.classList.add('correct')});
-  if(quiz._none){const nb=document.getElementById('qNone');if(nb)nb.classList.add('correct');}
+  if(quiz._none)noneReveal(qi);
   const dn=document.getElementById('qDunno');if(dn){dn.disabled=true;dn.classList.add('dunno-wrong');}
   const q=data[qi];q.wrong=(q.wrong||0)+1;q.tLast='wrong';q.tStreak=0;quiz.wrongList.push(q);if(quiz.official)q.flag=true;saveWords();
   const ex=document.getElementById('qExpl');if(ex)ex.classList.remove('hide');
