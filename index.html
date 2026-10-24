@@ -921,6 +921,10 @@ body.th-cute .sync-title{font-family:"Nunito","Jua",sans-serif;color:#4CC552;tex
 .quiz-choice.none-open{display:flex;flex-direction:column;align-items:flex-start;gap:3px}
 .none-tag{font-size:12px;font-weight:700;color:#176b43}
 .none-real{font-size:15px;color:var(--ink);white-space:pre-line}
+
+.note-cnt{font-size:10.5px;font-weight:700;color:#c0392b;background:#fdecec;border-radius:6px;padding:1px 6px}
+.note-st{font-size:10.5px;color:var(--sub);background:#f1f2f5;border-radius:6px;padding:1px 6px}
+.note-st.good{color:#176b43;background:#e3f4ea;font-weight:700}
 </style>
 </head>
 <body>
@@ -962,6 +966,7 @@ body.th-cute .sync-title{font-family:"Nunito","Jua",sans-serif;color:#4CC552;tex
 <button class="primary" onclick="startQuiz()">전체 테스트</button>
 </div>
 <div class="row" id="testChunkRow" style="margin-top:8px"></div>
+<div class="row hide" id="noteRow" style="margin-top:8px"></div>
 <div class="row" id="freqTestRow" style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)">
   <span class="count" style="font-weight:700;color:#0b6b5e">TCSE 빈출</span>
   일차 <input type="number" id="freqDayFrom" min="1" value="1" style="width:52px"> ~ <input type="number" id="freqDayTo" min="1" value="1" placeholder="끝" style="width:52px">
@@ -1066,7 +1071,7 @@ body.th-cute .sync-title{font-family:"Nunito","Jua",sans-serif;color:#4CC552;tex
   <div class="card" id="writingBody"></div>
 </div>
 
-<footer id="appFooter"><details><summary>VOCA v2026.10.22 · 업데이트 기록</summary><ul><li><b>2026.10.22</b> 테스트에서 틀렸을 때·결과 화면의 예문/유사어/어근/발음도 ‘표시 항목’ 설정을 따름</li><li><b>2026.10.21</b> 연습 테스트에 ‘답 없음’ 보기 (정답을 빼는 비율 설정 가능, 정답은 ‘답 없음’ 칸에 표시) · ‘모르겠어요’ 버튼 없앰 · 테스트 결과: 전체 단어 결과 펼쳐보기(TCSE 빈출 표시) · 틀린 단어마다 내가 고른 것·헷갈리기 쉬운 단어 함께 보기</li><li><b>2026.10.14</b> 3회독부터 연습 테스트를 50개씩 묶기 · 설정창 정리 (학습 설정 하나로 합치고, 나머지는 ‘표시 · 세부 설정’으로) · 회독 진도를 연습 테스트 완료 일차 기준으로 (빨강 또는 무지개 = 완료) · 3회독부터 묶음 테스트 순서 ①전체 ②전체 ③오답복습 ④전체 ⑤오답복습 ⑥전체 (3회 파랑·5회 빨강·6회 무지개) · 오답 복습 25문제 = 오답 → TCSE 빈출 → 랜덤 순으로 채움</li><li><b>2026.10.06</b> 설정 > 학습 자료 받기: 암호로 잠근 GRE 단어·TCSE·RC·Writing 자료를 받아오기 · 아이패드·아이폰에서 RC·테스트 기록이 안 받아지던 문제 수정 (저장 공간이 모자라면 자동 압축 저장) · 맨 위에 마지막 동기화 시간, 맨 아래에 버전 기록 표시</li><li><b>2026.10.05</b> 단어 테스트: 뜻이 2/3 이상 겹치는 선택은 △ (0.5점) · 고양이 100%/90% 표정 교체</li><li><b>2026.10.03</b> 로그인 · 계정별 클라우드 동기화 (어느 기기에서든 같은 기록)</li><li><b>이전</b> 캘린더 시험일·계획·자동 분배 · 고영희 테마와 점수별 표정 · 호버 사전 · TCSE 실전 화면과 AI 분석 프롬프트 복사 · Writing 예시 CSV 가져오기 · 틀린 단어 어근 표시</li></ul></details></footer>
+<footer id="appFooter"><details><summary>VOCA v2026.10.24 · 업데이트 기록</summary><ul><li><b>2026.10.24</b> 3회독부터 ‘오답 노트’: 6/6 끝낸 묶음에서 틀린 단어를 모아 보기·테스트</li><li><b>2026.10.22</b> 테스트에서 틀렸을 때·결과 화면의 예문/유사어/어근/발음도 ‘표시 항목’ 설정을 따름</li><li><b>2026.10.21</b> 연습 테스트에 ‘답 없음’ 보기 (정답을 빼는 비율 설정 가능, 정답은 ‘답 없음’ 칸에 표시) · ‘모르겠어요’ 버튼 없앰 · 테스트 결과: 전체 단어 결과 펼쳐보기(TCSE 빈출 표시) · 틀린 단어마다 내가 고른 것·헷갈리기 쉬운 단어 함께 보기</li><li><b>2026.10.14</b> 3회독부터 연습 테스트를 50개씩 묶기 · 설정창 정리 (학습 설정 하나로 합치고, 나머지는 ‘표시 · 세부 설정’으로) · 회독 진도를 연습 테스트 완료 일차 기준으로 (빨강 또는 무지개 = 완료) · 3회독부터 묶음 테스트 순서 ①전체 ②전체 ③오답복습 ④전체 ⑤오답복습 ⑥전체 (3회 파랑·5회 빨강·6회 무지개) · 오답 복습 25문제 = 오답 → TCSE 빈출 → 랜덤 순으로 채움</li><li><b>2026.10.06</b> 설정 > 학습 자료 받기: 암호로 잠근 GRE 단어·TCSE·RC·Writing 자료를 받아오기 · 아이패드·아이폰에서 RC·테스트 기록이 안 받아지던 문제 수정 (저장 공간이 모자라면 자동 압축 저장) · 맨 위에 마지막 동기화 시간, 맨 아래에 버전 기록 표시</li><li><b>2026.10.05</b> 단어 테스트: 뜻이 2/3 이상 겹치는 선택은 △ (0.5점) · 고양이 100%/90% 표정 교체</li><li><b>2026.10.03</b> 로그인 · 계정별 클라우드 동기화 (어느 기기에서든 같은 기록)</li><li><b>이전</b> 캘린더 시험일·계획·자동 분배 · 고영희 테마와 점수별 표정 · 호버 사전 · TCSE 실전 화면과 AI 분석 프롬프트 복사 · Writing 예시 CSV 가져오기 · 틀린 단어 어근 표시</li></ul></details></footer>
 
 <div id="settingsModal" class="hide" onclick="if(event.target===this)toggleSettings(false)" style="position:fixed;inset:0;background:rgba(20,25,40,.35);z-index:200;display:flex;justify-content:flex-end">
   <div style="background:var(--card);width:380px;max-width:92vw;height:100%;overflow-y:auto;padding:18px 20px">
@@ -1721,7 +1726,7 @@ function recordPractice(){
     label:quiz.label||'',mode:quiz.mode,score:quiz.score,total:quiz.pool.length,
     pct:Math.round(quiz.score/quiz.pool.length*100),
     round:(quiz.round||1),roundTest:!!quiz.roundTest,cover:(quiz.coverDays||null),rtSession:(quiz.rtSession!=null?quiz.rtSession:null),
-    chunk:quiz.chunk||null,review:!!quiz.review,
+    chunk:quiz.chunk||null,review:!!quiz.review,note:!!quiz.note,noteKeys:quiz.note?quiz.pool.map(w=>w.day+'_'+w.no):undefined,
     freqDay:(quiz.freqDay!=null?quiz.freqDay:null),
     wrong:[...(quiz.wrongList||[])].sort((a,b)=>(a.day-b.day)||(a.no-b.no)).map(w=>({word:w.word,mean:w.mean,day:w.day,no:w.no}))});
   if(arr.length>2000)arr.splice(0,arr.length-2000);
@@ -2235,12 +2240,13 @@ document.addEventListener('keydown',e=>{
 let quiz=null;
 function setQuizMode(on){
   if(on)toggleSettings(false);
-  ['mainTabs','studyCard','listCard','addCard','roundTestBox','testConfig','testChunkRow','freqTestRow','testNote','testHead'].forEach(id=>{
+  ['mainTabs','studyCard','listCard','addCard','roundTestBox','testConfig','testChunkRow','noteRow','freqTestRow','testNote','testHead'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.classList.toggle('hide',on);
   });
 }
 function renderTestChunkRow(){
   if(typeof renderRoundProgress==='function')renderRoundProgress();
+  if(typeof noteRenderRow==='function')noteRenderRow();
   const el=document.getElementById('testChunkRow');if(!el)return;
   const day=+document.getElementById('qDayFrom').value||1;
   const dayWords=data.filter(w=>+w.day===day);
@@ -2428,7 +2434,7 @@ function updateFreqAvail(){
     }else{bd.style.display='none';}
   }
 }
-function endQuiz(){clearQuizTimer();quiz=null;twSync();document.getElementById('quizArea').innerHTML='';setQuizMode(false);render();renderTestChunkRow();renderRoundTest();}
+function endQuiz(){clearQuizTimer();const _wasNote=!!(quiz&&quiz.note);quiz=null;twSync();document.getElementById('quizArea').innerHTML='';setQuizMode(false);render();renderTestChunkRow();renderRoundTest();if(_wasNote)noteOpen();}
 function clearQuizTimer(){if(quiz&&quiz._tid){clearInterval(quiz._tid);quiz._tid=null;}}
 function startQuizTimer(){
   clearQuizTimer();
@@ -2489,6 +2495,69 @@ function allResHTML(){
   return '<details class="allres"><summary>전체 '+rows.length+'단어 결과 보기'+(nTc?' · TCSE 빈출 '+nTc+'개':'')+'</summary>'+
     rows.map(w=>{const k=w.day+'_'+w.no,st=wk.has(k)?'x':(tk.has(k)?'t':'o');
       return '<div class="ar-row ar-'+st+'"><span class="ar-mk">'+(st==='x'?'✕':st==='t'?'△':'○')+'</span><span class="ar-no">'+w.day+'-'+w.no+'</span><b>'+esc(w.word)+'</b><span class="ar-mean">'+esc(rsShort(w.mean))+'</span>'+rsTcBadge(w)+'</div>';}).join('')+'</details>';
+}
+
+/* ================= 오답 노트 (3회독부터) =================
+   6/6까지 끝낸 50개 묶음에서, 이번 회독에 한 번이라도 틀린 단어를 모아 둔다. 빠지지 않고 계속 남음. */
+let noteDay=0;
+function noteRound(){try{roundEnsure();return (roundState&&roundState.cur)||1;}catch(e){return 1;}}
+function noteCollect(r){
+  const prac=loadPractice(), done={}, cnt={}, last={};
+  const chunks={};prac.forEach(x=>{if(x.chunk&&(x.round||1)===r)chunks[x.chunk.day+'_'+x.chunk.from]=1;});
+  Object.keys(chunks).forEach(k=>{const [d,f]=k.split('_');if(chunkSeq(+d,+f,r,prac).n>=6)done[k]=1;});
+  prac.forEach((x,i)=>{if(!x.chunk||(x.round||1)!==r||!done[x.chunk.day+'_'+x.chunk.from])return;
+    (x.wrong||[]).forEach(w=>{const k=w.day+'_'+w.no;cnt[k]=(cnt[k]||0)+1;last[k]=i;});});
+  const st={};prac.forEach(x=>{if(!x.note||(x.round||1)!==r||!x.noteKeys)return;const wk=new Set((x.wrong||[]).map(w=>w.day+'_'+w.no));
+    x.noteKeys.forEach(k=>{const o=st[k]||(st[k]={t:0,c:0,streak:0});o.t++;if(wk.has(k)){o.streak=0;}else{o.c++;o.streak++;}});});
+  const byKey={};data.forEach(w=>{byKey[w.day+'_'+w.no]=w;});
+  const items=Object.keys(cnt).filter(k=>byKey[k]).map(k=>({w:byKey[k],k:k,wrong:cnt[k],st:st[k]||{t:0,c:0,streak:0}}));
+  items.sort((a,b)=>(b.wrong-a.wrong)||(a.w.day-b.w.day)||(a.w.no-b.w.no));
+  return {items:items,chunks:Object.keys(done).length};
+}
+function noteRenderRow(){
+  const el=document.getElementById('noteRow');if(!el)return;
+  const r=noteRound();
+  if(r<3||quiz){el.classList.add('hide');return;}
+  const nc=noteCollect(r);
+  el.classList.remove('hide');
+  el.innerHTML='<button class="chip" style="border-color:#c0392b;color:#c0392b;font-weight:700" onclick="noteOpen()">📒 '+r+'회독 오답 노트 · '+nc.items.length+'단어</button>'+
+    '<span class="count">6/6 끝낸 묶음 '+nc.chunks+'개에서 틀린 단어가 모여요</span>';
+}
+function noteOpen(){
+  const r=noteRound();const nc=noteCollect(r);
+  setQuizMode(true);
+  const a=document.getElementById('quizArea');
+  const days=[...new Set(nc.items.map(x=>x.w.day))].sort((x,y)=>x-y);
+  if(noteDay&&!days.includes(noteDay))noteDay=0;
+  const list=nc.items.filter(x=>!noteDay||x.w.day===noteDay);
+  let h='<div class="row" style="justify-content:space-between;align-items:center"><h3 style="margin:0">📒 '+r+'회독 오답 노트 <span class="count">'+nc.items.length+'단어</span></h3><button class="small" onclick="noteClose()">닫기</button></div>';
+  if(!nc.items.length){a.innerHTML=h+'<p class="study-tip" style="margin-top:10px">아직 모인 단어가 없어요. 50개 묶음을 6/6까지 끝내면 그 묶음에서 틀렸던 단어가 여기 모여요.</p>';return;}
+  h+='<p class="study-tip" style="margin:6px 0 8px">6/6 끝낸 묶음에서 이번 회독에 한 번이라도 틀린 단어예요. 많이 틀린 순. 노트 테스트에서 맞혀도 빠지지 않아요.</p>';
+  h+='<div class="row" style="gap:6px;align-items:center;flex-wrap:wrap"><select id="noteDaySel" onchange="noteDay=+this.value;noteOpen()"><option value="0">전체 일차</option>'+days.map(d=>'<option value="'+d+'"'+(d===noteDay?' selected':'')+'>'+d+'일차 ('+nc.items.filter(x=>x.w.day===d).length+')</option>').join('')+'</select>'+
+    '<select id="noteMode"><option value="mean">뜻 고르기</option><option value="word">단어 고르기</option></select>'+
+    '<button class="primary small" onclick="noteTest(25)">테스트 25문제</button><button class="small" onclick="noteTest(0)">이 목록 전부 ('+list.length+')</button></div>';
+  h+=list.map(x=>{const w=x.w,st=x.st;
+    return '<div class="entry"><div class="e-top"><span class="e-day">'+w.day+'일차</span><span class="e-word">'+esc(w.word)+'</span>'+(w.pron&&vw('p')?'<span class="e-pron">'+esc(w.pron)+'</span>':'')+rsTcBadge(w)+
+      '<span class="note-cnt">틀림 '+x.wrong+'</span>'+(st.t?'<span class="note-st'+(st.streak>=2?' good':'')+'">노트 '+st.c+'/'+st.t+(st.streak>=2?' · '+st.streak+'연속 ✓':'')+'</span>':'')+'</div>'+
+      (w.mean?'<div class="e-mean">'+esc(breakNumbered(w.mean))+'</div>':'')+(w.etym&&vw('e')?'<div class="etym"><b>어근·어원</b> · '+esc(w.etym)+'</div>':'')+(w.sent&&vw('s')?'<div class="e-sent">'+esc(breakNumbered(w.sent))+'</div>':'')+(w.syn&&vw('y')?'<div class="e-syn">≈ '+esc(w.syn)+'</div>':'')+
+      (function(){const c=confusables(w,null,3);return c.length?'<div class="conf"><span class="conf-h">헷갈리기 쉬운 단어</span>'+c.map(z=>'<span class="conf-chip"><b>'+esc(z.x.word)+'</b> '+esc(rsShort(z.x.mean))+' <em>'+z.why+'</em></span>').join('')+'</div>':'';})()+
+      '</div>';}).join('');
+  a.innerHTML=h;
+}
+function noteClose(){document.getElementById('quizArea').innerHTML='';setQuizMode(false);render();renderTestChunkRow();renderRoundTest();}
+function noteTest(n){
+  const r=noteRound();const nc=noteCollect(r);
+  let list=nc.items.filter(x=>!noteDay||x.w.day===noteDay);
+  if(!list.length)return;
+  /* 25문제: 많이 틀린 것·노트에서 아직 약한 것 우선, 같은 점수는 랜덤 */
+  list=list.map(x=>({x:x,s:x.wrong*2-(x.st.streak||0)*1.5+Math.random()}));
+  list.sort((a,b)=>b.s-a.s);
+  let pool=list.map(o=>o.x.w);if(n)pool=pool.slice(0,n);
+  pool=pool.sort(()=>Math.random()-.5);
+  if(pool.length<1)return;
+  const mode=(document.getElementById('noteMode')||{}).value||'mean';
+  quiz={note:true,pool:pool,i:0,mode:mode,score:0,wrongList:[],official:false,target:'quizArea',round:r,distractSrc:data,label:r+'회독 오답 노트'+(noteDay?' · '+noteDay+'일차':'')+' '+pool.length+'문항'};
+  setQuizMode(true);showQ();
 }
 function vw(k){return !settings.view||settings.view[k]==null||!!settings.view[k];}
 function showQ(){twSync();
