@@ -5968,7 +5968,7 @@ function dkBuild(){
   const walk=(rules,wrap)=>{for(const r of rules){
     if(r.type===1){const sel=r.selectorText;if(!sel||/html\.dark/.test(sel))continue;const decl=[];
       for(let i=0;i<r.style.length;i++){const p=r.style[i],v=r.style.getPropertyValue(p);const nv=dkVal(p,v);if(nv)decl.push(p+':'+nv+(r.style.getPropertyPriority(p)?' !important':''));}
-      if(decl.length){const ns=sel.split(',').map(x=>{x=x.trim();if(/^(html|:root)\b/.test(x))return null;return 'html.dark '+x.replace(/^body\b/,'body');}).filter(Boolean).join(',');if(ns)out.push((wrap?wrap+'{':'')+ns+'{'+decl.join(';')+'}'+(wrap?'}':''));}}
+      if(decl.length){const ns=sel.split(',').map(x=>{x=x.trim();if(/^(html|:root)\b/.test(x))return null;return ':where(html.dark) '+x;}).filter(Boolean).join(',');if(ns)out.push((wrap?wrap+'{':'')+ns+'{'+decl.join(';')+'}'+(wrap?'}':''));}}
     else if(r.type===4&&r.cssRules)walk(r.cssRules,'@media '+r.conditionText);}};
   for(const sh of document.styleSheets){let rs;try{rs=sh.cssRules;}catch(e){continue;}if(sh.ownerNode&&sh.ownerNode.id==='dkStyle')continue;walk(rs,'');}
   out.push('html.dark body{background:var(--bg);color:var(--ink)}:where(html.dark) input,:where(html.dark) select,:where(html.dark) textarea{background:#11151c;color:var(--ink);border-color:var(--line)}:where(html.dark) button{background-color:#1e232d;color:var(--ink)}html.dark img{filter:brightness(.9)}');
