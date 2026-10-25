@@ -352,7 +352,9 @@
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VOCA</title>
+<script>/* 다크 모드: 깜빡임 없게 가장 먼저 적용 */(function(){try{var m=localStorage.getItem('voca_dark')||'light';var d=m==='dark'||(m==='auto'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');}catch(e){}})();</script>
 <style>
+html.dark{color-scheme:dark;--card2:#1f242e;--bd:#2f3541;--bg:#0f1218;--card:#181c24;--ink:#e6e9ef;--sub:#9aa3b2;--acc:#6f88ff;--line:#2b313d;--red:#ff7a7a;--green:#4cc98a}
 :root{--bg:#f6f7fb;--card:#fff;--ink:#1c2333;--sub:#6b7280;--acc:#4f6df5;--line:#e5e7eb;--red:#e05555;--green:#2da56a}
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif}
 body{background:var(--bg);color:var(--ink);padding:16px;max-width:900px;margin:0 auto}
@@ -811,6 +813,7 @@ details.wr-guide>summary,details.wr-help>summary{font-weight:700;cursor:pointer;
 .brand{display:flex;align-items:center;gap:10px;min-width:0}
 /* ===== 테마: 고영희 ===== */
 body.th-cute{--acc:#4CC552;--accD:#38A23E;--bg:#fff}
+html.dark body.th-cute{--bg:#0f1218;--acc:#4CC552;--accD:#38A23E}
 body.th-cute .th-only{display:inline-flex}
 body.th-cute .res-cat{display:flex;align-items:center;gap:14px;margin:4px 0 12px}
 body.th-cute .res-cat svg{width:110px;height:82px;flex:none}
@@ -1071,7 +1074,7 @@ body.th-cute .sync-title{font-family:"Nunito","Jua",sans-serif;color:#4CC552;tex
   <div class="card" id="writingBody"></div>
 </div>
 
-<footer id="appFooter"><details><summary>VOCA v2026.10.24 · 업데이트 기록</summary><ul><li><b>2026.10.24</b> 3회독부터 ‘오답 노트’: 6/6 끝낸 묶음에서 틀린 단어를 모아 보기·테스트</li><li><b>2026.10.22</b> 테스트에서 틀렸을 때·결과 화면의 예문/유사어/어근/발음도 ‘표시 항목’ 설정을 따름</li><li><b>2026.10.21</b> 연습 테스트에 ‘답 없음’ 보기 (정답을 빼는 비율 설정 가능, 정답은 ‘답 없음’ 칸에 표시) · ‘모르겠어요’ 버튼 없앰 · 테스트 결과: 전체 단어 결과 펼쳐보기(TCSE 빈출 표시) · 틀린 단어마다 내가 고른 것·헷갈리기 쉬운 단어 함께 보기</li><li><b>2026.10.14</b> 3회독부터 연습 테스트를 50개씩 묶기 · 설정창 정리 (학습 설정 하나로 합치고, 나머지는 ‘표시 · 세부 설정’으로) · 회독 진도를 연습 테스트 완료 일차 기준으로 (빨강 또는 무지개 = 완료) · 3회독부터 묶음 테스트 순서 ①전체 ②전체 ③오답복습 ④전체 ⑤오답복습 ⑥전체 (3회 파랑·5회 빨강·6회 무지개) · 오답 복습 25문제 = 오답 → TCSE 빈출 → 랜덤 순으로 채움</li><li><b>2026.10.06</b> 설정 > 학습 자료 받기: 암호로 잠근 GRE 단어·TCSE·RC·Writing 자료를 받아오기 · 아이패드·아이폰에서 RC·테스트 기록이 안 받아지던 문제 수정 (저장 공간이 모자라면 자동 압축 저장) · 맨 위에 마지막 동기화 시간, 맨 아래에 버전 기록 표시</li><li><b>2026.10.05</b> 단어 테스트: 뜻이 2/3 이상 겹치는 선택은 △ (0.5점) · 고양이 100%/90% 표정 교체</li><li><b>2026.10.03</b> 로그인 · 계정별 클라우드 동기화 (어느 기기에서든 같은 기록)</li><li><b>이전</b> 캘린더 시험일·계획·자동 분배 · 고영희 테마와 점수별 표정 · 호버 사전 · TCSE 실전 화면과 AI 분석 프롬프트 복사 · Writing 예시 CSV 가져오기 · 틀린 단어 어근 표시</li></ul></details></footer>
+<footer id="appFooter"><details><summary>VOCA v2026.10.25 · 업데이트 기록</summary><ul><li><b>2026.10.25</b> 다크 모드 (설정 > 테마 > 화면 밝기: 밝게 / 어둡게 / 기기 설정 따라)</li><li><b>2026.10.24</b> 3회독부터 ‘오답 노트’: 6/6 끝낸 묶음에서 틀린 단어를 모아 보기·테스트</li><li><b>2026.10.22</b> 테스트에서 틀렸을 때·결과 화면의 예문/유사어/어근/발음도 ‘표시 항목’ 설정을 따름</li><li><b>2026.10.21</b> 연습 테스트에 ‘답 없음’ 보기 (정답을 빼는 비율 설정 가능, 정답은 ‘답 없음’ 칸에 표시) · ‘모르겠어요’ 버튼 없앰 · 테스트 결과: 전체 단어 결과 펼쳐보기(TCSE 빈출 표시) · 틀린 단어마다 내가 고른 것·헷갈리기 쉬운 단어 함께 보기</li><li><b>2026.10.14</b> 3회독부터 연습 테스트를 50개씩 묶기 · 설정창 정리 (학습 설정 하나로 합치고, 나머지는 ‘표시 · 세부 설정’으로) · 회독 진도를 연습 테스트 완료 일차 기준으로 (빨강 또는 무지개 = 완료) · 3회독부터 묶음 테스트 순서 ①전체 ②전체 ③오답복습 ④전체 ⑤오답복습 ⑥전체 (3회 파랑·5회 빨강·6회 무지개) · 오답 복습 25문제 = 오답 → TCSE 빈출 → 랜덤 순으로 채움</li><li><b>2026.10.06</b> 설정 > 학습 자료 받기: 암호로 잠근 GRE 단어·TCSE·RC·Writing 자료를 받아오기 · 아이패드·아이폰에서 RC·테스트 기록이 안 받아지던 문제 수정 (저장 공간이 모자라면 자동 압축 저장) · 맨 위에 마지막 동기화 시간, 맨 아래에 버전 기록 표시</li><li><b>2026.10.05</b> 단어 테스트: 뜻이 2/3 이상 겹치는 선택은 △ (0.5점) · 고양이 100%/90% 표정 교체</li><li><b>2026.10.03</b> 로그인 · 계정별 클라우드 동기화 (어느 기기에서든 같은 기록)</li><li><b>이전</b> 캘린더 시험일·계획·자동 분배 · 고영희 테마와 점수별 표정 · 호버 사전 · TCSE 실전 화면과 AI 분석 프롬프트 복사 · Writing 예시 CSV 가져오기 · 틀린 단어 어근 표시</li></ul></details></footer>
 
 <div id="settingsModal" class="hide" onclick="if(event.target===this)toggleSettings(false)" style="position:fixed;inset:0;background:rgba(20,25,40,.35);z-index:200;display:flex;justify-content:flex-end">
   <div style="background:var(--card);width:380px;max-width:92vw;height:100%;overflow-y:auto;padding:18px 20px">
@@ -1189,6 +1192,10 @@ body.th-cute .sync-title{font-family:"Nunito","Jua",sans-serif;color:#4CC552;tex
       <div class="set-body">
         <div class="row" style="gap:18px"><label class="tog"><input type="radio" name="themeSel" value="basic" onchange="thSet('basic')">기본</label>
         <label class="tog"><input type="radio" name="themeSel" value="cute" onchange="thSet('cute')">고영희</label></div>
+        <div class="set-sub" style="margin-top:10px">화면 밝기</div>
+        <div class="row" style="gap:18px"><label class="tog"><input type="radio" name="darkSel" value="light" onchange="dkSet('light')">밝게</label>
+        <label class="tog"><input type="radio" name="darkSel" value="dark" onchange="dkSet('dark')">어둡게</label>
+        <label class="tog"><input type="radio" name="darkSel" value="auto" onchange="dkSet('auto')">기기 설정 따라</label></div>
         <p class="study-tip" style="margin-top:6px">고영희 테마는 배너·탭·주요 버튼 모양이 바뀌고, 위쪽에 오늘의 단어가 나옵니다. 데이터는 그대로예요.</p>
       </div>
     </details>
@@ -5936,6 +5943,60 @@ document.getElementById('qDayFrom').addEventListener('input',renderTestChunkRow)
 ['freqMin','freqDayFrom','freqDayTo'].forEach(function(id){var e=document.getElementById(id);if(e)e.addEventListener('input',updateFreqAvail);});
 updateFreqAvail();
 roundState=roundLoad();renderTabs();renderAll();syncStudySettings();updatePracticeCount();
+
+/* ================= 다크 모드 =================
+   CSS에 직접 박힌 밝은 배경·어두운 글자색을 자동으로 바꾼 덮어쓰기 규칙을 만들어 붙이고,
+   화면에 새로 그려지는 인라인 색도 같은 규칙으로 바꾼다. */
+const DARK_KEY='voca_dark';
+function dkParse(c){c=c.trim().toLowerCase();let m;
+  if((m=c.match(/^#([0-9a-f]{3,8})$/))){let h=m[1];if(h.length===3||h.length===4)h=h.split('').map(x=>x+x).join('');const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16),a=h.length===8?parseInt(h.slice(6,8),16)/255:1;return [r,g,b,a];}
+  if((m=c.match(/^rgba?\(([^)]+)\)$/))){const p=m[1].split(/[ ,\/]+/).filter(Boolean).map(parseFloat);return [p[0],p[1],p[2],p.length>3?p[3]:1];}
+  if(c==='white')return [255,255,255,1];if(c==='black')return [0,0,0,1];return null;}
+function dkHsl(r,g,b){r/=255;g/=255;b/=255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b);let h=0,s=0,l=(mx+mn)/2;if(mx!==mn){const d=mx-mn;s=l>.5?d/(2-mx-mn):d/(mx+mn);h=mx===r?((g-b)/d+(g<b?6:0)):mx===g?((b-r)/d+2):((r-g)/d+4);h/=6;}return [h,s,l];}
+function dkRgb(h,s,l){if(!s){const v=Math.round(l*255);return [v,v,v];}const q=l<.5?l*(1+s):l+s-l*s,p=2*l-q;const f=t=>{if(t<0)t+=1;if(t>1)t-=1;return t<1/6?p+(q-p)*6*t:t<1/2?q:t<2/3?p+(q-p)*(2/3-t)*6:p;};return [f(h+1/3),f(h),f(h-1/3)].map(x=>Math.round(x*255));}
+function dkMap(col,kind){const c=dkParse(col);if(!c)return null;let [h,s,l]=dkHsl(c[0],c[1],c[2]);
+  if(kind==='bg'){ if(l<0.6)return null; l=0.10+(1-l)*0.55; s=Math.min(s,0.45); }
+  else if(kind==='bd'){ if(l<0.55)return null; l=0.18+(1-l)*0.5; s=Math.min(s,0.4); }
+  else { if(l>0.55)return null; l=0.93-l*0.45; }
+  const [r,g,b]=dkRgb(h,s,l);return c[3]<1?'rgba('+r+','+g+','+b+','+c[3]+')':'rgb('+r+','+g+','+b+')';}
+const DK_RE=/#[0-9a-fA-F]{3,8}\b|rgba?\([^)]*\)|\bwhite\b|\bblack\b/g;
+function dkKind(prop){prop=prop.toLowerCase();if(prop.indexOf('background')===0||prop==='fill')return 'bg';if(prop.indexOf('border')===0||prop.indexOf('outline')===0)return 'bd';if(prop==='color'||prop==='stroke'||prop==='-webkit-text-fill-color'||prop==='text-decoration-color')return 'fg';return null;}
+function dkVal(prop,val){const k=dkKind(prop);if(!k||val.indexOf('var(')>=0&&!DK_RE.test(val))return null;DK_RE.lastIndex=0;let ch=false;const out=val.replace(DK_RE,m=>{const r=dkMap(m,k);if(r){ch=true;return r;}return m;});return ch?out:null;}
+let dkSheet=null;
+function dkBuild(){
+  if(dkSheet)return;const out=[];
+  const walk=(rules,wrap)=>{for(const r of rules){
+    if(r.type===1){const sel=r.selectorText;if(!sel||/html\.dark/.test(sel))continue;const decl=[];
+      for(let i=0;i<r.style.length;i++){const p=r.style[i],v=r.style.getPropertyValue(p);const nv=dkVal(p,v);if(nv)decl.push(p+':'+nv+(r.style.getPropertyPriority(p)?' !important':''));}
+      if(decl.length){const ns=sel.split(',').map(x=>{x=x.trim();if(/^(html|:root)\b/.test(x))return null;return 'html.dark '+x.replace(/^body\b/,'body');}).filter(Boolean).join(',');if(ns)out.push((wrap?wrap+'{':'')+ns+'{'+decl.join(';')+'}'+(wrap?'}':''));}}
+    else if(r.type===4&&r.cssRules)walk(r.cssRules,'@media '+r.conditionText);}};
+  for(const sh of document.styleSheets){let rs;try{rs=sh.cssRules;}catch(e){continue;}if(sh.ownerNode&&sh.ownerNode.id==='dkStyle')continue;walk(rs,'');}
+  out.push('html.dark body{background:var(--bg);color:var(--ink)}:where(html.dark) input,:where(html.dark) select,:where(html.dark) textarea{background:#11151c;color:var(--ink);border-color:var(--line)}:where(html.dark) button{background-color:#1e232d;color:var(--ink)}html.dark img{filter:brightness(.9)}');
+  dkSheet=document.createElement('style');dkSheet.id='dkStyle';dkSheet.textContent=out.join('\n');document.head.appendChild(dkSheet);
+}
+function dkInline(root){
+  if(!document.documentElement.classList.contains('dark'))return;
+  const els=root.querySelectorAll?root.querySelectorAll('[style]'):[];
+  const fix=el=>{if(el.dataset.dkDone===el.getAttribute('style'))return;const st=el.style;let ch=false;
+    for(let i=0;i<st.length;i++){const p=st[i];const nv=dkVal(p,st.getPropertyValue(p));if(nv){st.setProperty(p,nv,st.getPropertyPriority(p));ch=true;}}
+    el.dataset.dkDone=el.getAttribute('style');};
+  if(root.getAttribute&&root.getAttribute('style'))fix(root);els.forEach(fix);
+}
+let dkObs=null;
+function dkApply(){
+  let m='light';try{m=localStorage.getItem(DARK_KEY)||'light';}catch(e){}
+  const on=m==='dark'||(m==='auto'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.classList.toggle('dark',on);
+  if(on){dkBuild();dkInline(document.body);
+    if(!dkObs){dkObs=new MutationObserver(ms=>{if(!document.documentElement.classList.contains('dark'))return;ms.forEach(mu=>{if(mu.type==='childList')mu.addedNodes.forEach(n=>{if(n.nodeType===1)dkInline(n);});else if(mu.type==='attributes'&&mu.target.nodeType===1)dkInline(mu.target);});});
+      dkObs.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['style']});}}
+  document.querySelectorAll('input[name=darkSel]').forEach(r=>{r.checked=r.value===m;});
+}
+function dkSet(m){try{localStorage.setItem(DARK_KEY,m);}catch(e){}
+  if(m!=='dark'&&!(m==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches)){location.reload();return;} /* 밝은 화면으로 돌아갈 땐 바뀐 인라인 색을 되돌리려고 새로고침 */
+  dkApply();}
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{let m='light';try{m=localStorage.getItem(DARK_KEY)||'light';}catch(e){}if(m==='auto')location.reload();});}catch(e){}
+dkApply();
 
 /* ================= 학습 자료 팩 (암호로 잠가 서버에 보관) =================
    GRE 단어(뜻·예문·어근 등 내용만), TCSE·RC 문제, Writing 주제·예시를
