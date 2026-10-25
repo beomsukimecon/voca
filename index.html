@@ -957,6 +957,17 @@ body.th-cute .sync-title{font-family:"Nunito","Jua",sans-serif;color:#4CC552;tex
 .hist-day b{min-width:58px;text-align:center}
 .ar-title{font-weight:700;font-size:14px;padding:2px 0 6px}
 .ar-cnt{font-size:11px;color:var(--sub);min-width:40px;text-align:right}
+
+.hs-row{display:grid;grid-template-columns:16px 34px minmax(0,1fr) 62px 66px 42px;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.hs-row:last-child{border-bottom:none}
+.hs-wm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hs-wm .ar-mean{flex:none}
+.hs-c{display:flex;justify-content:flex-start}
+.hs-row .tcse-freq{margin-left:0;white-space:nowrap}
+.hs-row .note-cnt{white-space:nowrap}
+@media(max-width:480px){.hs-row{grid-template-columns:14px 30px minmax(0,1fr) 58px 62px 36px;gap:4px;font-size:13px}}
+.hs-row.hs-hot{background:#e8f0ff}
+.hs-row.ar-x.hs-hot{background:#fff6f6;box-shadow:inset 3px 0 0 #1f6feb}
 </style>
 </head>
 <body>
@@ -2634,8 +2645,8 @@ function histOpen(){
   if(!items.length){a.innerHTML=h+'<p class="study-tip">'+lbl+' 연습 테스트 기록이 없어요.</p>';return;}
   const total=histOnlyWrong?null:items.length;
   h+='<div class="allres" style="margin-top:6px"><div class="ar-title">'+lbl+' · '+(total!=null?'본 단어 '+total+'개 · ':'')+'<span style="color:var(--red)">틀린 단어 '+nWrong+'개</span></div>'+
-    items.map(o=>{const x=o.w,bad=o.n>0;return '<div class="ar-row '+(bad?'ar-x':'ar-o')+'"><span class="ar-mk">'+(bad?'✕':'○')+'</span><span class="ar-no">'+x.day+'-'+x.no+'</span><b>'+esc(x.word)+'</b><span class="ar-mean">'+esc(rsShort(x.mean))+'</span>'+rsTcBadge(x)+
-      (bad?'<span class="note-cnt">'+o.n+'번 틀림</span>':'')+'<span class="ar-cnt">'+o.t+'번 봄</span></div>';}).join('')+'</div>';
+    items.map(o=>{const x=o.w,bad=o.n>0;return '<div class="hs-row '+(bad?'ar-x':'ar-o')+(rsTc(x)>=3?' hs-hot':'')+'"><span class="ar-mk">'+(bad?'✕':'○')+'</span><span class="ar-no">'+x.day+'-'+x.no+'</span><span class="hs-wm"><b>'+esc(x.word)+'</b> <span class="ar-mean">'+esc(rsShort(x.mean))+'</span></span>'+
+      '<span class="hs-c">'+(bad?'<span class="note-cnt">'+o.n+'번 틀림</span>':'')+'</span><span class="hs-c">'+rsTcBadge(x)+'</span><span class="ar-cnt">'+o.t+'번 봄</span></div>';}).join('')+'</div>';
   a.innerHTML=h;
 }
 function histStep(d){const md=Math.max(1,maxDay());histDay=Math.min(md,Math.max(0,histDay+d));histOpen();}
