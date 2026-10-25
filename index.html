@@ -939,6 +939,10 @@ body.th-cute .sync-title{font-family:"Nunito","Jua",sans-serif;color:#4CC552;tex
 .note-cnt{font-size:10.5px;font-weight:700;color:#c0392b;background:#fdecec;border-radius:6px;padding:1px 6px}
 .note-st{font-size:10.5px;color:var(--sub);background:#f1f2f5;border-radius:6px;padding:1px 6px}
 .note-st.good{color:#176b43;background:#e3f4ea;font-weight:700}
+
+.tg-box{padding:4px 2px}
+.tg-tag{font-size:11px;font-weight:700;color:#0b6b5e;background:#e2f6f1;border-radius:6px;padding:1px 6px;vertical-align:middle}
+.tg-pass{background:#e6f7ee;border:1px solid #9fd8ba;color:#176b43;border-radius:10px;padding:10px 12px;font-weight:700;margin-bottom:10px}
 </style>
 </head>
 <body>
@@ -1085,7 +1089,7 @@ body.th-cute .sync-title{font-family:"Nunito","Jua",sans-serif;color:#4CC552;tex
   <div class="card" id="writingBody"></div>
 </div>
 
-<footer id="appFooter"><details><summary>VOCA v2026.10.25 · 업데이트 기록</summary><ul><li><b>2026.10.25</b> 동기화 데이터 사용량 대폭 줄임 (바뀐 항목만 주고받기) · 다크 모드 (설정 > 테마 > 화면 밝기: 밝게 / 어둡게 / 기기 설정 따라)</li><li><b>2026.10.24</b> 3회독부터 ‘오답 노트’: 6/6 끝낸 묶음에서 틀린 단어를 모아 보기·테스트</li><li><b>2026.10.22</b> 테스트에서 틀렸을 때·결과 화면의 예문/유사어/어근/발음도 ‘표시 항목’ 설정을 따름</li><li><b>2026.10.21</b> 연습 테스트에 ‘답 없음’ 보기 (정답을 빼는 비율 설정 가능, 정답은 ‘답 없음’ 칸에 표시) · ‘모르겠어요’ 버튼 없앰 · 테스트 결과: 전체 단어 결과 펼쳐보기(TCSE 빈출 표시) · 틀린 단어마다 내가 고른 것·헷갈리기 쉬운 단어 함께 보기</li><li><b>2026.10.14</b> 3회독부터 연습 테스트를 50개씩 묶기 · 설정창 정리 (학습 설정 하나로 합치고, 나머지는 ‘표시 · 세부 설정’으로) · 회독 진도를 연습 테스트 완료 일차 기준으로 (빨강 또는 무지개 = 완료) · 3회독부터 묶음 테스트 순서 ①전체 ②전체 ③오답복습 ④전체 ⑤오답복습 ⑥전체 (3회 파랑·5회 빨강·6회 무지개) · 오답 복습 25문제 = 오답 → TCSE 빈출 → 랜덤 순으로 채움</li><li><b>2026.10.06</b> 설정 > 학습 자료 받기: 암호로 잠근 GRE 단어·TCSE·RC·Writing 자료를 받아오기 · 아이패드·아이폰에서 RC·테스트 기록이 안 받아지던 문제 수정 (저장 공간이 모자라면 자동 압축 저장) · 맨 위에 마지막 동기화 시간, 맨 아래에 버전 기록 표시</li><li><b>2026.10.05</b> 단어 테스트: 뜻이 2/3 이상 겹치는 선택은 △ (0.5점) · 고양이 100%/90% 표정 교체</li><li><b>2026.10.03</b> 로그인 · 계정별 클라우드 동기화 (어느 기기에서든 같은 기록)</li><li><b>이전</b> 캘린더 시험일·계획·자동 분배 · 고영희 테마와 점수별 표정 · 호버 사전 · TCSE 실전 화면과 AI 분석 프롬프트 복사 · Writing 예시 CSV 가져오기 · 틀린 단어 어근 표시</li></ul></details></footer>
+<footer id="appFooter"><details><summary>VOCA v2026.10.25 · 업데이트 기록</summary><ul><li><b>2026.10.25</b> TCSE: 기본 출제 순서 랜덤 · 세션 끝나면 선지·문장 단어 점검(단어장에 있는 단어만, 선지 단어는 전부) 90% 넘어야 종료, 켜고 끌 수 있음 · 동기화 데이터 사용량 대폭 줄임 (바뀐 항목만 주고받기) · 다크 모드 (설정 > 테마 > 화면 밝기: 밝게 / 어둡게 / 기기 설정 따라)</li><li><b>2026.10.24</b> 3회독부터 ‘오답 노트’: 6/6 끝낸 묶음에서 틀린 단어를 모아 보기·테스트</li><li><b>2026.10.22</b> 테스트에서 틀렸을 때·결과 화면의 예문/유사어/어근/발음도 ‘표시 항목’ 설정을 따름</li><li><b>2026.10.21</b> 연습 테스트에 ‘답 없음’ 보기 (정답을 빼는 비율 설정 가능, 정답은 ‘답 없음’ 칸에 표시) · ‘모르겠어요’ 버튼 없앰 · 테스트 결과: 전체 단어 결과 펼쳐보기(TCSE 빈출 표시) · 틀린 단어마다 내가 고른 것·헷갈리기 쉬운 단어 함께 보기</li><li><b>2026.10.14</b> 3회독부터 연습 테스트를 50개씩 묶기 · 설정창 정리 (학습 설정 하나로 합치고, 나머지는 ‘표시 · 세부 설정’으로) · 회독 진도를 연습 테스트 완료 일차 기준으로 (빨강 또는 무지개 = 완료) · 3회독부터 묶음 테스트 순서 ①전체 ②전체 ③오답복습 ④전체 ⑤오답복습 ⑥전체 (3회 파랑·5회 빨강·6회 무지개) · 오답 복습 25문제 = 오답 → TCSE 빈출 → 랜덤 순으로 채움</li><li><b>2026.10.06</b> 설정 > 학습 자료 받기: 암호로 잠근 GRE 단어·TCSE·RC·Writing 자료를 받아오기 · 아이패드·아이폰에서 RC·테스트 기록이 안 받아지던 문제 수정 (저장 공간이 모자라면 자동 압축 저장) · 맨 위에 마지막 동기화 시간, 맨 아래에 버전 기록 표시</li><li><b>2026.10.05</b> 단어 테스트: 뜻이 2/3 이상 겹치는 선택은 △ (0.5점) · 고양이 100%/90% 표정 교체</li><li><b>2026.10.03</b> 로그인 · 계정별 클라우드 동기화 (어느 기기에서든 같은 기록)</li><li><b>이전</b> 캘린더 시험일·계획·자동 분배 · 고영희 테마와 점수별 표정 · 호버 사전 · TCSE 실전 화면과 AI 분석 프롬프트 복사 · Writing 예시 CSV 가져오기 · 틀린 단어 어근 표시</li></ul></details></footer>
 
 <div id="settingsModal" class="hide" onclick="if(event.target===this)toggleSettings(false)" style="position:fixed;inset:0;background:rgba(20,25,40,.35);z-index:200;display:flex;justify-content:flex-end">
   <div style="background:var(--card);width:380px;max-width:92vw;height:100%;overflow-y:auto;padding:18px 20px">
@@ -3934,6 +3938,7 @@ function tcwlRenderList(){
 }
 function renderTcse(){
   if(tcseSession){showTcseStep();return;}
+  if(tgPending()){tgResume();return;}
   const el=document.getElementById('tcseBody');if(!el)return;
   if(!TCSE.length){
     el.innerHTML='<h3>TCSE 문제풀이</h3>'+
@@ -3961,8 +3966,9 @@ function renderTcse(){
      '<select id="tcType"><option value="all">전체 유형</option><option value="TC1">TC1</option><option value="TC2">TC2</option><option value="TC3">TC3</option><option value="SE">SE</option></select>'+
      '<select id="tcScope"><option value="all">전체</option><option value="unseen">미풀이</option><option value="wrong">오답</option></select></div>';
   h+='<div class="row" style="margin-top:8px">문제 <input type="number" id="tcCount" value="20" min="1" style="width:70px">개 '+
-     '<select id="tcOrder"><option value="no">번호순</option><option value="random">랜덤</option></select>'+
-     '<button class="primary" onclick="startTcse()">문제풀이 시작</button></div>';
+     '<select id="tcOrder"><option value="random" selected>랜덤</option><option value="no">번호순</option></select>'+
+     '<button class="primary" onclick="startTcse()">문제풀이 시작</button></div>'+
+     '<label class="tog" style="margin-top:8px"><input type="checkbox" id="tgOn"'+(tgEnabled()?' checked':'')+' onchange="tgSetOn(this.checked)">끝나면 단어 점검 (선지·문장 단어, 90% 넘어야 종료)</label>';
   h+='<div class="row" style="margin-top:12px"><button class="small danger" onclick="tcResetProgress()">진행 기록 초기화</button>'+
      '<button class="small" onclick="document.getElementById(\'tcseCsvFile\').click()">다른 CSV 불러오기</button>'+
      '<input type="file" id="tcseCsvFile" accept=".csv" class="hide" onchange="tcseImport(this)"></div>';
@@ -4024,6 +4030,106 @@ function startTcse(){
   document.getElementById('mainTabs').classList.add('hide');
   showTcseStep();
 }
+
+/* ================= TCSE 단어 점검 (세션 끝나면 90% 넘어야 빠져나감) =================
+   푼 문제의 선지 단어는 전부(많으면 30개 넘어도), 나머지는 문장 속 단어장 단어로 최대 30개까지 채운다. */
+const TG_KEY='voca_tcse_gate', TG_ON_KEY='voca_tcse_gate_on';
+function tgEnabled(){try{return localStorage.getItem(TG_ON_KEY)!=='0';}catch(e){return true;}}
+function tgSetOn(v){try{localStorage.setItem(TG_ON_KEY,v?'1':'0');}catch(e){}}
+let tg=null;
+function tgPending(){try{const g=JSON.parse(localStorage.getItem(TG_KEY));return g&&g.items&&g.items.length?g:null;}catch(e){return null;}}
+function tgSave(){try{if(tg&&!tg.passed)localStorage.setItem(TG_KEY,JSON.stringify({items:tg.items,at:tg.at,qn:tg.qn}));else localStorage.removeItem(TG_KEY);}catch(e){}}
+function tgTokens(t){return (String(t||'').match(/[A-Za-z][A-Za-z'’-]{2,}/g)||[]).map(w=>w.replace(/[’']s$/,'')).filter(w=>{const k=tcNorm(w);return k&&k.length>=3&&!TC_STOP.has(k)&&!(typeof hdSkip==='function'&&hdSkip(k));});}
+function tgShort(m){m=String(m||'').replace(/\s+/g,' ').trim();return m.length>60?m.slice(0,58)+'…':m;}
+function tgNetMean(k){
+  if(typeof hdGetPart!=='function')return Promise.resolve('');
+  return hdGetPart(k,'ko').then(r=>{if(!r)return '';
+    if(r.dict){const t=[];r.dict.slice(0,2).forEach(p=>p.terms.filter(x=>!x.rare).slice(0,3).forEach(x=>{if(!t.includes(x.t))t.push(x.t);}));return t.slice(0,5).join(', ');}
+    return r.mt||'';}).catch(()=>'');
+}
+async function tgBuild(qs){
+  const must=[],extra=[],seen=new Set();
+  const add=(w,arr)=>{const k=tcNorm(w);if(!k||seen.has(k))return;seen.add(k);arr.push({raw:w,k:k});};
+  qs.forEach(q=>Object.keys(q.choices||{}).forEach(L=>tgTokens(q.choices[L]).forEach(w=>add(w,must))));
+  qs.forEach(q=>tgTokens(q.question).forEach(w=>{const info=hdLookup(w);if(info&&info.kind!=='net')add(w,extra);}));
+  const pickExtra=extra.slice(0,Math.max(0,30-must.length));
+  const all=must.map(x=>Object.assign(x,{must:true})).concat(pickExtra);
+  const items=[],missing=[];
+  const local=x=>{const info=hdLookup(x.raw);return info&&info.kind!=='net'&&info.mean?{word:info.word||x.raw,mean:info.mean}:null;};
+  all.forEach(x=>{const l=local(x);if(l)items.push(Object.assign(l,{must:!!x.must}));else missing.push(x.raw);});   /* 뜻 없는 단어는 뺌 (온라인 사전 안 씀) */
+  return {items:items,missing:missing};
+}
+function tgStart(s){
+  const el=document.getElementById('tcseBody');
+  el.innerHTML='<div class="tg-box"><h3>📝 단어 점검 준비 중…</h3><p class="study-tip">방금 푼 문제의 선지·문장 단어를 모으고 있어요.</p></div>';
+  tgBuild(s.gq).then(r=>{
+    s.gateDone=true; /* 세션 쪽은 점검으로 넘김 */
+    if(r.items.length<4){tg=null;try{localStorage.removeItem(TG_KEY);}catch(e){}el.innerHTML=s._doneHtml||(s._doneHtml=tcDoneHTML());return;}
+    tg={items:r.items,missing:r.missing,at:new Date().toISOString(),qn:s.gq.length,round:0,sess:s};
+    tgSave();tgRound();
+  });
+}
+function tgResume(){
+  const g=tgPending();if(!g)return;
+  document.getElementById('mainTabs').classList.add('hide');
+  tg={items:g.items,missing:[],at:g.at,qn:g.qn,round:0,sess:null};tgRound();
+}
+function tgRound(){
+  tg.round++;
+  const prevWrong=new Set(tg.lastWrong||[]);
+  const arr=tg.items.slice().sort(()=>Math.random()-.5).sort((a,b)=>(prevWrong.has(b.word)?1:0)-(prevWrong.has(a.word)?1:0));
+  tg.pool=arr;tg.i=0;tg.score=0;tg.wrong=[];tg.answered=false;tgShow();
+}
+function tgChoices(it){
+  const others=tg.items.filter(x=>x!==it&&x.mean!==it.mean).map(x=>x.mean);
+  let deck=[];try{deck=tcGreWords().map(w=>w.mean).filter(Boolean);}catch(e){}
+  const pool=[...new Set(others.concat(others.length<6?deck.sort(()=>Math.random()-.5).slice(0,40):[]))].filter(m=>m!==it.mean&&!(typeof meanSim==='function'&&meanSim(m,it.mean)>=0.5));
+  const ch=pool.sort(()=>Math.random()-.5).slice(0,3);ch.push(it.mean);return ch.sort(()=>Math.random()-.5);
+}
+function tgShow(){
+  const el=document.getElementById('tcseBody');if(!el||!tg)return;
+  document.getElementById('mainTabs').classList.add('hide');
+  if(tg.i>=tg.pool.length){tgEnd();return;}
+  const it=tg.pool[tg.i];tg.cur=tgChoices(it);tg.answered=false;
+  el.innerHTML='<div class="tg-box"><div class="row" style="justify-content:space-between"><span class="count">📝 단어 점검 '+(tg.round>1?tg.round+'회차 · ':'')+(tg.i+1)+'/'+tg.pool.length+' · 맞힘 '+tg.score+'</span></div>'+
+    '<div class="quiz-prompt" style="margin-top:6px">'+esc(it.word)+(it.must?' <span class="tg-tag">선지</span>':'')+'</div>'+
+    tg.cur.map((m,ci)=>'<button class="quiz-choice tg-ch" data-ci="'+ci+'" onclick="tgAnswer('+ci+')"><span>'+esc(tgShort(m))+'</span></button>').join('')+
+    '<div id="tgNext" class="hide" style="margin-top:8px"><button class="primary" onclick="tgNext()">다음 →</button></div>'+
+    '<div class="study-tip" style="margin-top:6px">키보드: 1~4 선택 · Enter 다음</div></div>';
+}
+function tgAnswer(ci){
+  if(!tg||tg.answered)return;tg.answered=true;
+  const it=tg.pool[tg.i],ok=tg.cur[ci]===it.mean;
+  document.querySelectorAll('#tcseBody .tg-ch').forEach(b=>{b.disabled=true;if(tg.cur[+b.dataset.ci]===it.mean)b.classList.add('correct');});
+  if(ok){tg.score++;setTimeout(()=>{if(tg&&tg.answered)tgNext();},700);}
+  else{tg.wrong.push(it.word);document.querySelector('#tcseBody .tg-ch[data-ci="'+ci+'"]').classList.add('wrong');document.getElementById('tgNext').classList.remove('hide');}
+}
+function tgNext(){if(!tg)return;tg.i++;tgShow();}
+function tgEnd(){
+  const el=document.getElementById('tcseBody');
+  const pct=Math.round(tg.score/tg.pool.length*100);
+  tg.lastWrong=tg.wrong.slice();
+  if(pct>=90){
+    tg.passed=true;tgSave();
+    const s=tg.sess, wl=tg.wrong;tg=null;
+    const msg='<div class="tg-pass">✅ 단어 점검 통과! '+pct+'%'+(wl.length?' · 틀린 단어: '+wl.map(esc).join(', '):'')+'</div>';
+    if(s&&tcseSession===s){el.innerHTML=msg+(s._doneHtml||(s._doneHtml=tcDoneHTML()));}
+    else{el.innerHTML=msg+'<div class="row" style="margin-top:10px"><button class="primary" onclick="endTcse()">TCSE 홈으로</button></div>';}
+    return;
+  }
+  const wrongItems=tg.pool.filter(x=>tg.wrong.includes(x.word));
+  el.innerHTML='<div class="tg-box"><h3>단어 점검 '+tg.score+'/'+tg.pool.length+' ('+pct+'%)</h3>'+
+    '<p class="study-tip" style="color:var(--red);font-weight:700">90% 넘어야 끝나요. 틀린 단어 보고 다시 해봐요.</p>'+
+    wrongItems.map(x=>'<div class="entry"><div class="e-top"><span class="e-word">'+esc(x.word)+'</span>'+(x.must?'<span class="tg-tag">선지</span>':'')+'</div><div class="e-mean">'+esc(x.mean)+'</div></div>').join('')+
+    '<div class="row" style="margin-top:10px"><button class="primary" onclick="tgRound()">다시 하기 (틀린 것 먼저)</button></div></div>';
+}
+setTimeout(function(){try{if(tgPending()&&typeof switchTab==='function')switchTab('tcse');}catch(e){}},300);
+document.addEventListener('keydown',function(e){
+  if(!tg||!document.querySelector('#tcseBody .tg-ch'))return;
+  const tag=(e.target&&e.target.tagName)||'';if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT')return;
+  if(e.key>='1'&&e.key<='4'){e.preventDefault();e.stopImmediatePropagation();tgAnswer(+e.key-1);}
+  else if(e.key==='Enter'){const n=document.getElementById('tgNext');if(n&&!n.classList.contains('hide')){e.preventDefault();e.stopImmediatePropagation();tgNext();}}
+},true);
 function endTcse(){tcStopTimer();tcseSession=null;tcEdit=null;document.getElementById('mainTabs').classList.remove('hide');renderTcse();}
 function tcNext(){tcseSession.i++;tcseSession.sel=[];tcseSession.answered=false;tcEdit=null;showTcseStep();}
 
@@ -4048,7 +4154,7 @@ function showTcseStep(){
   {const wc=document.getElementById('tcseWordCard');if(wc)wc.classList.add('hide');}
   const s=tcseSession;
   if(!s.t0)s.t0=Date.now();
-  if(s.i>=s.pool.length){tcStopTimer();el.innerHTML=tcDoneHTML();return;}
+  if(s.i>=s.pool.length){tcStopTimer();if(!s.gateDone&&(s.gq||[]).length&&tgEnabled()){tgStart(s);return;}el.innerHTML=s._doneHtml||(s._doneHtml=tcDoneHTML());return;}
   const q=s.pool[s.i], p=tcProg[q.id], mk=!!(p&&p.bookmarked);
   el.innerHTML='<div class="rc-exam">'+
     '<div class="rc-topbar">'+
@@ -4140,7 +4246,7 @@ function tcDunno(){
   tcGrade(s.pool[s.i],[],true);
 }
 function tcGrade(q,selected,viaDunno){
-  const s=tcseSession;s.answered=true;
+  const s=tcseSession;s.answered=true;if(!(s.gq=s.gq||[]).includes(q))s.gq.push(q);
   const selSet=new Set(selected), ansSet=new Set(q.answer);
   const correct=!viaDunno && selected.length===q.answer.length && q.answer.every(a=>selSet.has(a));
   // 선지 색칠
