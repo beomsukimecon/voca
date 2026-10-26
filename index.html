@@ -2653,7 +2653,13 @@ function allResHTML(){
 
 /* ================= 오답 노트 (3회독부터) =================
    6/6까지 끝낸 50개 묶음에서, 이번 회독에 한 번이라도 틀린 단어를 모아 둔다. 빠지지 않고 계속 남음. */
-let noteDay=0;
+let noteDay=0,subPage='';
+/* 요약·내 예문·오답 노트 화면에서 Esc → 메인으로 */
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Escape'||!subPage||(typeof quiz!=='undefined'&&quiz)||document.getElementById('msOv'))return;
+  e.preventDefault();const p=subPage;
+  if(p==='hist')histClose();else if(p==='ms')msPageClose();else if(p==='note')noteClose();
+});
 function noteRound(){try{roundEnsure();return (roundState&&roundState.cur)||1;}catch(e){return 1;}}
 function noteCollect(r){
   const prac=loadPractice(), done={}, cnt={}, last={};
@@ -2678,7 +2684,7 @@ function noteRenderRow(){
     '<span class="count">6/6 끝낸 묶음 '+nc.chunks+'개에서 틀린 단어가 모여요</span>';
 }
 function noteOpen(){
-  const r=noteRound();const nc=noteCollect(r);
+  subPage='note';const r=noteRound();const nc=noteCollect(r);
   setQuizMode(true);
   const a=document.getElementById('quizArea');
   const days=[...new Set(nc.items.map(x=>x.w.day))].sort((x,y)=>x-y);
@@ -2698,8 +2704,9 @@ function noteOpen(){
       '</div>';}).join('');
   a.innerHTML=h;
 }
-function noteClose(){document.getElementById('quizArea').innerHTML='';setQuizMode(false);render();renderTestChunkRow();renderRoundTest();}
+function noteClose(){subPage='';document.getElementById('quizArea').innerHTML='';setQuizMode(false);render();renderTestChunkRow();renderRoundTest();}
 function noteTest(n){
+  subPage='';
   const r=noteRound();const nc=noteCollect(r);
   let list=nc.items.filter(x=>!noteDay||x.w.day===noteDay);
   if(!list.length)return;
@@ -2718,7 +2725,7 @@ function noteTest(n){
 let histDay=0,histRound=0,histSort='day';
 let histOnlyWrong=false;
 function histOpen(){
-  roundEnsure();
+  subPage='hist';roundEnsure();
   if(!histRound)histRound=(roundState&&roundState.cur)||1;
   const r=histRound,mx=Math.max(roundState.max||1,r);
   const byKey={};data.forEach(w=>{byKey[w.day+'_'+w.no]=w;});
@@ -2749,7 +2756,7 @@ function histOpen(){
   a.innerHTML=h;
 }
 function histStep(d){const md=Math.max(1,maxDay());histDay=Math.min(md,Math.max(0,histDay+d));histOpen();}
-function histClose(){histRound=0;histDay=0;document.getElementById('quizArea').innerHTML='';setQuizMode(false);render();renderTestChunkRow();renderRoundTest();}
+function histClose(){subPage='';histRound=0;histDay=0;document.getElementById('quizArea').innerHTML='';setQuizMode(false);render();renderTestChunkRow();renderRoundTest();}
 
 /* ================= 내 예문 (단어마다 직접 쓴 문장) ================= */
 const MS_KEY='voca_mysent';
@@ -2797,7 +2804,7 @@ function msRefresh(){try{if(typeof renderStatusChips==='function')renderStatusCh
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('msOv')){e.stopImmediatePropagation();msClose();}},true);
 let msQ='',msSort='recent';
 function msPage(){
-  const o=msLoad();
+  subPage='ms';const o=msLoad();
   let rows=Object.keys(o).map(k=>{const r=o[k];const w=data.find(x=>msK(x)===k)||{word:r.word,day:r.day,no:r.no,mean:''};const last=(r.items||[]).reduce((m,x)=>x.at>m?x.at:m,'');return {k:k,w:w,items:r.items||[],last:last};}).filter(r=>r.items.length);
   if(msQ){const q=msQ.toLowerCase();rows=rows.filter(r=>r.k.indexOf(q)>=0||(r.w.mean||'').indexOf(msQ)>=0||r.items.some(x=>x.t.toLowerCase().indexOf(q)>=0));}
   rows.sort(msSort==='day'?(a,b)=>(a.w.day-b.w.day)||(a.w.no-b.w.no):(a,b)=>b.last.localeCompare(a.last));
@@ -2813,7 +2820,7 @@ function msPage(){
       '<div class="ms-inline">'+r.items.map(x=>'<div>✍️ '+esc(x.t)+(msHasWord(r.w.word,x.t)?'':' <span class="ms-warn">단어 없음?</span>')+' <span class="count">'+String(x.at||'').slice(5,10).replace('-','/')+'</span></div>').join('')+'</div></div>').join('')
       :'<p class="study-tip">'+(msQ?'검색 결과가 없어요.':'아직 쓴 예문이 없어요. 단어장·테스트 결과·오답 노트의 ✍️ 버튼이나, 회독별 요약에서 단어를 눌러 쓸 수 있어요.')+'</p>')+'</div>';
 }
-function msPageClose(){msQ='';document.getElementById('quizArea').innerHTML='';setQuizMode(false);render();renderTestChunkRow();renderRoundTest();}
+function msPageClose(){subPage='';msQ='';document.getElementById('quizArea').innerHTML='';setQuizMode(false);render();renderTestChunkRow();renderRoundTest();}
 function msCopyAll(btn){
   const o=msLoad();let i=0;const lines=[];
   Object.keys(o).forEach(k=>{const r=o[k];const w=data.find(x=>msK(x)===k)||{};(r.items||[]).forEach(x=>{i++;lines.push(i+'. '+(w.word||r.word)+(w.mean?' ('+rsShort(w.mean)+')':'')+'\n   → '+x.t);});});
