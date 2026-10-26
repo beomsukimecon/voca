@@ -76,6 +76,7 @@
   function flushNow(){Object.keys(mem).forEach(function(k){var m=mem[k];if(m&&!m.done){m.done=true;writeC(k,LZ.compressToUTF16(m.v));}});}
   window.addEventListener('pagehide',flushNow);
   document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')flushNow();});
+  window.addEventListener('storage',function(e){if(e.storageArea===localStorage&&e.key)delete mem[e.key];});
   window.VStore={get:sget,compact:function(){return compact;},whenIdle:whenIdle};
 
   function lsGet(k){try{return sget(k);}catch(e){return null;}}
@@ -83,8 +84,11 @@
   function lsDel(k){sdel(k);}
   function syncable(k){return typeof k==='string'&&k.indexOf('voca')===0&&!NO_SYNC.test(k);}
   function jget(k,d){try{return JSON.parse(lsGet(k))||d;}catch(e){return d;}}
-  var S={session:jget(SESS_KEY,null),meta:jget(META_KEY,{}),dirty:{},timer:null,pushing:false,status:'',lastSync:+(rget('__sync_last')||0),lastPull:0};
+  var KS_KEY='__ksync';
+  var S={ks:jget(KS_KEY,{}),session:jget(SESS_KEY,null),meta:jget(META_KEY,{}),dirty:{},timer:null,pushing:false,status:'',lastSync:+(rget('__sync_last')||0),lastPull:0};
   window.VSync=S;
+  function markSynced(k){S.ks[k]=Date.now();lsSet(KS_KEY,JSON.stringify(S.ks));}
+  S.syncedAt=function(k){return S.ks[k]||0;};
   function saveMeta(){lsSet(META_KEY,JSON.stringify(S.meta));}
   function saveSess(){if(S.session)lsSet(SESS_KEY,JSON.stringify(S.session));else lsDel(SESS_KEY);}
 
@@ -142,15 +146,35 @@
     if(!S.session||S.pushing)return Promise.resolve();
     var keys=Object.keys(S.dirty);if(!keys.length)return Promise.resolve();
     S.pushing=true;S.dirty={};
-    var ups=[],dels=[];
-    keys.forEach(function(k){var v=lsGet(k);if(v===null)dels.push(k);else ups.push({user_id:S.session.user.id,key:k,value:v});});
+    var ups=[],dels=[],conds=[];var WH=window.VSyncWords;
+    keys.forEach(function(k){var v=lsGet(k);if(v===null)dels.push(k);else if(WH&&WH.is(k)&&S.meta[k])conds.push({k:k,v:v});else ups.push({user_id:S.session.user.id,key:k,value:v});});
     var jobs=[];
-    if(ups.length)jobs.push(rest('POST','?on_conflict=user_id,key&select=key,updated_at',ups,{'Prefer':'resolution=merge-duplicates,return=representation'}).then(function(rows){(rows||[]).forEach(function(r){S.meta[r.key]=r.updated_at;});}));
+    if(ups.length)jobs.push(rest('POST','?on_conflict=user_id,key&select=key,updated_at',ups,{'Prefer':'resolution=merge-duplicates,return=representation'}).then(function(rows){(rows||[]).forEach(function(r){S.meta[r.key]=r.updated_at;markSynced(r.key);});}));
+    conds.forEach(function(c){jobs.push(pushCond(c.k,c.v,0));});
     if(dels.length)jobs.push(rest('DELETE','?key=in.('+dels.map(function(k){return '"'+k.replace(/"/g,'')+'"';}).join(',')+')').then(function(){dels.forEach(function(k){delete S.meta[k];});}));
     setStatus('저장 중…');
     return Promise.all(jobs).then(function(){saveMeta();S.lastSync=Date.now();setStatus('저장됨');})
       .catch(function(e){keys.forEach(function(k){S.dirty[k]=1;});setStatus('저장 실패 (다시 시도함)');console.warn('[sync]',e);clearTimeout(S.timer);S.timer=setTimeout(push,15000);})
       .then(function(){S.pushing=false;if(Object.keys(S.dirty).length)schedule();});
+  }
+  /* 단어장: 서버가 내가 마지막으로 본 버전일 때만 덮어쓰기. 그 사이 다른 기기가 바꿨으면 받아서 합친 뒤 다시 올림 */
+  function pushCond(k,v,tries){
+    var q='?key=eq.'+encodeURIComponent(k)+'&updated_at=eq.'+encodeURIComponent(S.meta[k])+'&select=key,updated_at';
+    return rest('PATCH',q,{value:v},{'Prefer':'return=representation'}).then(function(rows){
+      if(rows&&rows.length){S.meta[k]=rows[0].updated_at;markSynced(k);var WH=window.VSyncWords;if(WH&&WH.pushed)WH.pushed(k);return;}
+      return fetchKeys([k]).then(function(full){
+        var r=full&&full[0];
+        if(!r){return rest('POST','?on_conflict=user_id,key&select=key,updated_at',[{user_id:S.session.user.id,key:k,value:lsGet(k)}],{'Prefer':'resolution=merge-duplicates,return=representation'}).then(function(rr){(rr||[]).forEach(function(x){S.meta[x.key]=x.updated_at;markSynced(x.key);});});}
+        S.meta[k]=r.updated_at;
+        var WH=window.VSyncWords,ok=false;
+        try{ok=WH&&WH.rebase(k,r.value);}catch(e){console.warn('[sync] merge',e);}
+        delete S.dirty[k];
+        var nv=lsGet(k);
+        if(!ok||nv===r.value){markSynced(k);return;}
+        if(tries>=2){return rest('POST','?on_conflict=user_id,key&select=key,updated_at',[{user_id:S.session.user.id,key:k,value:nv}],{'Prefer':'resolution=merge-duplicates,return=representation'}).then(function(rr){(rr||[]).forEach(function(x){S.meta[x.key]=x.updated_at;markSynced(x.key);});});}
+        return pushCond(k,nv,tries+1);
+      });
+    });
   }
   function pushAllLocal(){
     var n=0;for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(syncable(k)){S.dirty[k]=1;n++;}}
@@ -180,7 +204,7 @@
   }
   function applyRows(rows,replaceAll){
     var changed=0,seen={};
-    rows.forEach(function(r){seen[r.key]=1;if(lsGet(r.key)!==r.value){if(!lsSet(r.key,r.value))return;changed++;}S.meta[r.key]=r.updated_at;});
+    rows.forEach(function(r){seen[r.key]=1;if(lsGet(r.key)!==r.value){if(!lsSet(r.key,r.value))return;changed++;}S.meta[r.key]=r.updated_at;markSynced(r.key);});
     localKeys().forEach(function(k){
       if(seen[k])return;
       if(replaceAll||S.meta[k]){lsDel(k);delete S.meta[k];changed++;}   /* 다른 기기에서 지워진 키 */
@@ -202,7 +226,7 @@
       if(busyNow()&&!force){showBanner();return;}
       return fetchKeys(newer.map(function(r){return r.key;})).then(function(full){
         var changed=0;
-        full.forEach(function(r){if(lsGet(r.key)===r.value){S.meta[r.key]=r.updated_at;return;}if(lsSet(r.key,r.value)){S.meta[r.key]=r.updated_at;changed++;}});
+        full.forEach(function(r){if(lsGet(r.key)===r.value){S.meta[r.key]=r.updated_at;markSynced(r.key);return;}if(lsSet(r.key,r.value)){S.meta[r.key]=r.updated_at;markSynced(r.key);changed++;}});
         gone.forEach(function(k){lsDel(k);delete S.meta[k];changed++;});
         saveMeta();
         if(changed)reloadOnce();else{S.lastSync=Date.now();setStatus('최신 상태');}
@@ -1131,7 +1155,7 @@ body.th-cute .sync-title{font-family:"Nunito","Jua",sans-serif;color:#4CC552;tex
   <div class="card" id="writingBody"></div>
 </div>
 
-<footer id="appFooter"><details><summary>VOCA v2026.10.26 · 업데이트 기록</summary><ul><li><b>2026.10.26</b> 단어장 필터 정리(몰라요·애매해요·알아요·미체크·틀림 제거) · ‘✍️ 내 예문’ 필터 추가</li><li><b>2026.10.25</b> ‘내 예문’: 단어마다 직접 예문 쓰기(✍️) · 내 예문 모음 · AI 첨삭 프롬프트 복사 · 연습 테스트 ‘회독별 요약’ (맞힌/틀린 단어, 틀린 횟수) · 학습 카드 기본 숨김(세부 설정에서 다시 켤 수 있음), 회독 선택은 테스트 카드로 · TCSE: 기본 출제 순서 랜덤 · 세션 끝나면 선지·문장 단어 점검(단어장에 있는 단어만, 선지 단어는 전부) 90% 넘어야 종료, 켜고 끌 수 있음 · 동기화 데이터 사용량 대폭 줄임 (바뀐 항목만 주고받기) · 다크 모드 (설정 > 테마 > 화면 밝기: 밝게 / 어둡게 / 기기 설정 따라)</li><li><b>2026.10.24</b> 3회독부터 ‘오답 노트’: 6/6 끝낸 묶음에서 틀린 단어를 모아 보기·테스트</li><li><b>2026.10.22</b> 테스트에서 틀렸을 때·결과 화면의 예문/유사어/어근/발음도 ‘표시 항목’ 설정을 따름</li><li><b>2026.10.21</b> 연습 테스트에 ‘답 없음’ 보기 (정답을 빼는 비율 설정 가능, 정답은 ‘답 없음’ 칸에 표시) · ‘모르겠어요’ 버튼 없앰 · 테스트 결과: 전체 단어 결과 펼쳐보기(TCSE 빈출 표시) · 틀린 단어마다 내가 고른 것·헷갈리기 쉬운 단어 함께 보기</li><li><b>2026.10.14</b> 3회독부터 연습 테스트를 50개씩 묶기 · 설정창 정리 (학습 설정 하나로 합치고, 나머지는 ‘표시 · 세부 설정’으로) · 회독 진도를 연습 테스트 완료 일차 기준으로 (빨강 또는 무지개 = 완료) · 3회독부터 묶음 테스트 순서 ①전체 ②전체 ③오답복습 ④전체 ⑤오답복습 ⑥전체 (3회 파랑·5회 빨강·6회 무지개) · 오답 복습 25문제 = 오답 → TCSE 빈출 → 랜덤 순으로 채움</li><li><b>2026.10.06</b> 설정 > 학습 자료 받기: 암호로 잠근 GRE 단어·TCSE·RC·Writing 자료를 받아오기 · 아이패드·아이폰에서 RC·테스트 기록이 안 받아지던 문제 수정 (저장 공간이 모자라면 자동 압축 저장) · 맨 위에 마지막 동기화 시간, 맨 아래에 버전 기록 표시</li><li><b>2026.10.05</b> 단어 테스트: 뜻이 2/3 이상 겹치는 선택은 △ (0.5점) · 고양이 100%/90% 표정 교체</li><li><b>2026.10.03</b> 로그인 · 계정별 클라우드 동기화 (어느 기기에서든 같은 기록)</li><li><b>이전</b> 캘린더 시험일·계획·자동 분배 · 고영희 테마와 점수별 표정 · 호버 사전 · TCSE 실전 화면과 AI 분석 프롬프트 복사 · Writing 예시 CSV 가져오기 · 틀린 단어 어근 표시</li></ul></details></footer>
+<footer id="appFooter"><details><summary>VOCA v2026.10.26 · 업데이트 기록</summary><ul><li><b>2026.10.26</b> 단어 수정이 가끔 되돌아가던 문제 수정 (여러 기기·탭 기록을 단어별로 합치기) · 단어장 필터 정리(몰라요·애매해요·알아요·미체크·틀림 제거) · ‘✍️ 내 예문’ 필터 추가</li><li><b>2026.10.25</b> ‘내 예문’: 단어마다 직접 예문 쓰기(✍️) · 내 예문 모음 · AI 첨삭 프롬프트 복사 · 연습 테스트 ‘회독별 요약’ (맞힌/틀린 단어, 틀린 횟수) · 학습 카드 기본 숨김(세부 설정에서 다시 켤 수 있음), 회독 선택은 테스트 카드로 · TCSE: 기본 출제 순서 랜덤 · 세션 끝나면 선지·문장 단어 점검(단어장에 있는 단어만, 선지 단어는 전부) 90% 넘어야 종료, 켜고 끌 수 있음 · 동기화 데이터 사용량 대폭 줄임 (바뀐 항목만 주고받기) · 다크 모드 (설정 > 테마 > 화면 밝기: 밝게 / 어둡게 / 기기 설정 따라)</li><li><b>2026.10.24</b> 3회독부터 ‘오답 노트’: 6/6 끝낸 묶음에서 틀린 단어를 모아 보기·테스트</li><li><b>2026.10.22</b> 테스트에서 틀렸을 때·결과 화면의 예문/유사어/어근/발음도 ‘표시 항목’ 설정을 따름</li><li><b>2026.10.21</b> 연습 테스트에 ‘답 없음’ 보기 (정답을 빼는 비율 설정 가능, 정답은 ‘답 없음’ 칸에 표시) · ‘모르겠어요’ 버튼 없앰 · 테스트 결과: 전체 단어 결과 펼쳐보기(TCSE 빈출 표시) · 틀린 단어마다 내가 고른 것·헷갈리기 쉬운 단어 함께 보기</li><li><b>2026.10.14</b> 3회독부터 연습 테스트를 50개씩 묶기 · 설정창 정리 (학습 설정 하나로 합치고, 나머지는 ‘표시 · 세부 설정’으로) · 회독 진도를 연습 테스트 완료 일차 기준으로 (빨강 또는 무지개 = 완료) · 3회독부터 묶음 테스트 순서 ①전체 ②전체 ③오답복습 ④전체 ⑤오답복습 ⑥전체 (3회 파랑·5회 빨강·6회 무지개) · 오답 복습 25문제 = 오답 → TCSE 빈출 → 랜덤 순으로 채움</li><li><b>2026.10.06</b> 설정 > 학습 자료 받기: 암호로 잠근 GRE 단어·TCSE·RC·Writing 자료를 받아오기 · 아이패드·아이폰에서 RC·테스트 기록이 안 받아지던 문제 수정 (저장 공간이 모자라면 자동 압축 저장) · 맨 위에 마지막 동기화 시간, 맨 아래에 버전 기록 표시</li><li><b>2026.10.05</b> 단어 테스트: 뜻이 2/3 이상 겹치는 선택은 △ (0.5점) · 고양이 100%/90% 표정 교체</li><li><b>2026.10.03</b> 로그인 · 계정별 클라우드 동기화 (어느 기기에서든 같은 기록)</li><li><b>이전</b> 캘린더 시험일·계획·자동 분배 · 고영희 테마와 점수별 표정 · 호버 사전 · TCSE 실전 화면과 AI 분석 프롬프트 복사 · Writing 예시 CSV 가져오기 · 틀린 단어 어근 표시</li></ul></details></footer>
 
 <div id="settingsModal" class="hide" onclick="if(event.target===this)toggleSettings(false)" style="position:fixed;inset:0;background:rgba(20,25,40,.35);z-index:200;display:flex;justify-content:flex-end">
   <div style="background:var(--card);width:380px;max-width:92vw;height:100%;overflow-y:auto;padding:18px 20px">
@@ -1295,7 +1319,61 @@ function dateKey(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.get
 function todayKey(){return dateKey(new Date());}
 function ymd(){return todayKey().slice(2).replace(/-/g,'');}
 
-function loadWords(){try{return JSON.parse(localStorage.getItem(WORD_KEY()))||[]}catch(e){return[]}}
+
+/* ---- 단어장 충돌 방지: 단어마다 수정 시각을 기록하고, 다른 기기/탭 버전과 합친다 ----
+   _id: 단어 고유 id · _m: 뜻 등 내용 수정 시각 · _p: 일차/번호 바뀐 시각 · _t: 테스트 기록 바뀐 시각 · _c: 추가된 시각 */
+const W_CF=['word','mean','pron','sent','syn','etym'], W_CNT=['wrong','unknown','ambiguous','known','studied'], W_ST=['flag','tLast','tStreak','lastLevel'];
+const WSIG=new WeakMap();let wordsLast=null,wordIds=null;
+function wNewId(){return Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-5);}
+function wSig(w){return [W_CF.map(f=>w[f]==null?'':String(w[f])).join('\u0001'),w.day+'_'+w.no,W_CNT.concat(W_ST).map(f=>w[f]==null?'':String(w[f])).join('\u0001')];}
+function wTombKey(){return '__tomb_'+WORD_KEY();}
+function tombLoad(){try{return JSON.parse(localStorage.getItem(wTombKey()))||{};}catch(e){return {};}}
+function tombSave(t){try{const ks=Object.keys(t);if(ks.length>6000)ks.slice(0,ks.length-6000).forEach(k=>delete t[k]);localStorage.setItem(wTombKey(),JSON.stringify(t));}catch(e){}}
+function wSnap(arr){wordIds=new Map();arr.forEach(w=>{if(!w._id)w._id=wNewId();WSIG.set(w,wSig(w));wordIds.set(w._id,(w.word||'').trim().toLowerCase());});}
+function wStamp(arr){
+  const now=Date.now(),ids=new Map();
+  arr.forEach(w=>{if(!w._id)w._id=wNewId();ids.set(w._id,(w.word||'').trim().toLowerCase());const o=WSIG.get(w),n=wSig(w);
+    if(!o){if(!w._c)w._c=now;if(!w._m)w._m=now;if(!w._p)w._p=now;if(!w._t)w._t=now;}
+    else{if(o[0]!==n[0])w._m=now;if(o[1]!==n[1])w._p=now;if(o[2]!==n[2])w._t=now;}
+    WSIG.set(w,n);});
+  if(wordIds){let t=null;wordIds.forEach((wd,id)=>{if(!ids.has(id)){t=t||tombLoad();t[id]=now;if(wd)t['w:'+wd]=now;}});if(t)tombSave(t);}
+  wordIds=ids;
+}
+function wSyncedAt(){try{return (window.VSync&&VSync.syncedAt)?VSync.syncedAt(WORD_KEY()):0;}catch(e){return 0;}}
+/* remote(다른 쪽 버전)를 바탕으로, 이 쪽에서 바뀐 것을 얹는다. 이 쪽 단어 객체는 그대로 재사용(테스트 중이어도 안전) */
+function wordsRebase(remote,local,syncedAt){
+  const tomb=tombLoad(),byId=new Map(),byW=new Map(),used=new Set(),out=[];
+  local.forEach(w=>{if(w._id)byId.set(w._id,w);const k=(w.word||'').trim().toLowerCase();if(!byW.has(k))byW.set(k,w);});
+  remote.forEach(r=>{
+    const rk=(r.word||'').trim().toLowerCase();
+    let l=(r._id&&byId.get(r._id))||null;
+    if(!l){const c=byW.get(rk);if(c&&!used.has(c))l=c;}
+    if(!l){if((r._id&&tomb[r._id])||tomb['w:'+rk])return;out.push(r);return;}
+    used.add(l);
+    if((r._m||0)>(l._m||0)){W_CF.forEach(f=>{if(r[f]===undefined)delete l[f];else l[f]=r[f];});l._m=r._m;}
+    if((r._p||0)>(l._p||0)){l.day=r.day;l.no=r.no;l._p=r._p;}
+    W_CNT.forEach(f=>{const v=Math.max(+l[f]||0,+r[f]||0);if(v||l[f]!==undefined)l[f]=v;});
+    if((r._t||0)>(l._t||0)){W_ST.forEach(f=>{if(r[f]===undefined)delete l[f];else l[f]=r[f];});l._t=r._t;}
+    if(r._id)l._id=r._id;
+    out.push(l);
+  });
+  local.forEach(l=>{if(used.has(l))return;const k=(l.word||'').trim().toLowerCase();if((l._c||0)>(syncedAt||0)&&!(tomb[l._id]||tomb['w:'+k]&&tomb['w:'+k]>(l._c||0)))out.push(l);});
+  out.sort((a,b)=>(a.day-b.day)||(a.no-b.no));
+  return out;
+}
+/* 동기화 쪽에서 부르는 연결 고리 */
+window.VSyncWords={
+  is:function(k){return k===WORD_KEY();},
+  rebase:function(k,remoteStr){
+    if(k!==WORD_KEY())return false;
+    let remote;try{remote=JSON.parse(remoteStr)||[];}catch(e){return false;}
+    data=wordsRebase(remote,data,wSyncedAt());
+    saveWords();try{if(!(typeof quiz!=='undefined'&&quiz))renderAll();}catch(e){}
+    return true;
+  },
+  pushed:function(k){if(k===WORD_KEY())tombSave({});}
+};
+function loadWords(){let raw=null,arr=[];try{raw=localStorage.getItem(WORD_KEY());arr=JSON.parse(raw)||[];}catch(e){arr=[];}wordsLast=raw;wSnap(arr);return arr;}
 var __quotaWarned=false;
 function quotaWarn(){if(__quotaWarned)return;__quotaWarned=true;try{alert('브라우저 저장 공간이 부족합니다.\n설정 → 기록·백업에서 [전체 저장]으로 백업한 뒤, 오래된 연습기록을 정리하거나 RC/TCSE 등 큰 데이터를 줄여주세요.\n(일부 변경이 저장되지 않을 수 있습니다)');}catch(e){}}
 function twItemHTML(y){
@@ -1305,7 +1383,14 @@ function twItemHTML(y){
     (x.etym?'<div class="tw-etym">어근 · '+esc(x.etym)+'</div>':'')+
     (x.sent?'<div class="tw-sent">'+esc(breakNumbered(x.sent))+'</div>':'')+'</div>';
 }
-function saveWords(){try{localStorage.setItem(WORD_KEY(),JSON.stringify(data));}catch(e){quotaWarn();}tcFreqCache=null;hdIdx=null;}
+function saveWords(){
+  try{
+    const cur=localStorage.getItem(WORD_KEY());
+    if(wordsLast!==null&&cur!==null&&cur!==wordsLast){try{data=wordsRebase(JSON.parse(cur)||[],data,wSyncedAt());}catch(e){}}   /* 다른 탭에서 바뀐 것 합치기 */
+    wStamp(data);
+    const str=JSON.stringify(data);localStorage.setItem(WORD_KEY(),str);wordsLast=str;
+  }catch(e){quotaWarn();}
+  tcFreqCache=null;hdIdx=null;}
 function loadCal(){try{return JSON.parse(localStorage.getItem(CAL_KEY()))||{}}catch(e){return{}}}
 function saveCal(){try{localStorage.setItem(CAL_KEY(),JSON.stringify(calendar));}catch(e){quotaWarn();}}
 
