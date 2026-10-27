@@ -333,12 +333,12 @@
   function paintStamp(){
     var e=document.getElementById('syncStamp');if(!e)return;
     e.classList.remove('bad');
-    if(!S.session){e.textContent='로그인 안 함 · 이 기기에만 저장';e.title='눌러서 로그인';return;}
+    if(!S.session){e.textContent='로그인 안 함';e.title='이 기기에만 저장 중 · 눌러서 로그인';return;}
     var t=S.status||'';
-    if(/중|대기/.test(t)){e.textContent='☁ '+(/대기/.test(t)?'저장 대기':t);}
-    else if(/실패/.test(t)){e.textContent='☁ '+t;e.classList.add('bad');}
-    else e.textContent=S.lastSync?'☁ 마지막 동기화 '+hm(S.lastSync):'☁ 동기화 전';
-    e.title='눌러서 지금 동기화';
+    if(/중|대기/.test(t)){e.textContent='☁ '+(/대기/.test(t)?'대기':'…');}
+    else if(/실패/.test(t)){e.textContent='☁ 실패';e.classList.add('bad');}
+    else e.textContent=S.lastSync?'☁ '+hm(S.lastSync):'☁ 동기화 전';
+    e.title=(t?t+' · ':'')+(S.lastSync?'마지막 동기화 '+hm(S.lastSync)+' · ':'')+'눌러서 지금 동기화';
   }
   function stampClick(){if(!S.session){showLogin();return;}setStatus('동기화 중…');push().then(checkRemote).then(function(){paintStamp();});}
   function renderAccount(){
@@ -927,7 +927,7 @@ body.th-cute .sync-title{font-family:"Nunito","Jua",sans-serif;color:#4CC552;tex
 .sync-go{width:100%;padding:11px 0;font-size:15px;font-weight:700}
 .sync-skip{width:100%;margin-top:8px;border:none;background:none;color:var(--sub);font-size:12.5px;text-decoration:underline}
 .sync-banner{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:400;background:#1f2328;color:#fff;border-radius:12px;padding:10px 14px;font-size:13px;display:flex;gap:8px;align-items:center;box-shadow:0 6px 18px rgba(0,0,0,.25)}
-.sync-stamp{display:block;margin:-6px 0 4px auto;border:none;background:none;padding:2px 0;font-size:11px;line-height:1.2;color:var(--sub);cursor:pointer}
+.sync-stamp{display:block;white-space:nowrap;margin:-6px 0 4px auto;border:none;background:none;padding:2px 0;font-size:11px;line-height:1.2;color:var(--sub);cursor:pointer}
 .sync-stamp:hover{color:var(--ink);text-decoration:underline}
 .sync-stamp.bad{color:var(--red)}
 #syncStampRow{display:flex;justify-content:flex-end}
@@ -1014,6 +1014,67 @@ body.th-cute .sync-title{font-family:"Nunito","Jua",sans-serif;color:#4CC552;tex
 .keys-b{min-width:86px;font-family:ui-monospace,Menlo,monospace}
 .keys-b.set{border-color:var(--acc);color:var(--acc);font-weight:700}
 .keys-b.wait{background:#fff4d6;border-color:#e0b100;color:#8a5a00}
+/* Quant */
+.qt-exam .qt-body{border:1px solid #d0d5dd;border-top:none;background:#fff;padding:14px 18px;display:flex;flex-direction:column;gap:12px}
+.qt-stim{min-width:0;border-bottom:1px solid var(--line);padding-bottom:12px}
+.qt-q{min-width:0}
+.qimg{max-width:100%;height:auto;display:block;margin:0 0 6px}
+.qt-ans{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.qt-ans.qt-row{flex-direction:row;flex-wrap:wrap;gap:8px}
+.qt-opt{display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:8px 10px;cursor:pointer;font-size:14px}
+.qt-opt input{display:none}.qt-opt.sel{border-color:#1f3a5f;background:#eef3fa}
+.qt-ov{width:24px;height:24px;border-radius:50%;border:1.5px solid #1f3a5f;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex:none}
+.qt-opt.sel .qt-ov,.qt-letter.sel{background:#1f3a5f;color:#fff}
+.qt-letter{width:42px;height:42px;border-radius:50%;border:1.5px solid #1f3a5f;background:#fff;color:#1f3a5f;font-weight:700;font-size:15px;padding:0}
+.qt-letter.sq{border-radius:6px}
+.qt-ne input{width:160px;font-size:16px;padding:8px;text-align:center}
+.qt-frac{align-items:flex-start}.qt-frac hr{width:160px;margin:2px 0;border:none;border-top:2px solid var(--ink)}
+.qt-check{margin-top:10px;font-weight:700;padding:8px 10px;border-radius:8px}
+.qt-check.ok{background:#e9f7ee;color:#1e7a43}.qt-check.bad{background:#fdecec;color:#b42323}
+.qt-rev{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:8px}
+.qt-rv{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:12px;color:var(--sub)}
+.qt-rv b{font-size:16px;color:var(--ink)}.qt-rv.done{background:#eef3fa}.qt-rv.mk{border-color:#e0a800;box-shadow:inset 0 0 0 1px #e0a800}
+.qt-calc{position:fixed;right:16px;bottom:16px;width:230px;background:#fff;border:1px solid #aab;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);padding:10px;z-index:60}
+.qt-cd{background:#f2f4f7;border-radius:6px;padding:8px;text-align:right;font-variant-numeric:tabular-nums;font-size:17px;margin:6px 0;overflow:hidden;white-space:nowrap}
+.qt-cr{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:4px}.qt-cr button{padding:7px 0;font-size:14px}
+.qt-card{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:10px}
+.qt-hrow{gap:10px;padding:6px 0;border-bottom:1px solid var(--line);cursor:pointer;font-size:13.5px;flex-wrap:wrap}.qt-hrow:last-child{border-bottom:none}
+.qt-ri{border-bottom:1px solid var(--line)}.qt-ri:last-child{border-bottom:none}.qt-ri>summary{list-style:none;cursor:pointer}.qt-ri>summary::-webkit-details-marker{display:none}
+.qt-rr{display:grid;grid-template-columns:16px 26px minmax(0,1fr) auto auto 40px;align-items:center;gap:6px;padding:6px 0;font-size:13px}
+.qt-rr .hs-wm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qt-rbody{padding:6px 0 10px}
+.qt-exit{background:#7a2b2b!important;border-color:#8a3a3a!important}
+@media(max-width:760px){.qt-exam .qt-body{padding:8px}}
+html.dark .qt-opt{border-color:#3a4256}
+html.dark .qt-ov,html.dark .qt-letter{border-color:#8fa8ff;color:#dfe6ff}
+html.dark .qt-opt.sel{border-color:#8fa8ff;background:#26375f;box-shadow:inset 0 0 0 1px #8fa8ff}
+html.dark .qt-opt.sel .qt-ov,html.dark .qt-letter.sel{background:#8fa8ff;border-color:#8fa8ff;color:#0e1424}
+html.dark .qt-rv.done{background:#26375f}
+html.dark .qt-check.ok{background:#173a26;color:#7fe0a3}html.dark .qt-check.bad{background:#401c1c;color:#ff9c9c}
+/* 다크: 선택 표시 또렷하게 */
+html.dark .tcse-choice.sel,html.dark .v-gitem.sel,html.dark .v-card.sel{background:#26375f;border-color:#8fa8ff;box-shadow:0 0 0 1px #8fa8ff inset;color:#fff}
+html.dark .tcx-colbox .tcse-choice.sel,html.dark .tcx-colbox .tcse-choice.sel:hover:not(:disabled){background:#3d5fae;color:#fff;box-shadow:inset 0 0 0 2px #8fa8ff}
+html.dark .tcx-se .tcse-choice.sel{background:#26375f;border-color:#8fa8ff;box-shadow:none}
+html.dark .tcx-se .tcse-choice.sel::before{background:#8fa8ff;border-color:#8fa8ff;color:#0e1424}
+html.dark .tcx-se .tcse-choice::before{border-color:#9aa4b5;background:transparent}
+html.dark .rc-choice.sel{border-color:#8fa8ff;background:#26375f;box-shadow:inset 0 0 0 1px #8fa8ff}
+html.dark .rc-sent.sel{background:#3d5fae;color:#fff;box-shadow:inset 0 0 0 1px #8fa8ff}
+html.dark .cal-cell.sel{background:#26375f;box-shadow:inset 0 0 0 2px #8fa8ff}
+html.dark .rb-mode.on{background:#3d5fae;color:#fff;border-color:#8fa8ff}
+html.dark .rc-tbtn.on{background:#e0a800;border-color:#e0a800;color:#1f3a5f}
+.qt-tx{font-size:16.5px;line-height:1.65;color:var(--ink)}
+.qt-tx p{margin:0 0 8px}
+.qt-tx sup,.qt-tx sub,.qt-txo sup,.qt-opt sup{font-size:.72em;line-height:0}
+.qt-qcg{display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;text-align:center;margin:12px 0 4px;padding:10px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.qt-qcg b{text-decoration:underline}
+.qt-opt span:last-child{font-size:15.5px}
+.qt-ov.sq{border-radius:5px}
+.qt-origbtn{background:none;border:none;padding:2px 0;font-size:11.5px;color:var(--sub);text-decoration:underline;cursor:pointer}
+.qt-txo{font-size:15px;line-height:1.6;margin:4px 0 6px}
+.qt-origd{margin:4px 0 8px}.qt-origd summary{cursor:pointer}
+html.dark .qimg{filter:invert(.9) hue-rotate(180deg)}
+html.dark .qt-exam .qt-body,html.dark .qt-calc,html.dark .qt-rv,html.dark .qt-letter{background:var(--card,#1c1f26)}
+body.th-cute .tabs button.s-quant{--c:#2BB673;--d:#1E9A5C}
 </style>
 </head>
 <body>
@@ -1155,13 +1216,14 @@ body.th-cute .sync-title{font-family:"Nunito","Jua",sans-serif;color:#4CC552;tex
 </div>
 
 <div id="rcView" class="hide"><div class="card" id="rcBody"></div></div>
+<div id="quantView" class="hide"><div class="card" id="quantBody"></div></div>
 
 <!-- ============ WRITING VIEW ============ -->
 <div id="writingView" class="hide">
   <div class="card" id="writingBody"></div>
 </div>
 
-<footer id="appFooter"><details><summary>VOCA v2026.10.27 · 업데이트 기록</summary><ul><li><b>2026.10.27</b> 단축키 바꾸기 (설정 > ⌨️ 단축키)</li><li><b>2026.10.26</b> 단어 수정이 가끔 되돌아가던 문제 수정 (여러 기기·탭 기록을 단어별로 합치기) · 단어장 필터 정리(몰라요·애매해요·알아요·미체크·틀림 제거) · ‘✍️ 내 예문’ 필터 추가</li><li><b>2026.10.25</b> ‘내 예문’: 단어마다 직접 예문 쓰기(✍️) · 내 예문 모음 · AI 첨삭 프롬프트 복사 · 연습 테스트 ‘회독별 요약’ (맞힌/틀린 단어, 틀린 횟수) · 학습 카드 기본 숨김(세부 설정에서 다시 켤 수 있음), 회독 선택은 테스트 카드로 · TCSE: 기본 출제 순서 랜덤 · 세션 끝나면 선지·문장 단어 점검(단어장에 있는 단어만, 선지 단어는 전부) 90% 넘어야 종료, 켜고 끌 수 있음 · 동기화 데이터 사용량 대폭 줄임 (바뀐 항목만 주고받기) · 다크 모드 (설정 > 테마 > 화면 밝기: 밝게 / 어둡게 / 기기 설정 따라)</li><li><b>2026.10.24</b> 3회독부터 ‘오답 노트’: 6/6 끝낸 묶음에서 틀린 단어를 모아 보기·테스트</li><li><b>2026.10.22</b> 테스트에서 틀렸을 때·결과 화면의 예문/유사어/어근/발음도 ‘표시 항목’ 설정을 따름</li><li><b>2026.10.21</b> 연습 테스트에 ‘답 없음’ 보기 (정답을 빼는 비율 설정 가능, 정답은 ‘답 없음’ 칸에 표시) · ‘모르겠어요’ 버튼 없앰 · 테스트 결과: 전체 단어 결과 펼쳐보기(TCSE 빈출 표시) · 틀린 단어마다 내가 고른 것·헷갈리기 쉬운 단어 함께 보기</li><li><b>2026.10.14</b> 3회독부터 연습 테스트를 50개씩 묶기 · 설정창 정리 (학습 설정 하나로 합치고, 나머지는 ‘표시 · 세부 설정’으로) · 회독 진도를 연습 테스트 완료 일차 기준으로 (빨강 또는 무지개 = 완료) · 3회독부터 묶음 테스트 순서 ①전체 ②전체 ③오답복습 ④전체 ⑤오답복습 ⑥전체 (3회 파랑·5회 빨강·6회 무지개) · 오답 복습 25문제 = 오답 → TCSE 빈출 → 랜덤 순으로 채움</li><li><b>2026.10.06</b> 설정 > 학습 자료 받기: 암호로 잠근 GRE 단어·TCSE·RC·Writing 자료를 받아오기 · 아이패드·아이폰에서 RC·테스트 기록이 안 받아지던 문제 수정 (저장 공간이 모자라면 자동 압축 저장) · 맨 위에 마지막 동기화 시간, 맨 아래에 버전 기록 표시</li><li><b>2026.10.05</b> 단어 테스트: 뜻이 2/3 이상 겹치는 선택은 △ (0.5점) · 고양이 100%/90% 표정 교체</li><li><b>2026.10.03</b> 로그인 · 계정별 클라우드 동기화 (어느 기기에서든 같은 기록)</li><li><b>이전</b> 캘린더 시험일·계획·자동 분배 · 고영희 테마와 점수별 표정 · 호버 사전 · TCSE 실전 화면과 AI 분석 프롬프트 복사 · Writing 예시 CSV 가져오기 · 틀린 단어 어근 표시</li></ul></details></footer>
+<footer id="appFooter"><details><summary>VOCA v2026.10.27 · 업데이트 기록</summary><ul><li><b>2026.10.27</b> Quant: 수식·그림 없는 문제 약 340개를 텍스트로 (글자 선명, 보기 클릭, 원본 이미지 전환 가능 · 자료 파일 다시 불러오기 필요) · 그래프 세트 오류 수정 · Quant 문제 이미지 여백을 잘라 글자를 크게, 그래프 자료는 문제 위에 크게 · 다크 모드에서 고른 보기가 잘 보이게 · 맨 위 동기화 표시를 짧게(시간만) · 단축키 바꾸기 (설정 > ⌨️ 단축키) · Quant 탭: 실전 모의고사(2섹션 12문제 21분 + 15문제 26분, 1섹션 결과로 2섹션 난이도 조절) · 주제별 연습 · 틀린 문제 다시 풀기 · 계산기 · 결과에서 문제 이미지/AI 풀이 프롬프트 복사 (문제 자료는 암호로 받기)</li><li><b>2026.10.26</b> 단어 수정이 가끔 되돌아가던 문제 수정 (여러 기기·탭 기록을 단어별로 합치기) · 단어장 필터 정리(몰라요·애매해요·알아요·미체크·틀림 제거) · ‘✍️ 내 예문’ 필터 추가</li><li><b>2026.10.25</b> ‘내 예문’: 단어마다 직접 예문 쓰기(✍️) · 내 예문 모음 · AI 첨삭 프롬프트 복사 · 연습 테스트 ‘회독별 요약’ (맞힌/틀린 단어, 틀린 횟수) · 학습 카드 기본 숨김(세부 설정에서 다시 켤 수 있음), 회독 선택은 테스트 카드로 · TCSE: 기본 출제 순서 랜덤 · 세션 끝나면 선지·문장 단어 점검(단어장에 있는 단어만, 선지 단어는 전부) 90% 넘어야 종료, 켜고 끌 수 있음 · 동기화 데이터 사용량 대폭 줄임 (바뀐 항목만 주고받기) · 다크 모드 (설정 > 테마 > 화면 밝기: 밝게 / 어둡게 / 기기 설정 따라)</li><li><b>2026.10.24</b> 3회독부터 ‘오답 노트’: 6/6 끝낸 묶음에서 틀린 단어를 모아 보기·테스트</li><li><b>2026.10.22</b> 테스트에서 틀렸을 때·결과 화면의 예문/유사어/어근/발음도 ‘표시 항목’ 설정을 따름</li><li><b>2026.10.21</b> 연습 테스트에 ‘답 없음’ 보기 (정답을 빼는 비율 설정 가능, 정답은 ‘답 없음’ 칸에 표시) · ‘모르겠어요’ 버튼 없앰 · 테스트 결과: 전체 단어 결과 펼쳐보기(TCSE 빈출 표시) · 틀린 단어마다 내가 고른 것·헷갈리기 쉬운 단어 함께 보기</li><li><b>2026.10.14</b> 3회독부터 연습 테스트를 50개씩 묶기 · 설정창 정리 (학습 설정 하나로 합치고, 나머지는 ‘표시 · 세부 설정’으로) · 회독 진도를 연습 테스트 완료 일차 기준으로 (빨강 또는 무지개 = 완료) · 3회독부터 묶음 테스트 순서 ①전체 ②전체 ③오답복습 ④전체 ⑤오답복습 ⑥전체 (3회 파랑·5회 빨강·6회 무지개) · 오답 복습 25문제 = 오답 → TCSE 빈출 → 랜덤 순으로 채움</li><li><b>2026.10.06</b> 설정 > 학습 자료 받기: 암호로 잠근 GRE 단어·TCSE·RC·Writing 자료를 받아오기 · 아이패드·아이폰에서 RC·테스트 기록이 안 받아지던 문제 수정 (저장 공간이 모자라면 자동 압축 저장) · 맨 위에 마지막 동기화 시간, 맨 아래에 버전 기록 표시</li><li><b>2026.10.05</b> 단어 테스트: 뜻이 2/3 이상 겹치는 선택은 △ (0.5점) · 고양이 100%/90% 표정 교체</li><li><b>2026.10.03</b> 로그인 · 계정별 클라우드 동기화 (어느 기기에서든 같은 기록)</li><li><b>이전</b> 캘린더 시험일·계획·자동 분배 · 고영희 테마와 점수별 표정 · 호버 사전 · TCSE 실전 화면과 AI 분석 프롬프트 복사 · Writing 예시 CSV 가져오기 · 틀린 단어 어근 표시</li></ul></details></footer>
 
 <div id="settingsModal" class="hide" onclick="if(event.target===this)toggleSettings(false)" style="position:fixed;inset:0;background:rgba(20,25,40,.35);z-index:200;display:flex;justify-content:flex-end">
   <div style="background:var(--card);width:380px;max-width:92vw;height:100%;overflow-y:auto;padding:18px 20px">
@@ -1505,12 +1567,14 @@ function switchTab(t){
   document.getElementById('tcseView').classList.toggle('hide',t!=='tcse');
   document.getElementById('writingView').classList.toggle('hide',t!=='writing');
   document.getElementById('rcView').classList.toggle('hide',t!=='rc');
+  document.getElementById('quantView').classList.toggle('hide',t!=='quant');
   renderTabs();
   if(t==='cal'){ if(!calSel)calSel=todayKey(); renderCalendar(); }
   else if(t==='verbs'){ renderVerbs(); }
   else if(t==='tcse'){ renderTcse(); }
   else if(t==='writing'){ renderWriting(); }
   else if(t==='rc'){ renderRc(); }
+  else if(t==='quant'){ renderQuant(); }
   else render();
 }
 /* ================= 테마 ================= */
@@ -1520,6 +1584,7 @@ const TH_ICON={
   tcse:'<i class="ti"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4" fill="currentColor"/><path d="M6 14.5h5" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><path d="M14 9.5l1.6 5 1.6-5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></i>',
   rc:'<i class="ti"><svg viewBox="0 0 24 24"><path d="M3 6.5C6 5 9 5 12 7c3-2 6-2 9-.5V19c-3-1.5-6-1.5-9 .5-3-2-6-2-9-.5z" fill="currentColor"/><path d="M12 7v12.5" stroke="#fff" stroke-width="1.8"/></svg></i>',
   writing:'<i class="ti"><svg viewBox="0 0 24 24"><path d="M15.5 3.5l5 5L9 20H4v-5z" fill="currentColor"/><path d="M13.5 5.5l5 5" stroke="#fff" stroke-width="1.8"/></svg></i>',
+  quant:'<i class="ti"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4" fill="currentColor"/><path d="M7 8.5h4M9 6.5v4M13.5 8.5h4M7 15.5l3 3M10 15.5l-3 3M13.5 15h4M13.5 18h4" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg></i>',
   cal:'<i class="ti"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="4" fill="currentColor"/><path d="M8 3v4M16 3v4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="15" r="2.2" fill="#fff"/></svg></i>'
 };
 function thGet(){try{return localStorage.getItem(THEME_KEY)||'basic'}catch(e){return 'basic'}}
@@ -1607,6 +1672,7 @@ function renderTabs(){
   h+='<button class="add" onclick="addDeck()" title="단어장 추가">＋</button>';
   h+='<button id="tabTCSE" class="s-tcse'+(mainTab==='tcse'?' on':'')+'" onclick="switchTab(\'tcse\')" style="margin-left:auto">'+TH_ICON.tcse+'TCSE</button>';
   h+='<button id="tabRC" class="s-rc'+(mainTab==='rc'?' on':'')+'" onclick="switchTab(\'rc\')">'+TH_ICON.rc+'RC</button>';
+  h+='<button id="tabQUANT" class="s-quant'+(mainTab==='quant'?' on':'')+'" onclick="switchTab(\'quant\')">'+TH_ICON.quant+'Quant</button>';
   h+='<button id="tabWRITING" class="s-writing'+(mainTab==='writing'?' on':'')+'" onclick="switchTab(\'writing\')">'+TH_ICON.writing+'Writing</button>';
   h+='<button id="tabCAL" class="s-cal'+(mainTab==='cal'?' on':'')+'" onclick="switchTab(\'cal\')">'+TH_ICON.cal+'캘린더</button>';
   el.innerHTML=h;
@@ -1634,6 +1700,7 @@ function switchDeck(id){
   if(typeof writingSession!=='undefined'&&writingSession){if(typeof clearWrTimer==='function')clearWrTimer();writingSession=null;document.getElementById('mainTabs').classList.remove('hide');}
   if(typeof rcS!=='undefined'&&rcS){if(typeof rcStopTimer==='function')rcStopTimer();rcSaveSession();rcS=null;document.getElementById('mainTabs').classList.remove('hide');}
   {const rv=document.getElementById('rcView');if(rv)rv.classList.add('hide');}
+  {const qv=document.getElementById('quantView');if(qv)qv.classList.add('hide');}
   CUR=id;saveActive();
   hdIdx=null;data=loadWords();calendar=loadCal();chunkProg=loadChunk();settings=loadSettings();QSIZE=settings.chunkSize||25;roundState=roundLoad();
   syncSettingsUI();syncViewUI();updatePracticeCount();
@@ -2889,6 +2956,416 @@ function msCopyAll(btn){
   rcCopyText(txt,btn,'복사됨!');
 }
 setTimeout(msChip,0);
+
+/* ================= GRE Quant 모의고사 (문제 이미지 + 정답표) =================
+   문제 이미지는 이 기기 IndexedDB에만 저장(용량 큼). 자료는 파일로 불러오거나, 암호로 잠근 팩으로 받는다.
+   기록(voca_quant_hist)은 계정에 동기화된다. */
+const QT_DB='vocaQuant', QT_HIST='voca_quant_hist', QT_OPT='voca_quant_opt';
+const QT_SEC={ar:'산술',al:'대수',da:'데이터 분석',wp:'응용·그래프',ge:'기하',tr:'함정·기술',b130:'기본 130 (OG)',r170:'심화 170'};
+const QT_QC=['Quantity A is greater.','Quantity B is greater.','The two quantities are equal.','The relationship cannot be determined from the information given.'];
+let QD=null, QS=null, qtImgCache={}, qtCalcOpen=false;
+function qtDb(){return new Promise((res,rej)=>{const r=indexedDB.open(QT_DB,1);r.onupgradeneeded=()=>{r.result.createObjectStore('kv');};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
+async function qtGet(k){const db=await qtDb();return new Promise((res,rej)=>{const t=db.transaction('kv').objectStore('kv').get(k);t.onsuccess=()=>res(t.result);t.onerror=()=>rej(t.error);});}
+async function qtPutMany(obj){const db=await qtDb();return new Promise((res,rej)=>{const tx=db.transaction('kv','readwrite');const st=tx.objectStore('kv');Object.keys(obj).forEach(k=>st.put(obj[k],k));tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);});}
+async function qtClearDb(){const db=await qtDb();return new Promise((res)=>{const tx=db.transaction('kv','readwrite');tx.objectStore('kv').clear();tx.oncomplete=()=>res();});}
+async function qtLoad(){if(QD)return QD;try{const m=await qtGet('meta');if(m&&m.q){QD=m;QD.byId={};m.q.forEach(q=>{QD.byId[q.id]=q;});}}catch(e){}return QD;}
+/* 이미지 여백(흰 부분)을 잘라내고, 글자가 본문 크기(약 16px)로 보이게 폭을 정함 */
+const qtImgW={};
+function qtTrimImg(u){return new Promise(res=>{const im=new Image();im.onload=()=>{try{
+  const W=im.naturalWidth,H=im.naturalHeight,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');x.drawImage(im,0,0);
+  const d=x.getImageData(0,0,W,H).data;let x0=W,y0=H,x1=-1,y1=-1;
+  for(let y=0;y<H;y++)for(let i=0;i<W;i++){const k=(y*W+i)*4;if(d[k+3]>20&&(d[k]<200||d[k+1]<200||d[k+2]<200)){if(i<x0)x0=i;if(i>x1)x1=i;if(y<y0)y0=y;if(y>y1)y1=y;}}
+  if(x1<0)return res({u:u,w:W});
+  const P=8;x0=Math.max(0,x0-P);y0=Math.max(0,y0-P);x1=Math.min(W-1,x1+P);y1=Math.min(H-1,y1+P);
+  const c2=document.createElement('canvas');c2.width=x1-x0+1;c2.height=y1-y0+1;const x2=c2.getContext('2d');x2.fillStyle='#fff';x2.fillRect(0,0,c2.width,c2.height);x2.drawImage(c,x0,y0,c2.width,c2.height,0,0,c2.width,c2.height);
+  res({u:c2.toDataURL('image/png'),w:c2.width});}catch(e){res({u:u,w:im.naturalWidth});}};im.onerror=()=>res({u:u,w:0});im.src=u;});}
+async function qtImg(id){if(qtImgCache[id])return qtImgCache[id];const b=await qtGet('img:'+id);if(!b)return '';const t=await qtTrimImg('data:image/png;base64,'+b);qtImgCache[id]=t.u;qtImgW[id]=t.w;return t.u;}
+function qtImgTag(id,u,alt){const w=qtImgW[id];return '<img class="qimg" src="'+u+'"'+(w?' style="width:'+Math.round(w*.7)+'px"':'')+' alt="'+(alt||'')+'">';}
+function qtOpt(){try{return Object.assign({noOG:false,unseen:true},JSON.parse(localStorage.getItem(QT_OPT))||{});}catch(e){return {noOG:false,unseen:true};}}
+function qtSetOpt(k,v){const o=qtOpt();o[k]=v;try{localStorage.setItem(QT_OPT,JSON.stringify(o));}catch(e){}}
+function qtHist(){try{return JSON.parse(localStorage.getItem(QT_HIST))||[];}catch(e){return [];}}
+function qtSaveHist(h){try{localStorage.setItem(QT_HIST,JSON.stringify(h.slice(-300)));}catch(e){quotaWarn();}}
+function qtSeen(){const s={};qtHist().forEach(a=>(a.secs||[]).forEach(sc=>(sc.items||[]).forEach(it=>{s[it.id]=(s[it.id]||0)+1;})));return s;}
+function qtWrongIds(){const last={};qtHist().forEach(a=>(a.secs||[]).forEach(sc=>(sc.items||[]).forEach(it=>{last[it.id]=it.ok;})));return Object.keys(last).filter(k=>!last[k]);}
+
+/* ---------- 채점 ---------- */
+function qtNum(s){s=String(s==null?'':s).replace(/[$,\s]/g,'').replace(/%$/,'');if(!s)return NaN;if(s.indexOf('/')>=0){const p=s.split('/');if(p.length!==2)return NaN;const a=parseFloat(p[0]),b=parseFloat(p[1]);return b?a/b:NaN;}return parseFloat(s);}
+function qtCorrect(q,r){
+  if(r==null||r==='')return false;
+  if(q.type==='qc'||q.type==='mc')return r===q.ans;
+  if(q.type==='multi')return r.split('').sort().join('')===q.ans.split('').sort().join('');
+  if(/[a-zπ]/i.test(q.ans))return String(r).replace(/\s/g,'').toLowerCase().replace(/pi/g,'π')===q.ans.toLowerCase();
+  const a=qtNum(q.ans),b=qtNum(r);if(isNaN(a)||isNaN(b))return false;
+  return Math.abs(a-b)<=Math.max(1e-9,Math.abs(a)*1e-6);
+}
+function qtFmtResp(q,r){if(r==null||r==='')return '—';if(q.type==='qc')return r;return r;}
+
+/* ---------- 모의고사 문제 뽑기 ---------- */
+function qtShuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function qtPools(){
+  const o=qtOpt();const ok=q=>!q.bad&&!q.nomock;
+  const hard=QD.q.filter(q=>ok(q)&&q.sec==='r170');
+  const easy=QD.q.filter(q=>ok(q)&&(o.noOG?['ar','al','da','wp','ge','tr'].includes(q.sec):q.sec==='b130'));
+  return {hard,easy};
+}
+function qtPickSection(size,qcN,hardShare,used){
+  const o=qtOpt(),seen=o.unseen?qtSeen():{},{hard,easy}=qtPools();
+  const rank=arr=>qtShuffle(arr.filter(q=>!used.has(q.id))).sort((a,b)=>(seen[a.id]||0)-(seen[b.id]||0));
+  const take=(arr,n,filt)=>{const out=[];for(const q of rank(arr)){if(out.length>=n)break;if(filt(q)&&!used.has(q.id)){out.push(q);used.add(q.id);}}return out;};
+  const nHard=k=>Math.round(k*hardShare);
+  /* 그래프 세트 1개 (2~3문제) */
+  let di=[];
+  const sets={};[...hard,...easy].forEach(q=>{if(q.stim&&!used.has(q.id))(sets[q.stim]=sets[q.stim]||[]).push(q);});
+  const preferHard=Math.random()<hardShare;
+  const setIds=qtShuffle(Object.keys(sets)).sort((a,b)=>{const ha=sets[a][0].sec==='r170'?0:1,hb=sets[b][0].sec==='r170'?0:1;const sa=sets[a].reduce((m,q)=>m+(seen[q.id]||0),0),sb=sets[b].reduce((m,q)=>m+(seen[q.id]||0),0);return (sa-sb)||(preferHard?ha-hb:hb-ha);});
+  if(setIds.length){di=sets[setIds[0]].sort((a,b)=>a.n-b.n).slice(0,3);di.forEach(q=>used.add(q.id));}
+  const qcs=[...take(hard,nHard(qcN),q=>q.type==='qc'&&!q.stim),...take(easy,qcN-nHard(qcN),q=>q.type==='qc'&&!q.stim)];
+  if(qcs.length<qcN)qcs.push(...take([...hard,...easy],qcN-qcs.length,q=>q.type==='qc'&&!q.stim));
+  const psN=size-qcs.length-di.length;
+  const ps=[];
+  ps.push(...take(nHard(1)?hard:easy,1,q=>q.type==='multi'&&!q.stim));
+  ps.push(...take(Math.random()<.5?hard:easy,1,q=>q.type==='ne'&&!q.stim));
+  const rest=psN-ps.length,rh=Math.max(0,nHard(psN)-ps.filter(q=>q.sec==='r170').length);
+  ps.push(...take(hard,Math.min(rest,rh),q=>q.type!=='qc'&&!q.stim));
+  ps.push(...take(easy,psN-ps.length,q=>q.type!=='qc'&&!q.stim));
+  if(ps.length<psN)ps.push(...take([...hard,...easy],psN-ps.length,q=>q.type!=='qc'&&!q.stim));
+  const psS=qtShuffle(ps);const at=Math.min(psS.length,Math.floor(Math.random()*(psS.length+1)));
+  psS.splice(at,0,...di);
+  return [...qtShuffle(qcs),...psS].map(q=>q.id);
+}
+
+/* ---------- 시작 ---------- */
+async function qtStartMock(){
+  await qtLoad();if(!QD)return;
+  const used=new Set();
+  QS={mode:'mock',label:'실전 모의고사',used:used,secs:[qtNewSec(qtPickSection(12,4,.5,used),21*60)],cur:0,showTime:true,at:new Date().toISOString()};
+  qtBegin();
+}
+function qtNewSec(ids,lim){return {ids:ids,resp:{},mark:{},tsp:{},lim:lim,left:lim,idx:0,review:false};}
+async function qtStartPractice(){
+  await qtLoad();if(!QD)return;
+  const src=document.getElementById('qtSrc').value,n=Math.max(1,+document.getElementById('qtN').value||10);
+  let pool=QD.q.filter(q=>!q.bad);
+  if(src==='wrong'){const w=new Set(qtWrongIds());pool=pool.filter(q=>w.has(q.id));}
+  else if(src!=='all')pool=pool.filter(q=>q.sec===src);
+  if(!pool.length){alert('고른 범위에 문제가 없어요.');return;}
+  const seen=qtOpt().unseen?qtSeen():{};
+  let pick=qtShuffle(pool).sort((a,b)=>(seen[a.id]||0)-(seen[b.id]||0)).slice(0,n);
+  /* 그래프 세트는 같은 세트끼리 붙여서 */
+  pick.sort((a,b)=>(a.stim||a.id).localeCompare(b.stim||b.id)||a.n-b.n);
+  pick=qtShuffleGroups(pick);
+  QS={mode:'practice',label:'연습 · '+(src==='all'?'전체':src==='wrong'?'틀린 문제':QT_SEC[src]),secs:[qtNewSec(pick.map(q=>q.id),0)],cur:0,showTime:true,at:new Date().toISOString(),checked:{}};
+  qtBegin();
+}
+function qtShuffleGroups(arr){const g=[];arr.forEach(q=>{const last=g[g.length-1];if(q.stim&&last&&last[0].stim===q.stim)last.push(q);else g.push([q]);});return qtShuffle(g).flat();}
+function qtBegin(){
+  document.getElementById('mainTabs').classList.add('hide');
+  qtSecStart();qtShow();
+}
+function qtSecStart(){const s=QS.secs[QS.cur];s.t0=Date.now();s.qt0=Date.now();clearInterval(QS.timer);QS.timer=setInterval(qtTick,1000);}
+function qtTick(){
+  if(!QS)return;const s=QS.secs[QS.cur];
+  const el=document.getElementById('qtTime');
+  if(s.lim){s.left=Math.max(0,s.lim-Math.floor((Date.now()-s.t0)/1000));if(el)el.textContent=QS.showTime?rcFmtTime(s.left):'--:--';if(el&&s.left<=60)el.style.background='#b42323';if(s.left<=0){qtEndSection(true);}}
+  else if(el){el.textContent=QS.showTime?rcFmtTime(Math.floor((Date.now()-s.t0)/1000)):'--:--';}
+}
+function qtTrack(){const s=QS.secs[QS.cur];const id=s.ids[s.idx];if(!id||s.review)return;const now=Date.now();s.tsp[id]=(s.tsp[id]||0)+(now-(s.qt0||now))/1000;s.qt0=now;}
+
+/* ---------- 화면 ---------- */
+async function qtShow(){
+  const el=document.getElementById('quantBody');if(!el||!QS)return;
+  const s=QS.secs[QS.cur];
+  if(s.review){qtShowReview();return;}
+  const id=s.ids[s.idx],q=QD.byId[id];
+  const sid=q.stim||q.ref,txt=!!q.tx&&!(QS.orig&&QS.orig[id]);
+  const img=txt?'':await qtImg(id),stim=sid?await qtImg(sid):'';
+  const mock=QS.mode==='mock',total=s.ids.length;
+  const secLbl=mock?'Section '+(QS.cur+1)+' of 2':'Practice';
+  const chk=QS.mode==='practice'&&QS.checked[id];
+  let h='<div class="rc-exam qt-exam"><div class="rc-topbar"><div class="rc-tt">Quantitative Reasoning · '+secLbl+'</div>'+
+    '<div class="rc-tmid"><span>Question '+(s.idx+1)+' of '+total+'</span><span class="rc-time" id="qtTime">'+(s.lim?rcFmtTime(s.left):'00:00')+'</span><button class="rc-tbtn" onclick="QS.showTime=!QS.showTime;qtTick()">'+(QS.showTime?'Hide':'Show')+' Time</button></div>'+
+    '<div class="rc-tbtns"><button class="rc-tbtn'+(s.mark[id]?' on':'')+'" onclick="qtMark()">'+(s.mark[id]?'★ Marked':'☆ Mark')+'</button>'+
+    (mock?'<button class="rc-tbtn" onclick="qtTrack();QS.secs[QS.cur].review=true;qtShow()">Review</button>':'')+
+    '<button class="rc-tbtn" onclick="qtCalc()">Calculator</button><button class="rc-tbtn qt-exit" onclick="qtExit()">✕ Exit</button></div></div>'+
+    '<div class="qt-body">'+(stim?'<div class="qt-stim">'+(q.ref?'<div class="count" style="margin-bottom:4px">참고: 앞 문제의 표</div>':'')+qtImgTag(sid,stim,'자료')+'</div>':'')+
+    '<div class="qt-q">'+(txt?qtTxHTML(q):qtImgTag(id,img,'문제 '+(s.idx+1)))+
+    (q.tx?'<button class="qt-origbtn" onclick="qtOrigToggle(\''+id+'\')">'+(txt?'원본 이미지로 보기':'텍스트로 보기')+'</button>':'')+
+    qtAnswerHTML(q,s.resp[id],chk,txt)+
+    (chk?qtCheckMsg(q,s.resp[id]):'')+'</div></div>'+
+    '<div class="rc-bottombar"><span class="count">'+(q.type==='multi'?'정답을 모두 고르세요':q.type==='ne'?'숫자를 입력하세요'+(q.ans.indexOf('/')>=0?' (분수)':''):'하나를 고르세요')+(mock?'':' · '+(QT_SEC[q.sec]||''))+'</span>'+
+    '<div class="row" style="gap:6px"><button onclick="qtNav(-1)"'+(s.idx===0?' disabled':'')+'>◀ Back</button>'+
+    (QS.mode==='practice'&&!chk?'<button class="primary" onclick="qtCheck()">확인</button>':'<button class="primary" id="qtNextBtn" onclick="qtNav(1)">'+(s.idx===total-1?(mock?'Review ▶':'끝내기'):'Next ▶')+'</button>')+'</div></div></div>'+
+    '<div id="qtCalcBox" class="'+(qtCalcOpen?'':'hide')+'"></div>';
+  el.innerHTML=h;if(qtCalcOpen)qtCalcRender();
+  qtTick();
+  const ni=el.querySelector('.qt-ne input');if(ni&&!chk)ni.focus();
+}
+/* 텍스트로 바꾼 문제(수식·그림 없는 문제) */
+function qtTxHTML(q){
+  const t=q.tx;if(!t)return '';
+  let h='<div class="qt-tx">'+(t.stem||[]).map(p=>'<p>'+p+'</p>').join('');
+  if(t.qa!=null)h+='<div class="qt-qcg"><b>Quantity A</b><b>Quantity B</b><div>'+t.qa+'</div><div>'+t.qb+'</div></div>';
+  return h+'</div>';
+}
+function qtPlain(html){return String(html||'').replace(/<sup>(.*?)<\/sup>/g,(m,x)=>{x=x.replace(/<[^>]+>/g,'');return '^'+(x.length>1?'('+x+')':x);}).replace(/<sub>(.*?)<\/sub>/g,'_($1)').replace(/<[^>]+>/g,'').replace(/&emsp;/g,'   ').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&').replace(/&#x27;|&#39;/g,"'").replace(/&quot;/g,'"');}
+function qtTxPlain(q){const t=q.tx;if(!t)return '';let s=(t.stem||[]).map(qtPlain).join('\n');
+  if(t.qa!=null)s+='\nQuantity A: '+qtPlain(t.qa)+'\nQuantity B: '+qtPlain(t.qb);
+  if(t.opts)s+='\n'+t.opts.map((o,i)=>String.fromCharCode(65+i)+'. '+qtPlain(o)).join('\n');return s;}
+function qtOrigToggle(id){QS.orig=QS.orig||{};QS.orig[id]=!QS.orig[id];qtShow();}
+function qtAnswerHTML(q,r,locked,txt){
+  const dis=locked?' disabled':'';
+  if(q.type==='qc')return '<div class="qt-ans">'+QT_QC.map((t,i)=>{const L='ABCD'[i];return '<label class="qt-opt'+(r===L?' sel':'')+'"><input type="radio" name="qtA" value="'+L+'"'+(r===L?' checked':'')+dis+' onchange="qtSet(\''+L+'\')"><span class="qt-ov">'+L+'</span><span>'+t+'</span></label>';}).join('')+'</div>';
+  if((q.type==='mc'||q.type==='multi')&&txt&&q.tx&&q.tx.opts){
+    const cur=r||'';
+    return '<div class="qt-ans">'+q.tx.opts.map((o,i)=>{const L=String.fromCharCode(65+i),on=cur.indexOf(L)>=0;
+      return '<label class="qt-opt'+(on?' sel':'')+'"><input type="checkbox"'+(on?' checked':'')+dis+' onchange="qtSet(\''+L+'\')"><span class="qt-ov'+(q.type==='multi'?' sq':'')+'">'+L+'</span><span>'+o+'</span></label>';}).join('')+'</div>';
+  }
+  if(q.type==='mc'||q.type==='multi'){
+    const n=Math.max(q.type==='mc'?2:2,q.opts||5),cur=r||'';
+    return '<div class="qt-ans qt-row">'+Array.from({length:n},(_,i)=>{const L=String.fromCharCode(65+i),on=cur.indexOf(L)>=0;
+      return '<button class="qt-letter'+(q.type==='multi'?' sq':'')+(on?' sel':'')+'"'+dis+' onclick="qtSet(\''+L+'\')">'+L+'</button>';}).join('')+'</div>';
+  }
+  const frac=q.ans.indexOf('/')>=0,parts=(r||'').split('/');
+  if(frac)return '<div class="qt-ans qt-ne qt-frac"><input inputmode="decimal" value="'+esc(parts[0]||'')+'"'+dis+' oninput="qtNE()"><hr><input inputmode="decimal" value="'+esc(parts[1]||'')+'"'+dis+' oninput="qtNE()"></div>';
+  return '<div class="qt-ans qt-ne"><input inputmode="decimal" value="'+esc(r||'')+'"'+dis+' oninput="qtNE()" placeholder="답 입력"></div>';
+}
+function qtCheckMsg(q,r){const ok=qtCorrect(q,r);return '<div class="qt-check '+(ok?'ok':'bad')+'">'+(ok?'✓ 정답':'✗ 오답 · 정답 '+esc(q.ans)+(r?' · 내 답 '+esc(r):''))+'</div>';}
+function qtCur(){const s=QS.secs[QS.cur];return {s:s,id:s.ids[s.idx],q:QD.byId[s.ids[s.idx]]};}
+function qtSet(L){
+  const {s,id,q}=qtCur();if(QS.mode==='practice'&&QS.checked[id])return;
+  if(q.type==='multi'){let r=s.resp[id]||'';r=r.indexOf(L)>=0?r.replace(L,''):r+L;s.resp[id]=r.split('').sort().join('');}
+  else s.resp[id]=L;
+  qtShow();
+}
+function qtNE(){const {s,id}=qtCur();const ins=[...document.querySelectorAll('#quantBody .qt-ne input')].map(i=>i.value.trim());s.resp[id]=ins.length===2?(ins[0]||ins[1]?ins[0]+'/'+ins[1]:''):ins[0];}
+function qtMark(){const {s,id}=qtCur();s.mark[id]=!s.mark[id];qtShow();}
+function qtCheck(){const {s,id,q}=qtCur();qtTrack();QS.checked[id]=true;qtShow();}
+function qtNav(d){
+  const s=QS.secs[QS.cur];qtTrack();
+  const n=s.idx+d;
+  if(n<0)return;
+  if(n>=s.ids.length){if(QS.mode==='mock'){s.review=true;qtShow();}else qtFinish();return;}
+  s.idx=n;qtShow();
+}
+function qtShowReview(){
+  const el=document.getElementById('quantBody'),s=QS.secs[QS.cur];
+  const ans=s.ids.filter(id=>s.resp[id]!=null&&s.resp[id]!=='').length;
+  el.innerHTML='<div class="rc-exam qt-exam"><div class="rc-topbar"><div class="rc-tt">Review · Section '+(QS.cur+1)+' of 2</div><div class="rc-tmid"><span>답한 문제 '+ans+'/'+s.ids.length+'</span><span class="rc-time" id="qtTime"></span></div><div class="rc-tbtns"><button class="rc-tbtn qt-exit" onclick="qtExit()">✕ Exit</button></div></div>'+
+    '<div class="qt-body"><p class="study-tip" style="margin:0 0 8px">번호를 누르면 그 문제로 가요. 시간이 남아 있으면 다시 볼 수 있어요.</p><div class="qt-rev">'+
+    s.ids.map((id,i)=>{const a=s.resp[id]!=null&&s.resp[id]!=='';return '<button class="qt-rv'+(a?' done':'')+(s.mark[id]?' mk':'')+'" onclick="qtGo('+i+')"><b>'+(i+1)+'</b><span>'+(a?'답함':'안 함')+(s.mark[id]?' ★':'')+'</span></button>';}).join('')+'</div></div>'+
+    '<div class="rc-bottombar"><span class="count">'+(QS.cur===0?'섹션을 끝내면 2섹션으로 넘어가요 (1섹션 결과에 따라 난이도가 달라져요)':'끝내면 결과를 보여줘요')+'</span><div class="row" style="gap:6px"><button onclick="qtGo('+s.idx+')">돌아가기</button><button class="primary" onclick="qtEndSection(false)">섹션 끝내기</button></div></div></div>';
+  qtTick();
+}
+function qtGo(i){const s=QS.secs[QS.cur];s.review=false;s.idx=i;s.qt0=Date.now();qtShow();}
+function qtEndSection(auto){
+  if(!QS)return;const s=QS.secs[QS.cur];
+  if(!auto&&!confirm(QS.cur===0?'1섹션을 끝내고 2섹션으로 넘어갈까요?':'2섹션을 끝내고 결과를 볼까요?'))return;
+  qtTrack();s.done=true;s.used=Math.min(s.lim||1e9,Math.round((Date.now()-s.t0)/1000));
+  if(QS.mode==='mock'&&QS.cur===0){
+    const c=s.ids.filter(id=>qtCorrect(QD.byId[id],s.resp[id])).length,pct=c/s.ids.length;
+    QS.s1pct=pct;QS.level=pct>=.6?'hard':'easy';
+    QS.secs.push(qtNewSec(qtPickSection(15,5,QS.level==='hard'?.8:.2,QS.used),26*60));QS.cur=1;
+    if(auto)alert('1섹션 시간이 끝났어요. 2섹션으로 넘어가요.');
+    qtSecStart();qtShow();return;
+  }
+  if(auto)alert('시간이 끝났어요.');
+  qtFinish();
+}
+function qtFinish(){
+  clearInterval(QS.timer);
+  if(QS.mode==='practice'){const s=QS.secs[0];s.used=Math.round((Date.now()-s.t0)/1000);}
+  const rec={at:QS.at,mode:QS.mode,label:QS.label,level:QS.level||'',secs:QS.secs.map(s=>({used:s.used||0,lim:s.lim,items:s.ids.map(id=>({id:id,r:s.resp[id]||'',ok:qtCorrect(QD.byId[id],s.resp[id])?1:0,t:Math.round(s.tsp[id]||0)}))}))};
+  rec.score=rec.secs.reduce((m,s)=>m+s.items.filter(i=>i.ok).length,0);rec.total=rec.secs.reduce((m,s)=>m+s.items.length,0);
+  if(rec.secs.some(s=>s.items.some(i=>i.r))){const h=qtHist();h.push(rec);qtSaveHist(h);if(typeof actBump==='function')try{actBump('quant',rec.total);}catch(e){}}
+  QS=null;qtResult(rec);
+}
+function qtExit(){
+  if(!QS)return;
+  if(!confirm(QS.mode==='mock'?'모의고사를 그만둘까요? (지금까지 푼 건 기록에 남지 않아요)':'연습을 끝내고 결과를 볼까요?'))return;
+  if(QS.mode==='practice'){qtTrack();qtFinish();return;}
+  clearInterval(QS.timer);QS=null;qtCalcOpen=false;document.getElementById('mainTabs').classList.remove('hide');renderQuant();
+}
+
+/* ---------- 결과 ---------- */
+let qtLastRec=null;
+function qtResult(rec){
+  qtLastRec=rec;qtCalcOpen=false;
+  const el=document.getElementById('quantBody');
+  document.getElementById('mainTabs').classList.add('hide');
+  const pct=rec.total?Math.round(rec.score/rec.total*100):0;
+  const byType={};rec.secs.forEach(s=>s.items.forEach(it=>{const q=QD.byId[it.id];if(!q)return;const k=q.stim?'di':q.type;const b=byType[k]||(byType[k]=[0,0]);b[0]++;if(it.ok)b[1]++;}));
+  const TN={qc:'QC',mc:'객관식',multi:'복수 선택',ne:'숫자 입력',di:'그래프(DI)'};
+  let h='<h3>'+esc(rec.label)+' 결과</h3><div class="statgrid"><div class="stat"><b>'+rec.score+'/'+rec.total+'</b><span class="count">정답</span></div><div class="stat"><b>'+pct+'%</b><span class="count">정답률</span></div>'+
+    rec.secs.map((s,i)=>'<div class="stat"><b>'+s.items.filter(x=>x.ok).length+'/'+s.items.length+'</b><span class="count">'+(rec.mode==='mock'?(i+1)+'섹션'+(i===1&&rec.level?' ('+(rec.level==='hard'?'어려움':'쉬움')+')':''):'연습')+' · '+rcFmtTime(s.used||0)+'</span></div>').join('')+'</div>'+
+    '<div class="count" style="margin-top:6px">유형별: '+Object.keys(byType).map(k=>TN[k]+' '+byType[k][1]+'/'+byType[k][0]).join(' · ')+'</div>'+
+    '<div class="row" style="margin-top:10px;gap:6px"><button class="primary" onclick="qtBackHome()">Quant 홈으로</button>'+(rec.score<rec.total?'<button onclick="qtCopyAllWrong(this)">🤖 틀린 문제 전체 프롬프트 복사</button>':'')+'</div>'+
+    '<p class="study-tip" style="margin-top:8px">줄을 누르면 문제가 펼쳐져요. 이미지를 복사해서 AI 채팅에 붙여넣고 프롬프트와 함께 물어보면 풀이를 받을 수 있어요.</p>';
+  rec.secs.forEach((s,si)=>{
+    if(rec.mode==='mock')h+='<div class="set-sub" style="margin-top:12px">'+(si+1)+'섹션</div>';
+    h+='<div class="allres" style="margin-top:6px">'+s.items.map((it,i)=>{const q=QD.byId[it.id]||{};
+      return '<details class="qt-ri" ontoggle="if(this.open)qtLoadRI(this,\''+it.id+'\')"><summary class="qt-rr '+(it.ok?'ar-o':'ar-x')+'"><span class="ar-mk">'+(it.ok?'○':'✕')+'</span><span class="ar-no">'+(i+1)+'</span><span class="hs-wm">'+(QT_SEC[q.sec]||'')+' #'+q.n+' · '+({qc:'QC',mc:'객관식',multi:'복수',ne:'숫자'})[q.type]+(q.stim?' · 그래프':'')+'</span><span class="hs-c">'+(it.ok?'':'<span class="note-cnt">내 답 '+esc(it.r||'—')+'</span>')+'</span><span class="hs-c"><span class="tcse-freq">정답 '+esc(q.ans)+'</span></span><span class="ar-cnt">'+it.t+'초</span></summary><div class="qt-rbody"></div></details>';}).join('')+'</div>';
+  });
+  el.innerHTML=h;
+}
+async function qtLoadRI(det,id){
+  const b=det.querySelector('.qt-rbody');if(b.dataset.ok)return;b.dataset.ok=1;
+  const q=QD.byId[id],sid=q.stim||q.ref,st=sid?await qtImg(sid):'';
+  const body=q.tx?qtTxHTML(q)+(q.tx.opts?'<div class="qt-txo">'+q.tx.opts.map((o,i)=>'<div><b>'+String.fromCharCode(65+i)+'.</b> '+o+'</div>').join('')+'</div>':'')+'<details class="qt-origd" ontoggle="if(this.open&&!this.dataset.ok){this.dataset.ok=1;qtImg(\''+id+'\').then(u=>{this.insertAdjacentHTML(\'beforeend\',qtImgTag(\''+id+'\',u))})}"><summary class="count">원본 이미지 보기</summary></details>':qtImgTag(id,await qtImg(id));
+  b.innerHTML=(st?qtImgTag(sid,st):'')+body+
+    '<div class="row" style="gap:6px;margin:6px 0"><button class="small" onclick="qtCopyImg(\''+id+'\',this)">🖼 문제 이미지 복사</button><button class="small" onclick="qtCopyPrompt(\''+id+'\',this)">🤖 AI 풀이 프롬프트 복사</button></div>';
+}
+function qtItemOf(id){if(!qtLastRec)return null;for(const s of qtLastRec.secs)for(const it of s.items)if(it.id===id)return it;return null;}
+function qtPromptFor(id){const q=QD.byId[id],it=qtItemOf(id)||{};
+  const tn={qc:'Quantitative Comparison (A: A가 큼 / B: B가 큼 / C: 같음 / D: 알 수 없음)',mc:'객관식 (하나 고르기)',multi:'복수 선택 (해당하는 것 모두)',ne:'숫자 입력'}[q.type];
+  if(q.tx&&!q.stim&&!q.ref)return 'GRE Quant 문제야. 유형: '+tn+'.\n\n'+qtTxPlain(q)+'\n\n내 답: '+(it.r||'(안 풀었음)')+' / 정답: '+q.ans+'\n'+
+    '1) 정답이 나오는 풀이를 단계별로 짧게 설명해줘.\n2) 내 답이 틀렸다면 어디서 왜 틀렸을 가능성이 큰지 짚어줘.\n3) 시험장에서 2분 안에 푸는 더 빠른 방법(어림, 숫자 대입, 선택지 활용 등)이 있으면 알려줘.\n4) 이 문제에 쓰인 개념을 한 줄로 정리해줘.';
+  return '첨부한 이미지는 GRE Quant 문제야'+(q.stim?' (그래프/표 자료 포함)':'')+'. 유형: '+tn+'.\n내 답: '+(it.r||'(안 풀었음)')+' / 정답: '+q.ans+'\n'+
+    '1) 정답이 나오는 풀이를 단계별로 짧게 설명해줘.\n2) 내 답이 틀렸다면 어디서 왜 틀렸을 가능성이 큰지 짚어줘.\n3) 시험장에서 2분 안에 푸는 더 빠른 방법(어림, 숫자 대입, 선택지 활용 등)이 있으면 알려줘.\n4) 이 문제에 쓰인 개념을 한 줄로 정리해줘.';}
+function qtCopyPrompt(id,btn){rcCopyText(qtPromptFor(id),btn,'복사됨!');}
+function qtCopyAllWrong(btn){
+  const ids=[];qtLastRec.secs.forEach(s=>s.items.forEach(it=>{if(!it.ok)ids.push(it.id);}));
+  const t='아래는 내가 GRE Quant 모의고사에서 틀린 문제 목록이야. 문제 이미지는 순서대로 첨부할게.\n각 문제마다 풀이, 내가 틀린 이유, 빠른 풀이법을 짧게 정리하고, 마지막에 내가 반복해서 약한 개념을 3개 이내로 요약해줘.\n\n'+
+    ids.map((id,i)=>{const q=QD.byId[id],it=qtItemOf(id);return (i+1)+'. ['+(QT_SEC[q.sec]||'')+' #'+q.n+'] 유형 '+q.type.toUpperCase()+' · 내 답 '+(it.r||'—')+' · 정답 '+q.ans;}).join('\n');
+  rcCopyText(t,btn,'복사됨!');
+}
+async function qtCopyImg(id,btn){
+  try{const u=await qtImg(id);const blob=await (await fetch(u)).blob();await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);btn.textContent='복사됨!';}
+  catch(e){const w=window.open();if(w)w.document.write('<img src="'+(await qtImg(id))+'">');btn.textContent='새 창에서 열었어요';}
+  setTimeout(()=>{btn.textContent='🖼 문제 이미지 복사';},1500);
+}
+function qtBackHome(){qtLastRec=null;document.getElementById('mainTabs').classList.remove('hide');renderQuant();}
+
+/* ---------- 계산기 (GRE 화면 계산기 비슷하게) ---------- */
+let qtCx={expr:'',mem:0};
+function qtCalc(){qtCalcOpen=!qtCalcOpen;const b=document.getElementById('qtCalcBox');if(b){b.classList.toggle('hide',!qtCalcOpen);if(qtCalcOpen)qtCalcRender();}}
+function qtCalcRender(){
+  const b=document.getElementById('qtCalcBox');if(!b)return;
+  const K=[['MR','M+','MC','C'],['7','8','9','÷'],['4','5','6','×'],['1','2','3','−'],['0','.','±','+'],['(',')','√','=']];
+  b.innerHTML='<div class="qt-calc"><div class="row" style="justify-content:space-between"><b style="font-size:13px">Calculator</b><button class="small" onclick="qtCalc()">✕</button></div><div class="qt-cd" id="qtCd">'+esc(qtCx.expr||'0')+'</div>'+
+    K.map(r=>'<div class="qt-cr">'+r.map(k=>'<button onclick="qtCk(\''+k+'\')">'+k+'</button>').join('')+'</div>').join('')+
+    '<button class="small" style="width:100%;margin-top:4px" onclick="qtCk(\'T\')">Transfer Display</button>'+(qtCx.mem?'<div class="count">M = '+qtCx.mem+'</div>':'')+'</div>';
+}
+function qtCalcEval(e){const s=e.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');if(!/^[\d+\-*/().\s]*$/.test(s))return NaN;try{const v=Function('return ('+(s||'0')+')')();return (typeof v==='number'&&isFinite(v))?+v.toPrecision(10):NaN;}catch(x){return NaN;}}
+function qtCk(k){
+  let e=qtCx.expr;
+  if(/^[0-9.]$/.test(k)||k==='('||k===')')e+=k;
+  else if('+−×÷'.includes(k))e+=k;
+  else if(k==='C')e='';
+  else if(k==='='){const v=qtCalcEval(e);e=isNaN(v)?'Error':String(v);}
+  else if(k==='√'){const v=qtCalcEval(e);e=isNaN(v)||v<0?'Error':String(+Math.sqrt(v).toPrecision(10));}
+  else if(k==='±'){const v=qtCalcEval(e);e=isNaN(v)?'Error':String(-v);}
+  else if(k==='M+'){const v=qtCalcEval(e);if(!isNaN(v))qtCx.mem=+(qtCx.mem+v).toPrecision(12);}
+  else if(k==='MR')e+=String(qtCx.mem);
+  else if(k==='MC')qtCx.mem=0;
+  else if(k==='T'){const v=qtCalcEval(e);const ins=document.querySelectorAll('#quantBody .qt-ne input:not([disabled])');if(ins.length&&!isNaN(v)){ins[0].value=String(v);qtNE();}}
+  if(e==='Error')setTimeout(()=>{qtCx.expr='';qtCalcRender();},900);
+  qtCx.expr=e;qtCalcRender();
+}
+
+/* ---------- 키보드 ---------- */
+document.addEventListener('keydown',function(e){
+  if(!QS||mainTab!=='quant')return;
+  const tag=(e.target&&e.target.tagName)||'';
+  if(tag==='INPUT'||tag==='TEXTAREA'){if(e.key==='Enter'){e.preventDefault();const b=QS.mode==='practice'&&!QS.checked[qtCur().id]?null:document.getElementById('qtNextBtn');if(b)b.click();else if(QS.mode==='practice')qtCheck();}return;}
+  const s=QS.secs[QS.cur];if(s.review)return;
+  const {q,id}=qtCur();
+  if(e.key>='1'&&e.key<='9'){const i=+e.key-1;const n=q.type==='qc'?4:(q.tx&&q.tx.opts?q.tx.opts.length:(q.opts||5));if(i<n&&q.type!=='ne'){e.preventDefault();qtSet(String.fromCharCode(65+i));}}
+  else if(e.key==='Enter'){e.preventDefault();if(QS.mode==='practice'&&!QS.checked[id])qtCheck();else qtNav(1);}
+  else if(e.key==='ArrowRight'){e.preventDefault();qtNav(1);}
+  else if(e.key==='ArrowLeft'){e.preventDefault();qtNav(-1);}
+  else if(e.key==='Escape'){e.preventDefault();qtExit();}
+});
+
+/* ---------- 자료 불러오기 / 팩 ---------- */
+async function qtImportFile(inp){
+  const f=inp.files[0];if(!f)return;const msg=document.getElementById('qtMsg');if(msg)msg.textContent='불러오는 중…';
+  try{const txt=await f.text();await qtStorePack(JSON.parse(txt));if(msg)msg.textContent='';renderQuant();}
+  catch(e){if(msg)msg.textContent='불러오기 실패: '+(e.message||e);}
+  inp.value='';
+}
+async function qtStorePack(p){
+  if(!p||!p.q||!p.img)throw new Error('올바른 Quant 자료 파일이 아니에요.');
+  await qtClearDb();
+  const kv={meta:{v:p.v||1,name:p.name||'',q:p.q,stim:p.stim||{}}};Object.keys(p.img).forEach(id=>{kv['img:'+id]=p.img[id];});
+  await qtPutMany(kv);QD=null;qtImgCache={};await qtLoad();
+}
+function qtB64(u8){return pkB64(u8);}
+let qtKeyCache={};
+async function qtKey(pw,saltB64){const k=pw+'|'+saltB64;if(!qtKeyCache[k])qtKeyCache[k]=await pkKey(pw,pkUnB64(saltB64));return qtKeyCache[k];}
+async function qtUploadPack(){
+  const a=document.getElementById('qtPw1').value,b=document.getElementById('qtPw2').value,msg=document.getElementById('qtMsg');
+  if(a.length<8)return msg.textContent='암호는 8자 이상으로 해주세요.';if(a!==b)return msg.textContent='두 암호가 달라요.';
+  await qtLoad();if(!QD)return msg.textContent='이 기기에 Quant 자료가 없어요. 먼저 파일을 불러오세요.';
+  try{
+    const ids=Object.keys(QD.byId).concat(Object.keys(QD.stim||{}));const img={};
+    for(const id of ids){img[id]=await qtGet('img:'+id);}
+    const saltB=pkB64(crypto.getRandomValues(new Uint8Array(16)));const key=await qtKey(a,saltB);
+    const chunks=[];let cur={},size=0;
+    ids.forEach(id=>{const v=img[id]||'';if(size+v.length>900000&&size){chunks.push(cur);cur={};size=0;}cur[id]=v;size+=v.length;});if(size)chunks.push(cur);
+    const parts=[['quant-meta',{v:QD.v,name:QD.name,q:QD.q,stim:QD.stim,chunks:chunks.length}]].concat(chunks.map((c,i)=>['quant-'+(i+1),c]));
+    for(let i=0;i<parts.length;i++){
+      msg.textContent='올리는 중… '+(i+1)+'/'+parts.length;
+      const iv=crypto.getRandomValues(new Uint8Array(12));
+      const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv:iv},key,new TextEncoder().encode(JSON.stringify(parts[i][1]))));
+      await VSyncUI.api('POST','content_pack?on_conflict=part',[{part:parts[i][0],salt:saltB,iv:pkB64(iv),data:pkB64(ct),info:{count:i===0?QD.q.length+'문제':'이미지 '+Object.keys(parts[i][1]).length,kind:'quant'}}],{'Prefer':'resolution=merge-duplicates,return=minimal'});
+    }
+    msg.textContent='올렸어요: '+QD.q.length+'문제 · 이미지 묶음 '+chunks.length+'개';
+  }catch(e){msg.textContent='올리기 실패: '+(e.message||e);}
+}
+async function qtPullPack(){
+  const pw=document.getElementById('qtPw').value,msg=document.getElementById('qtMsg');
+  if(!pw)return msg.textContent='암호를 넣어주세요.';
+  if(!(window.VSyncUI&&VSyncUI.user()))return msg.textContent='로그인해야 받을 수 있어요.';
+  try{
+    msg.textContent='받는 중…';
+    const metaRow=(await VSyncUI.api('GET','content_pack?select=part,salt,iv,data&part=eq.quant-meta'))[0];
+    if(!metaRow)return msg.textContent='서버에 Quant 자료가 아직 없어요.';
+    const dec=async row=>{const key=await qtKey(pw,row.salt);try{return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:pkUnB64(row.iv)},key,pkUnB64(row.data))));}catch(e){throw new Error('암호가 맞지 않아요.');}};
+    const meta=await dec(metaRow);const img={};
+    for(let i=1;i<=meta.chunks;i++){msg.textContent='받는 중… '+i+'/'+meta.chunks;const r=(await VSyncUI.api('GET','content_pack?select=part,salt,iv,data&part=eq.quant-'+i))[0];if(!r)throw new Error('자료 일부가 없어요 ('+i+')');Object.assign(img,await dec(r));}
+    await qtStorePack({v:meta.v,name:meta.name,q:meta.q,stim:meta.stim,img:img});msg.textContent='';renderQuant();
+  }catch(e){msg.textContent=e.message||String(e);}
+}
+async function qtWipe(){if(!confirm('이 기기의 Quant 문제 자료를 지울까요? (기록은 남아요)'))return;await qtClearDb();QD=null;qtImgCache={};renderQuant();}
+
+/* ---------- 홈 ---------- */
+async function renderQuant(){
+  const el=document.getElementById('quantBody');if(!el)return;
+  if(QS){qtShow();return;}
+  if(qtLastRec){qtResult(qtLastRec);return;}
+  await qtLoad();
+  const owner=window.VSyncUI&&VSyncUI.user()&&VSyncUI.user().id===PK_OWNER;
+  if(!QD){
+    el.innerHTML='<h3>GRE Quant 모의고사</h3><p class="study-tip">이 기기에 문제 자료가 없어요. 암호로 받거나, 자료 파일(quant500_pack.json)을 불러오세요.</p>'+
+      '<div class="row" style="gap:6px;margin-top:8px"><input id="qtPw" type="password" placeholder="자료 암호" style="flex:1;min-width:140px"><button class="primary" onclick="qtPullPack()">암호로 받기</button></div>'+
+      '<div class="row" style="gap:6px;margin-top:8px"><button onclick="document.getElementById(\'qtFile\').click()">📁 자료 파일 불러오기</button><input type="file" id="qtFile" accept=".json" class="hide" onchange="qtImportFile(this)"></div>'+
+      '<div id="qtMsg" class="count" style="margin-top:8px;min-height:16px"></div>';
+    return;
+  }
+  const o=qtOpt(),hist=qtHist(),seen=qtSeen(),valid=QD.q.filter(q=>!q.bad);
+  const mocks=hist.filter(a=>a.mode==='mock'),{hard,easy}=qtPools();
+  const unseenMock=[...hard,...easy].filter(q=>!seen[q.id]).length;
+  const secs=['ar','al','da','wp','ge','tr','b130','r170'];
+  let h='<div class="row" style="justify-content:space-between;align-items:baseline"><h3 style="margin:0">GRE Quant 모의고사</h3><span class="count">'+valid.length+'문제 · 푼 문제 '+Object.keys(seen).length+'</span></div>'+
+    '<div class="qt-card"><div class="set-sub">📝 실전 모의고사</div><p class="study-tip" style="margin:2px 0 8px">실제 시험처럼 1섹션 12문제 21분 → 2섹션 15문제 26분. 1섹션 정답률이 60% 이상이면 2섹션이 어려워져요. QC 약 ⅓ · 그래프 세트 1개 · 복수 선택·숫자 입력 포함.</p>'+
+    '<label class="tog"><input type="checkbox"'+(o.noOG?' checked':'')+' onchange="qtSetOpt(\'noOG\',this.checked);renderQuant()">OG(기본 130) 문제 빼기 <span class="count">(OG 책을 따로 풀었다면)</span></label>'+
+    '<label class="tog" style="margin-top:4px"><input type="checkbox"'+(o.unseen?' checked':'')+' onchange="qtSetOpt(\'unseen\',this.checked)">안 푼 문제 먼저</label>'+
+    '<div class="row" style="margin-top:8px;gap:8px"><button class="primary" onclick="qtStartMock()">모의고사 시작</button><span class="count">안 푼 문제 '+unseenMock+'개 남음 (모의고사 약 '+Math.floor(unseenMock/27)+'회분)</span></div></div>'+
+    '<div class="qt-card"><div class="set-sub">🎯 주제별 연습</div><p class="study-tip" style="margin:2px 0 8px">시간 제한 없이 한 문제씩 풀고 바로 채점해요.</p>'+
+    '<div class="row" style="gap:6px"><select id="qtSrc"><option value="all">전체</option>'+secs.map(k=>'<option value="'+k+'">'+QT_SEC[k]+' ('+valid.filter(q=>q.sec===k).length+')</option>').join('')+'<option value="wrong">❗ 마지막에 틀린 문제 ('+qtWrongIds().length+')</option></select>'+
+    '<input id="qtN" type="number" min="1" value="10" style="width:70px"> 문제 <button class="primary" onclick="qtStartPractice()">연습 시작</button></div></div>';
+  if(hist.length){
+    h+='<div class="qt-card"><div class="set-sub">📊 기록</div>'+hist.slice().reverse().slice(0,15).map((a,i)=>{const idx=hist.length-1-i;const p=a.total?Math.round(a.score/a.total*100):0;
+      return '<div class="row qt-hrow" onclick="qtOpenHist('+idx+')"><span class="count">'+String(a.at).slice(5,16).replace('T',' ')+'</span><b>'+esc(a.label)+'</b><span>'+a.score+'/'+a.total+' ('+p+'%)</span>'+(a.mode==='mock'?'<span class="count">1섹션 '+a.secs[0].items.filter(x=>x.ok).length+'/'+a.secs[0].items.length+(a.secs[1]?' · 2섹션 '+a.secs[1].items.filter(x=>x.ok).length+'/'+a.secs[1].items.length+(a.level?' '+(a.level==='hard'?'어려움':'쉬움'):''):'')+'</span>':'')+'</div>';}).join('')+'</div>';
+  }
+  h+='<details class="qt-card"><summary class="count" style="cursor:pointer">자료 관리</summary><div style="margin-top:6px"><span class="count">'+esc(QD.name||'')+' · 정답표 문제 있는 '+QD.q.filter(q=>q.bad).length+'문제는 자동 제외</span>'+
+    '<div class="row" style="gap:6px;margin-top:6px"><button class="small" onclick="document.getElementById(\'qtFile\').click()">📁 자료 파일 다시 불러오기</button><input type="file" id="qtFile" accept=".json" class="hide" onchange="qtImportFile(this)"><button class="small danger" onclick="qtWipe()">이 기기 자료 지우기</button></div>'+
+    (owner?'<div class="set-sub" style="margin-top:10px">관리자: 암호로 잠가 서버에 올리기</div><div class="row" style="gap:6px"><input id="qtPw1" type="password" placeholder="새 암호 (8자 이상)" style="flex:1;min-width:0"><input id="qtPw2" type="password" placeholder="한 번 더" style="flex:1;min-width:0"><button class="small" onclick="qtUploadPack()">올리기</button></div>':'')+
+    '<div id="qtMsg" class="count" style="margin-top:6px;min-height:16px"></div></div></details>';
+  el.innerHTML=h;
+}
+function qtOpenHist(i){const a=qtHist()[i];if(a)qtResult(a);}
+
 function vw(k){return !settings.view||settings.view[k]==null||!!settings.view[k];}
 function showQ(){twSync();
   const a=document.getElementById(quiz.target);
