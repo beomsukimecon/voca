@@ -1076,6 +1076,22 @@ html.dark .rc-tbtn.on{background:#e0a800;border-color:#e0a800;color:#1f3a5f}
 html.dark .qimg{filter:invert(.9) hue-rotate(180deg)}
 html.dark .qt-exam .qt-body,html.dark .qt-calc,html.dark .qt-rv,html.dark .qt-letter{background:var(--card,#1c1f26)}
 body.th-cute .tabs button.s-quant{--c:#2BB673;--d:#1E9A5C}
+.syn-prompt{font-size:30px;font-weight:800;text-align:center;margin:16px 0 4px;letter-spacing:.01em}
+.syn-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media(max-width:480px){.syn-grid{grid-template-columns:1fr}}
+.syn-opt{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:10px 12px 10px 34px;position:relative;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:16px;min-height:48px;justify-content:center}
+.syn-opt .syn-n{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--sub)}
+.syn-opt.sel{border-color:#1f6feb;background:#eef4ff;box-shadow:inset 0 0 0 1px #1f6feb}
+.syn-opt.ok{border-color:#2e9e57;background:#e9f7ee}.syn-opt.miss{border-color:#2e9e57;border-style:dashed;background:#f3fbf6}
+.syn-opt.bad{border-color:#d33;background:#fdecec}.syn-opt.dim{opacity:.75}
+.syn-mean{font-size:12.5px;color:var(--sub);font-weight:400}
+.syn-src{margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:14px;line-height:1.55}
+.syn-wr{padding:6px 0;border-bottom:1px solid var(--line);font-size:14px}.syn-wr:last-child{border-bottom:none}
+html.dark .syn-opt{background:transparent}
+html.dark .syn-opt.sel{background:#26375f;border-color:#8fa8ff;box-shadow:inset 0 0 0 1px #8fa8ff}
+html.dark .syn-opt.ok{background:#173a26;border-color:#5cc98a}html.dark .syn-opt.miss{background:transparent;border-color:#5cc98a}
+html.dark .syn-opt.bad{background:#401c1c;border-color:#e06c6c}
+.syn-miss{margin-top:10px;padding-top:8px;border-top:1px dashed var(--line)}
 </style>
 </head>
 <body>
@@ -1099,13 +1115,13 @@ body.th-cute .tabs button.s-quant{--c:#2BB673;--d:#1E9A5C}
 </div>
 
 <div class="card" id="testCard">
-<div id="testHead" class="row" style="justify-content:space-between;align-items:center;margin-bottom:6px"><h3 style="margin:0">테스트 (연습)</h3><span class="rstep"><button class="small" onclick="roundStep(-1)" aria-label="회독 감소">−</button><b id="testRoundLbl">1회독</b><button class="small" onclick="roundStep(1)" aria-label="회독 증가">＋</button></span></div>
+<div id="testHead" class="row" style="justify-content:space-between;align-items:center;margin-bottom:6px"><h3 style="margin:0">테스트</h3><span class="rstep"><button class="small" onclick="roundStep(-1)" aria-label="회독 감소">−</button><b id="testRoundLbl">1회독</b><button class="small" onclick="roundStep(1)" aria-label="회독 증가">＋</button></span></div>
 <div class="study-tip" id="roundProgress" style="margin:0 0 8px"></div>
 <div id="roundTestBox" style="border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:6px 0 10px;background:#f7fbfa">
   <div id="rtHead" class="study-tip" style="margin:0 0 6px"></div>
   <div class="row hide" id="rtCtl"><span id="rtDayLbl">시작 일차</span> <input type="number" id="rtDayFrom" min="1" value="1" style="width:64px" oninput="renderRoundTest()" onchange="rtDaySnap(this)"> <button class="primary" onclick="startRoundTest()">연습 TEST 시작</button></div>
 </div>
-<div class="count" style="margin:8px 0 4px">자유 테스트 (원하는 범위)</div>
+<div class="count" id="freeLbl" style="margin:8px 0 4px">자유 테스트 (원하는 범위)</div>
 <div class="row" id="testConfig">
 일차 <input type="number" id="qDayFrom" min="1" value="1" style="width:70px"> ~
 <input type="number" id="qDayTo" min="1" value="1" style="width:70px">
@@ -1131,6 +1147,8 @@ body.th-cute .tabs button.s-quant{--c:#2BB673;--d:#1E9A5C}
 <p class="study-tip" id="testNote">연습 테스트는 캘린더에 기록되지 않습니다. 공식 기록용 50문제 TEST는 캘린더 탭에서 시작하세요. ‘TCSE 빈출’은 TCSE 정답으로 자주 나온 GRE 단어만 골라 테스트합니다(빈도 높은 순).</p>
 <div id="quizArea" style="margin-top:12px"></div>
 </div>
+
+<div class="card" id="synCard"><div id="synArea"></div></div>
 
 <div class="card" id="listCard">
 <div class="row" style="justify-content:space-between">
@@ -1224,7 +1242,7 @@ body.th-cute .tabs button.s-quant{--c:#2BB673;--d:#1E9A5C}
   <div class="card" id="writingBody"></div>
 </div>
 
-<footer id="appFooter"><details><summary>VOCA v2026.10.27 · 업데이트 기록</summary><ul><li><b>2026.10.28</b> 회독별 요약: 50개마다 굵은 선</li><li><b>2026.10.27</b> Quant: 수식·그림 없는 문제 약 340개를 텍스트로 (글자 선명, 보기 클릭, 원본 이미지 전환 가능 · 자료 파일 다시 불러오기 필요) · 그래프 세트 오류 수정 · Quant 문제 이미지 여백을 잘라 글자를 크게, 그래프 자료는 문제 위에 크게 · 다크 모드에서 고른 보기가 잘 보이게 · 맨 위 동기화 표시를 짧게(시간만) · 단축키 바꾸기 (설정 > ⌨️ 단축키) · Quant 탭: 실전 모의고사(2섹션 12문제 21분 + 15문제 26분, 1섹션 결과로 2섹션 난이도 조절) · 주제별 연습 · 틀린 문제 다시 풀기 · 계산기 · 결과에서 문제 이미지/AI 풀이 프롬프트 복사 (문제 자료는 암호로 받기)</li><li><b>2026.10.26</b> 단어 수정이 가끔 되돌아가던 문제 수정 (여러 기기·탭 기록을 단어별로 합치기) · 단어장 필터 정리(몰라요·애매해요·알아요·미체크·틀림 제거) · ‘✍️ 내 예문’ 필터 추가</li><li><b>2026.10.25</b> ‘내 예문’: 단어마다 직접 예문 쓰기(✍️) · 내 예문 모음 · AI 첨삭 프롬프트 복사 · 연습 테스트 ‘회독별 요약’ (맞힌/틀린 단어, 틀린 횟수) · 학습 카드 기본 숨김(세부 설정에서 다시 켤 수 있음), 회독 선택은 테스트 카드로 · TCSE: 기본 출제 순서 랜덤 · 세션 끝나면 선지·문장 단어 점검(단어장에 있는 단어만, 선지 단어는 전부) 90% 넘어야 종료, 켜고 끌 수 있음 · 동기화 데이터 사용량 대폭 줄임 (바뀐 항목만 주고받기) · 다크 모드 (설정 > 테마 > 화면 밝기: 밝게 / 어둡게 / 기기 설정 따라)</li><li><b>2026.10.24</b> 3회독부터 ‘오답 노트’: 6/6 끝낸 묶음에서 틀린 단어를 모아 보기·테스트</li><li><b>2026.10.22</b> 테스트에서 틀렸을 때·결과 화면의 예문/유사어/어근/발음도 ‘표시 항목’ 설정을 따름</li><li><b>2026.10.21</b> 연습 테스트에 ‘답 없음’ 보기 (정답을 빼는 비율 설정 가능, 정답은 ‘답 없음’ 칸에 표시) · ‘모르겠어요’ 버튼 없앰 · 테스트 결과: 전체 단어 결과 펼쳐보기(TCSE 빈출 표시) · 틀린 단어마다 내가 고른 것·헷갈리기 쉬운 단어 함께 보기</li><li><b>2026.10.14</b> 3회독부터 연습 테스트를 50개씩 묶기 · 설정창 정리 (학습 설정 하나로 합치고, 나머지는 ‘표시 · 세부 설정’으로) · 회독 진도를 연습 테스트 완료 일차 기준으로 (빨강 또는 무지개 = 완료) · 3회독부터 묶음 테스트 순서 ①전체 ②전체 ③오답복습 ④전체 ⑤오답복습 ⑥전체 (3회 파랑·5회 빨강·6회 무지개) · 오답 복습 25문제 = 오답 → TCSE 빈출 → 랜덤 순으로 채움</li><li><b>2026.10.06</b> 설정 > 학습 자료 받기: 암호로 잠근 GRE 단어·TCSE·RC·Writing 자료를 받아오기 · 아이패드·아이폰에서 RC·테스트 기록이 안 받아지던 문제 수정 (저장 공간이 모자라면 자동 압축 저장) · 맨 위에 마지막 동기화 시간, 맨 아래에 버전 기록 표시</li><li><b>2026.10.05</b> 단어 테스트: 뜻이 2/3 이상 겹치는 선택은 △ (0.5점) · 고양이 100%/90% 표정 교체</li><li><b>2026.10.03</b> 로그인 · 계정별 클라우드 동기화 (어느 기기에서든 같은 기록)</li><li><b>이전</b> 캘린더 시험일·계획·자동 분배 · 고영희 테마와 점수별 표정 · 호버 사전 · TCSE 실전 화면과 AI 분석 프롬프트 복사 · Writing 예시 CSV 가져오기 · 틀린 단어 어근 표시</li></ul></details></footer>
+<footer id="appFooter"><details><summary>VOCA v2026.10.30 · 업데이트 기록</summary><ul><li><b>2026.10.30</b> ‘테스트 (연습)’ → ‘테스트’ · 테스트 아래에 ‘SE 유의어’ 카드 (단어장에 없는 SE 단어 뜻을 AI 프롬프트로 받아 채우기): 제시어의 같은 뜻 단어 고르기(1~2개) / 6개 중 같은 뜻 쌍 찾기 · TCSE SE 정답 쌍 먼저, 그다음 단어장 유의어 · 오답 선지는 실제 SE 선지·철자 비슷한 단어 · 채점 후 뜻과 원래 SE 문장</li><li><b>2026.10.28</b> 회독별 요약: 50개마다 굵은 선</li><li><b>2026.10.27</b> Quant: 수식·그림 없는 문제 약 340개를 텍스트로 (글자 선명, 보기 클릭, 원본 이미지 전환 가능 · 자료 파일 다시 불러오기 필요) · 그래프 세트 오류 수정 · Quant 문제 이미지 여백을 잘라 글자를 크게, 그래프 자료는 문제 위에 크게 · 다크 모드에서 고른 보기가 잘 보이게 · 맨 위 동기화 표시를 짧게(시간만) · 단축키 바꾸기 (설정 > ⌨️ 단축키) · Quant 탭: 실전 모의고사(2섹션 12문제 21분 + 15문제 26분, 1섹션 결과로 2섹션 난이도 조절) · 주제별 연습 · 틀린 문제 다시 풀기 · 계산기 · 결과에서 문제 이미지/AI 풀이 프롬프트 복사 (문제 자료는 암호로 받기)</li><li><b>2026.10.26</b> 단어 수정이 가끔 되돌아가던 문제 수정 (여러 기기·탭 기록을 단어별로 합치기) · 단어장 필터 정리(몰라요·애매해요·알아요·미체크·틀림 제거) · ‘✍️ 내 예문’ 필터 추가</li><li><b>2026.10.25</b> ‘내 예문’: 단어마다 직접 예문 쓰기(✍️) · 내 예문 모음 · AI 첨삭 프롬프트 복사 · 연습 테스트 ‘회독별 요약’ (맞힌/틀린 단어, 틀린 횟수) · 학습 카드 기본 숨김(세부 설정에서 다시 켤 수 있음), 회독 선택은 테스트 카드로 · TCSE: 기본 출제 순서 랜덤 · 세션 끝나면 선지·문장 단어 점검(단어장에 있는 단어만, 선지 단어는 전부) 90% 넘어야 종료, 켜고 끌 수 있음 · 동기화 데이터 사용량 대폭 줄임 (바뀐 항목만 주고받기) · 다크 모드 (설정 > 테마 > 화면 밝기: 밝게 / 어둡게 / 기기 설정 따라)</li><li><b>2026.10.24</b> 3회독부터 ‘오답 노트’: 6/6 끝낸 묶음에서 틀린 단어를 모아 보기·테스트</li><li><b>2026.10.22</b> 테스트에서 틀렸을 때·결과 화면의 예문/유사어/어근/발음도 ‘표시 항목’ 설정을 따름</li><li><b>2026.10.21</b> 연습 테스트에 ‘답 없음’ 보기 (정답을 빼는 비율 설정 가능, 정답은 ‘답 없음’ 칸에 표시) · ‘모르겠어요’ 버튼 없앰 · 테스트 결과: 전체 단어 결과 펼쳐보기(TCSE 빈출 표시) · 틀린 단어마다 내가 고른 것·헷갈리기 쉬운 단어 함께 보기</li><li><b>2026.10.14</b> 3회독부터 연습 테스트를 50개씩 묶기 · 설정창 정리 (학습 설정 하나로 합치고, 나머지는 ‘표시 · 세부 설정’으로) · 회독 진도를 연습 테스트 완료 일차 기준으로 (빨강 또는 무지개 = 완료) · 3회독부터 묶음 테스트 순서 ①전체 ②전체 ③오답복습 ④전체 ⑤오답복습 ⑥전체 (3회 파랑·5회 빨강·6회 무지개) · 오답 복습 25문제 = 오답 → TCSE 빈출 → 랜덤 순으로 채움</li><li><b>2026.10.06</b> 설정 > 학습 자료 받기: 암호로 잠근 GRE 단어·TCSE·RC·Writing 자료를 받아오기 · 아이패드·아이폰에서 RC·테스트 기록이 안 받아지던 문제 수정 (저장 공간이 모자라면 자동 압축 저장) · 맨 위에 마지막 동기화 시간, 맨 아래에 버전 기록 표시</li><li><b>2026.10.05</b> 단어 테스트: 뜻이 2/3 이상 겹치는 선택은 △ (0.5점) · 고양이 100%/90% 표정 교체</li><li><b>2026.10.03</b> 로그인 · 계정별 클라우드 동기화 (어느 기기에서든 같은 기록)</li><li><b>이전</b> 캘린더 시험일·계획·자동 분배 · 고영희 테마와 점수별 표정 · 호버 사전 · TCSE 실전 화면과 AI 분석 프롬프트 복사 · Writing 예시 CSV 가져오기 · 틀린 단어 어근 표시</li></ul></details></footer>
 
 <div id="settingsModal" class="hide" onclick="if(event.target===this)toggleSettings(false)" style="position:fixed;inset:0;background:rgba(20,25,40,.35);z-index:200;display:flex;justify-content:flex-end">
   <div style="background:var(--card);width:380px;max-width:92vw;height:100%;overflow-y:auto;padding:18px 20px">
@@ -1805,6 +1823,7 @@ function visible(){
 }
 
 function render(){
+  try{if(!synS&&typeof renderSynCard==='function'){clearTimeout(window.__synT);window.__synT=setTimeout(function(){try{renderSynCard();}catch(e){}},30);}}catch(e){}
   const opt={m:optMean.checked,s:optSent.checked,y:optSyn.checked,p:optPron.checked,e:optEtym.checked};
   const arr=visible();
   document.getElementById('listCount').textContent=arr.length;
@@ -2165,8 +2184,8 @@ function renderPracticeLog(){
 let study=null;
 function setStudyMode(on){
   if(on)toggleSettings(false);
-  ['mainTabs','testCard','listCard','addCard','studyTopRow','presetInfo','autoRow','chunkRow','roundProgress'].forEach(id=>{
-    document.getElementById(id).classList.toggle('hide',on);
+  ['mainTabs','testCard','listCard','addCard','studyTopRow','presetInfo','autoRow','chunkRow','roundProgress','synCard'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.classList.toggle('hide',on);
   });
 }
 function studyPriority(x){return (x.unknown||0)*2+(x.ambiguous||0)}
@@ -2520,7 +2539,7 @@ function studyHidden(){return !(settings&&settings.showStudy);}
 function applyStudyVis(){const h=studyHidden();const c=document.getElementById('studyCard');if(c&&!(typeof quiz!=='undefined'&&quiz))c.classList.toggle('hide',h);const b=document.getElementById('studyCfgBlock');if(b)b.classList.toggle('hide',h);const t=document.getElementById('setShowStudy');if(t)t.checked=!h;}
 function setQuizMode(on){
   if(on)toggleSettings(false);
-  ['mainTabs','studyCard','listCard','addCard','roundTestBox','testConfig','testChunkRow','noteRow','histRow','roundProgress','freqTestRow','testNote','testHead'].forEach(id=>{
+  ['mainTabs','studyCard','listCard','addCard','roundTestBox','testConfig','testChunkRow','noteRow','histRow','roundProgress','freqTestRow','testNote','testHead','freeLbl','synCard'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.classList.toggle('hide',on||(id==='studyCard'&&studyHidden()));
   });
 }
@@ -2784,7 +2803,7 @@ let noteDay=0,subPage='';
 document.addEventListener('keydown',function(e){
   if(e.key!=='Escape'||!subPage||(typeof quiz!=='undefined'&&quiz)||document.getElementById('msOv'))return;
   e.preventDefault();const p=subPage;
-  if(p==='hist')histClose();else if(p==='ms')msPageClose();else if(p==='note')noteClose();
+  if(p==='hist')histClose();else if(p==='ms')msPageClose();else if(p==='note')noteClose();else if(p==='syn')synEsc();
 });
 function noteRound(){try{roundEnsure();return (roundState&&roundState.cur)||1;}catch(e){return 1;}}
 function noteCollect(r){
@@ -3366,6 +3385,237 @@ async function renderQuant(){
   el.innerHTML=h;
 }
 function qtOpenHist(i){const a=qtHist()[i];if(a)qtResult(a);}
+
+
+/* ================= SE 유의어 연습 (단어장 탭) =================
+   1순위: TCSE SE 문제의 정답 두 단어(실제 시험이 같은 뜻으로 인정한 쌍)
+   2순위: GRE 단어장 '유의어' 칸에 적힌 단어 중 단어장에도 있는 한 단어짜리
+   모드: 제시어(제시어 1개 → 6개 중 같은 뜻 1~2개, 개수 표시) / 쌍 찾기(6개 중 같은 뜻 2개) */
+const SYN_STAT='voca_syn_stat', SYN_OPT='voca_syn_opt';
+let synS=null, synG=null;
+function synOpt(){try{return Object.assign({mode:'word',n:20,lo:'',hi:''},JSON.parse(localStorage.getItem(SYN_OPT))||{});}catch(e){return {mode:'word',n:20,lo:'',hi:''};}}
+function synSetOpt(k,v){const o=synOpt();o[k]=v;try{localStorage.setItem(SYN_OPT,JSON.stringify(o));}catch(e){}}
+function synStat(){try{return JSON.parse(localStorage.getItem(SYN_STAT))||{};}catch(e){return {};}}
+function synSaveStat(s){try{localStorage.setItem(SYN_STAT,JSON.stringify(s));}catch(e){quotaWarn();}}
+function synShuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+/* 단어 그래프 만들기 */
+function synBuild(){
+  const gre=tcBuildGreIndex(),info={},adj={},seq=[];
+  const node=(key,disp,w)=>{if(!key)return null;let n=info[key];if(!n){n=info[key]={k:key,word:disp||key,w:w||null,tcq:[]};}if(w&&!n.w){n.w=w;n.word=w.word;}return n;};
+  const edge=(a,b,src,qid)=>{if(!a||!b||a===b)return;[[a,b],[b,a]].forEach(([x,y])=>{const m=adj[x]||(adj[x]={});if(!m[y]||src==='tc')m[y]={src:src,qid:qid||(m[y]&&m[y].qid)};});};
+  /* GRE 단어장 */
+  gre.words.forEach(w=>{const k=tcNorm(w.word);if(k&&gre.idx[k]&&gre.idx[k].length===1)node(k,w.word,w);});
+  /* 1순위: TCSE SE 정답 쌍 */
+  const pairs=[];
+  (TCSE||[]).forEach(q=>{
+    if(q.type!=='SE'||!q.answer||q.answer.length!==2||!q.choices)return;
+    const keyOf=L=>{const raw=q.choices[L]||'';const lk=tcLinkFor(q,L,gre);const lw=lk.length===1&&gre.idx[tcNorm(lk[0])]?gre.idx[tcNorm(lk[0])][0]:null;
+      const k=lw?tcNorm(lw.word):tcNorm(raw);const n=node(k,lw?lw.word:raw.trim(),lw);if(n&&n.tcq.indexOf(q.id)<0)n.tcq.push(q.id);return k;};
+    const ks={};Object.keys(q.choices).forEach(L=>{ks[L]=keyOf(L);});
+    const a=ks[q.answer[0]],b=ks[q.answer[1]];
+    if(a&&b&&a!==b){edge(a,b,'tc',q.id);pairs.push({q:q,ks:ks,a:a,b:b});}
+  });
+  /* 2순위: 단어장 유의어 칸 */
+  gre.words.forEach(w=>{
+    const k=tcNorm(w.word);if(!info[k]||!w.syn)return;
+    String(w.syn).replace(/\([^)]*\)/g,' ').split(/[,;/·、\n]|\s{2,}/).forEach(s=>{
+      const t=tcNorm(s);if(!t||t.indexOf(' ')>=0||!/^[a-z][a-z-]*$/.test(t))return;
+      if(gre.idx[t]&&gre.idx[t].length===1&&t!==k)edge(k,t,'voca');
+    });
+  });
+  const tcById={};(TCSE||[]).forEach(q=>{tcById[q.id]=q;});
+  synG={info:info,adj:adj,pairs:pairs,tcById:tcById,len:(TCSE||[]).length+':'+gre.words.length};
+  return synG;
+}
+let synChk=0;
+function synGraph(){const now=Date.now();if(synG&&now-synChk<2000)return synG;synChk=now;
+  const want=(TCSE||[]).length+':'+tcGreWords().length;if(!synG||synG.len!==want)synBuild();return synG;}
+function synMean(k,G){const g=G||synG||synGraph(),n=g.info[k];if(!n)return '';if(n.w&&n.w.mean)return n.w.mean;return (typeof tcMeanings!=='undefined'&&tcMeanings[k])||'';}
+function synCounts(){const g=synGraph();let tc=0,vo=0;const seen=new Set();
+  Object.keys(g.adj).forEach(a=>Object.keys(g.adj[a]).forEach(b=>{const id=a<b?a+'|'+b:b+'|'+a;if(seen.has(id))return;seen.add(id);if(g.adj[a][b].src==='tc')tc++;else vo++;}));
+  return {tc:tc,vo:vo,se:g.pairs.length,prompts:Object.keys(g.adj).length};}
+/* 오답 후보로 쓰면 안 되는 단어: 제시어의 유의어 전부 + 뜻이 많이 겹치는 단어 */
+function synBad(k,cand){const g=synGraph();if(cand===k)return true;
+  if(g.adj[k]&&g.adj[k][cand])return true;
+  const a=synMean(k,g),b=synMean(cand,g);if(a&&b&&meanSim(a,b)>=0.5)return true;
+  return false;}
+/* 제시어 모드 문제 하나 */
+function synMakeWord(k,stat){
+  const g=synGraph(),nb=g.adj[k]||{};
+  const tcN=Object.keys(nb).filter(x=>nb[x].src==='tc'),voN=Object.keys(nb).filter(x=>nb[x].src!=='tc');
+  const pool=synShuffle(tcN).concat(synShuffle(voN));
+  const c=pool.length>=2&&Math.random()<0.6?2:1;
+  const ans=pool.slice(0,c);
+  const opts=new Set(ans);
+  const ok=x=>x&&!opts.has(x)&&!synBad(k,x)&&!ans.some(a=>g.adj[a]&&g.adj[a][x]);
+  /* ① 같은 SE 문제의 다른 선지(실제 함정) */
+  const qids=[];ans.forEach(a=>{const e=nb[a];if(e&&e.qid)qids.push(e.qid);});(g.info[k].tcq||[]).forEach(id=>{if(qids.indexOf(id)<0)qids.push(id);});
+  qids.forEach(id=>{const q=g.tcById[id];if(!q)return;synShuffle(Object.keys(q.choices)).forEach(L=>{if(opts.size>=6)return;const x=tcNorm(q.choices[L]);
+    const p=g.pairs.find(p=>p.q.id===id);const kk=p?p.ks[L]:x;if(ok(kk)&&g.info[kk])opts.add(kk);});});
+  /* ② 철자가 헷갈리는 단어 */
+  const w=g.info[k].w;
+  if(w&&opts.size<6){try{confusables(w,null,8).forEach(c=>{if(opts.size>=6||c.why!=='철자 비슷')return;const x=tcNorm(c.x.word);if(ok(x)&&g.info[x])opts.add(x);});}catch(e){}}
+  /* ③ 다른 유의어 문제에 나오는 단어 → 랜덤 */
+  const keys=Object.keys(g.adj),all=Object.keys(g.info);
+  let guard=0;while(opts.size<6&&guard++<400){const src=guard<200?keys:all;const x=src[Math.floor(Math.random()*src.length)];if(ok(x))opts.add(x);}
+  return {mode:'word',k:k,ans:ans,opts:synShuffle([...opts]),qids:qids,src:ans.some(a=>nb[a].src==='tc')?'tc':'voca'};
+}
+/* 쌍 찾기 모드 문제 하나 */
+function synMakePair(item){
+  const g=synGraph();
+  if(item.p){const p=item.p,q=p.q;const opts=synShuffle(Object.keys(q.choices).map(L=>p.ks[L]).filter((x,i,a)=>x&&a.indexOf(x)===i));
+    return {mode:'pair',ans:[p.a,p.b],opts:opts,qids:[q.id],src:'tc'};}
+  const a=item.a,b=item.b,opts=new Set([a,b]);
+  const ok=x=>x&&!opts.has(x)&&!synBad(a,x)&&!synBad(b,x)&&![...opts].some(o=>o!==a&&o!==b&&g.adj[o]&&g.adj[o][x]);
+  const keys=Object.keys(g.info);let guard=0;
+  while(opts.size<6&&guard++<500){const x=keys[Math.floor(Math.random()*keys.length)];if(ok(x))opts.add(x);}
+  return {mode:'pair',ans:[a,b],opts:synShuffle([...opts]),qids:[],src:'voca'};
+}
+/* 제시어 일차 범위 (비어 있으면 전체) */
+function synRange(){return null;}
+function synIn(k,r){if(!r)return true;const n=synGraph().info[k];const d=n&&n.w?+n.w.day:0;return d>=r[0]&&d<=r[1];}
+function synPromptCount(){const g=synGraph(),r=synRange();return Object.keys(g.adj).filter(k=>synIn(k,r)&&(Object.values(g.adj[k]).some(e=>e.src==='tc')||g.info[k].w)).length;}
+/* 세트 만들기: TCSE 70% 먼저, 틀린 적 있는 것·안 본 것 우선 */
+function synPlan(mode,n){
+  const g=synGraph(),st=synStat(),R=synRange();
+  const score=k=>{const s=st[k]||{seen:0,wrong:0};return (s.wrong*3)-(s.seen)+Math.random()*2+(s.seen?0:2);};
+  if(mode==='pair'){
+    const tcItems=synShuffle(g.pairs.filter(p=>synIn(p.a,R)||synIn(p.b,R))).sort((x,y)=>score(y.a+'|'+y.b)-score(x.a+'|'+x.b)).map(p=>({p:p,id:p.a+'|'+p.b}));
+    const seen=new Set();const vo=[];Object.keys(g.adj).forEach(a=>Object.keys(g.adj[a]).forEach(b=>{if(g.adj[a][b].src==='tc')return;if(!synIn(a,R)&&!synIn(b,R))return;const id=a<b?a+'|'+b:b+'|'+a;if(seen.has(id))return;seen.add(id);vo.push({a:a,b:b,id:id});}));
+    const voItems=synShuffle(vo).sort((x,y)=>score(y.id)-score(x.id));
+    const nt=Math.min(tcItems.length,Math.max(Math.round(n*0.7),n-voItems.length));
+    return synShuffle(tcItems.slice(0,nt).concat(voItems.slice(0,n-nt))).map(synMakePair);
+  }
+  const ks=Object.keys(g.adj).filter(k=>synIn(k,R));
+  const tcK=ks.filter(k=>Object.values(g.adj[k]).some(e=>e.src==='tc')).sort((a,b)=>score(b)-score(a));
+  const voK=ks.filter(k=>tcK.indexOf(k)<0&&g.info[k]&&g.info[k].w).sort((a,b)=>score(b)-score(a));
+  const nt=Math.min(tcK.length,Math.max(Math.round(n*0.7),n-voK.length));
+  return synShuffle(tcK.slice(0,nt).concat(voK.slice(0,n-nt))).map(synMakeWord).filter(x=>x.opts.length>=x.ans.length+2);
+}
+/* ---------- 화면 ---------- */
+function synOpen(){synS=null;renderSynCard();}
+function synFocus(on){
+  ['mainTabs','testCard','listCard','addCard','studyCard'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.toggle('hide',on||(id==='studyCard'&&studyHidden()));});
+  if(on)toggleSettings(false);
+}
+function synClose(){subPage='';synS=null;synFocus(false);renderSynCard();}
+function synEsc(){if(synS&&!synS.done){if(!synS.res.length){synClose();return;}if(!confirm('연습을 그만두고 결과를 볼까요?'))return;synFinish();return;}synClose();}
+function synHome(){renderSynCard();}
+function renderSynCard(){
+  const a=document.getElementById('synArea');if(!a)return;const o=synOpt();
+  if(typeof mainTab!=='undefined'&&mainTab!=='gre')return;
+  if(!TCSE||!TCSE.length){TCSE=tcLoad();}
+  const c=synCounts(),st=synStat();
+  const wrongN=Object.keys(st).filter(k=>st[k].wrong>0).length;
+  const miss=synMissing();
+  a.innerHTML='<div class="row" style="justify-content:space-between;align-items:baseline"><h3 style="margin:0">SE 유의어</h3><span class="count">TCSE SE 쌍 '+c.tc+' · 단어장 유의어 쌍 '+c.vo+(wrongN?' · 틀린 적 있는 단어 '+wrongN:'')+'</span></div>'+
+    '<p class="study-tip" style="margin:4px 0 8px">같은 뜻 단어 고르기. TCSE SE 정답 쌍을 먼저(약 70%), 그다음 단어장 유의어 칸에서 내요. 틀린 적 있는 단어·안 본 단어가 먼저 나와요.</p>'+
+    (c.tc+c.vo<4?'<p class="study-tip" style="color:var(--red)">연습할 단어 쌍이 거의 없어요. TCSE 자료와 단어장 유의어가 들어 있는지 확인하세요.</p>':'')+
+    '<div class="row" style="gap:6px;flex-wrap:wrap;align-items:center">'+
+    '<input id="synN" type="number" min="5" max="100" value="'+o.n+'" style="width:60px" onchange="synSetOpt(\'n\',+this.value||20)"> 개 '+
+    '<select id="synMode" onchange="synSetOpt(\'mode\',this.value)"><option value="word"'+(o.mode==='word'?' selected':'')+'>제시어 → 같은 뜻</option><option value="pair"'+(o.mode==='pair'?' selected':'')+'>쌍 찾기</option></select>'+
+    '<button class="primary" onclick="synStart()"'+(c.tc+c.vo?'':' disabled')+'>유의어 테스트</button></div>'+
+    (miss.length?'<div class="syn-miss"><span class="count">단어장에 없어 뜻이 비어 있는 SE 단어 <b>'+miss.length+'개</b> — AI에게 뜻을 받아 채울 수 있어요.</span>'+
+      '<div class="row" style="gap:6px;margin-top:6px"><button class="small" onclick="synMissCopy(this)">① AI 프롬프트 복사</button><button class="small" onclick="synMissPaste()">② AI 답 붙여넣기</button></div>'+
+      '<div id="synMissBox" class="hide" style="margin-top:6px"><textarea id="synMissTa" rows="6" style="width:100%;font-size:13px" placeholder="AI가 준 답을 그대로 붙여넣으세요 (한 줄에 단어 | 뜻)"></textarea>'+
+      '<div class="row" style="gap:6px;margin-top:4px"><button class="small primary" onclick="synMissSave()">저장</button><span class="count" id="synMissMsg"></span></div></div></div>':
+      '<div class="count" style="margin-top:6px">SE 단어 뜻이 모두 채워져 있어요.</div>');
+}
+window.addEventListener('load',function(){try{renderSynCard();}catch(e){}});
+/* 뜻이 비어 있는 SE 단어 → AI 프롬프트 / 답 붙여넣기 (TCSE 단어 목록의 '내 뜻'과 같은 곳에 저장) */
+function synMissing(){const g=synGraph();return Object.keys(g.info).filter(k=>(g.info[k].tcq||[]).length&&!synMean(k,g)).sort();}
+function synMissCopy(btn){const g=synGraph(),m=synMissing(),left=new Set(m);
+  /* 단어가 나온 SE 문제(문장 + 정답)와 함께 묶어서 보냄 */
+  const blocks=[];
+  g.pairs.forEach(p=>{const q=p.q;const ws=Object.keys(q.choices).filter(L=>left.has(p.ks[L]));if(!ws.length)return;
+    ws.forEach(L=>left.delete(p.ks[L]));
+    blocks.push('['+(blocks.length+1)+'] '+String(q.question||'').replace(/\s+/g,' ').trim()+'\n정답: '+q.answer.map(L=>q.choices[L]).join(', ')+
+      '\n선지: '+Object.keys(q.choices).map(L=>q.choices[L]).join(' / ')+'\n뜻이 필요한 단어: '+ws.map(L=>q.choices[L]+(q.answer.indexOf(L)>=0?' (정답)':' (오답 선지)')).join(', '));});
+  const t='아래는 GRE Sentence Equivalence 문제들이야. 각 문제의 "뜻이 필요한 단어"마다 한국어 뜻을 짧게(1~3개, 쉼표로 구분) 알려줘.\n'+
+    '- (정답) 단어: 이 문장의 빈칸에서 쓰인 뜻을 맨 앞에 쓰고, 필요하면 GRE에서 자주 쓰는 다른 뜻을 덧붙여.\n'+
+    '- (오답 선지) 단어: GRE에서 주로 쓰이는 뜻.\n'+
+    '형식은 반드시 한 줄에 하나씩 "단어 | 뜻" 으로만 써줘. 설명·번호·머리말 없이 목록만. 단어는 내가 준 철자 그대로.\n\n'+
+    blocks.join('\n\n')+(left.size?'\n\n[문제 정보 없음]\n'+[...left].map(k=>g.info[k].word).join('\n'):'');
+  rcCopyText(t,btn,'복사됨! AI에 붙여넣기');}
+function synMissPaste(){const b=document.getElementById('synMissBox');if(b){b.classList.remove('hide');const t=document.getElementById('synMissTa');if(t)t.focus();}}
+function synMissSave(){
+  const ta=document.getElementById('synMissTa'),msg=document.getElementById('synMissMsg');if(!ta)return;
+  const g=synGraph();let n=0,skip=0;
+  ta.value.split(/\r?\n/).forEach(line=>{
+    line=line.replace(/^\s*(?:[-*•]|\d+[.)])\s*/,'').replace(/\*\*/g,'').trim();if(!line)return;
+    const m=line.match(/^(.+?)\s*(?:\||\t|：|:|\s[—–-]\s)\s*(.+)$/);if(!m){skip++;return;}
+    const k=tcNorm(m[1]),v=m[2].trim();
+    if(!k||!v||!g.info[k]){skip++;return;}
+    if(g.info[k].w&&g.info[k].w.mean){skip++;return;}
+    tcSetMeaning(k,v);n++;});
+  if(msg)msg.textContent=n+'개 저장'+(skip?' · '+skip+'줄은 못 읽음':'');
+  if(n){setTimeout(renderSynCard,900);}
+}
+function synStart(){
+  const mode=document.getElementById('synMode').value,n=Math.max(5,Math.min(100,+document.getElementById('synN').value||20));
+  synSetOpt('mode',mode);synSetOpt('n',n);
+  const items=synPlan(mode,n);
+  if(!items.length){alert('이 범위에는 낼 문제가 없어요.');return;}
+  subPage='syn';synFocus(true);
+  synS={mode:mode,items:items,i:0,sel:[],checked:false,ok:0,res:[]};synShow();
+}
+function synWordBtn(k,i,cls,showMean){
+  return '<button class="syn-opt'+cls+'" onclick="synPick('+i+')"><span class="syn-n">'+(i+1)+'</span><b>'+esc(synGraph().info[k]?synGraph().info[k].word:k)+'</b>'+(showMean?'<span class="syn-mean">'+esc(rsShort(synMean(k))||'뜻 없음')+'</span>':'')+'</button>';
+}
+function synShow(){
+  const a=document.getElementById('synArea'),s=synS,it=s.items[s.i],g=synGraph();
+  const need=it.ans.length;
+  let h='<div class="row" style="justify-content:space-between;align-items:center"><span class="count">'+(s.i+1)+' / '+s.items.length+' · 맞힘 '+s.ok+'</span><button class="small" onclick="synEsc()">그만</button></div>';
+  if(it.mode==='word')h+='<div class="syn-prompt">'+esc(g.info[it.k].word)+'</div><div class="count" style="text-align:center;margin-bottom:8px">같은 뜻 단어 <b>'+need+'개</b>를 고르세요</div>';
+  else h+='<div class="count" style="text-align:center;margin:14px 0 8px;font-size:14px">뜻이 같은 단어 <b>2개</b>를 고르세요</div>';
+  h+='<div class="syn-grid">'+it.opts.map((k,i)=>{let cls='';
+    if(s.checked){const isA=it.ans.indexOf(k)>=0,isS=s.sel.indexOf(i)>=0;cls=isA?(isS?' ok':' miss'):(isS?' bad':' dim');}
+    else if(s.sel.indexOf(i)>=0)cls=' sel';
+    return synWordBtn(k,i,cls,s.checked);}).join('')+'</div>';
+  if(s.checked){
+    const right=s.res[s.res.length-1].ok;
+    h+='<div class="qt-check '+(right?'ok':'bad')+'">'+(right?'✓ 정답':'✗ 오답')+' · '+(it.mode==='word'?esc(g.info[it.k].word)+' ≈ ':'')+it.ans.map(k=>'<b>'+esc(g.info[k].word)+'</b>').join(' ≈ ')+
+      (it.mode==='word'?'<div class="syn-mean" style="margin-top:4px">'+esc(g.info[it.k].word)+': '+esc(synMean(it.k)||'뜻 없음')+'</div>':'')+'</div>';
+    const key=it.mode==='word'?it.k:it.ans[0],ansQ=it.ans.map(a=>(g.adj[key]&&g.adj[key][a]&&g.adj[key][a].src==='tc')?g.adj[key][a].qid:null).find(Boolean)||(it.mode==='pair'&&it.src==='tc'?it.qids[0]:null);
+    const q=g.tcById[ansQ]||it.qids.map(id=>g.tcById[id]).find(q=>q&&(g.info[key].tcq||[]).indexOf(q.id)>=0);
+    if(q)h+='<div class="syn-src"><div class="count" style="margin-bottom:4px">'+(q.id===ansQ?'이 쌍이 정답이었던 SE 문제':'제시어가 선지로 나온 SE 문제')+'</div><span class="e-day">TCSE S'+q.section+' Q'+q.question_no+'</span> '+tcQMarked(q.question)+'<div class="count" style="margin-top:4px">정답 '+q.answer.map(L=>esc(q.choices[L])).join(', ')+' · 선지 '+Object.keys(q.choices).map(L=>esc(q.choices[L])).join(' / ')+'</div></div>';
+    if(!ansQ)h+='<div class="count" style="margin-top:6px">정답 출처: 단어장 유의어 칸</div>';
+    h+='<div class="row" style="margin-top:10px"><button class="primary" id="synNext" onclick="synNext()">'+(s.i+1<s.items.length?'다음 →':'결과 보기')+'</button></div>';
+  }else{
+    h+='<div class="row" style="margin-top:10px"><button class="primary" id="synChk" onclick="synCheck()"'+(s.sel.length===need?'':' disabled')+'>확인</button></div>';
+  }
+  h+='<div class="study-tip">키보드: 1~6 고르기 · Enter 확인/다음 · Esc 그만</div>';
+  a.innerHTML=h;
+}
+function synPick(i){const s=synS;if(!s||s.checked)return;const it=s.items[s.i],need=it.ans.length;
+  const j=s.sel.indexOf(i);if(j>=0)s.sel.splice(j,1);else{if(need===1)s.sel=[i];else{s.sel.push(i);if(s.sel.length>need)s.sel.shift();}}synShow();}
+function synCheck(){const s=synS,it=s.items[s.i];if(s.checked||s.sel.length!==it.ans.length)return;
+  const picked=s.sel.map(i=>it.opts[i]);const ok=picked.every(k=>it.ans.indexOf(k)>=0);
+  s.checked=true;if(ok)s.ok++;s.res.push({it:it,picked:picked,ok:ok});
+  const st=synStat(),bump=(k,bad)=>{const o=st[k]||(st[k]={seen:0,wrong:0});o.seen++;if(bad)o.wrong++;o.t=Date.now();};
+  if(it.mode==='word'){bump(it.k,!ok);}else bump(it.ans[0]<it.ans[1]?it.ans[0]+'|'+it.ans[1]:it.ans[1]+'|'+it.ans[0],!ok);
+  synSaveStat(st);synShow();}
+function synNext(){const s=synS;if(s.i+1>=s.items.length){synFinish();return;}s.i++;s.sel=[];s.checked=false;synShow();}
+function synFinish(){
+  const s=synS;s.done=true;const g=synGraph();const a=document.getElementById('synArea');
+  const n=s.res.length,pct=n?Math.round(s.ok/n*100):0;
+  try{if(n&&typeof actBump==='function')actBump('syn',n);}catch(e){}
+  const wrong=s.res.filter(r=>!r.ok);
+  a.innerHTML='<div class="row" style="justify-content:space-between;align-items:center"><h3 style="margin:0">🔗 SE 유의어 결과</h3><button class="small" onclick="synClose()">닫기</button></div>'+
+    '<div class="statgrid"><div class="stat"><b>'+s.ok+'/'+n+'</b><span class="count">정답</span></div><div class="stat"><b>'+pct+'%</b><span class="count">정답률</span></div><div class="stat"><b>'+wrong.length+'</b><span class="count">틀림</span></div></div>'+
+    (wrong.length?'<div class="allres" style="margin-top:6px"><div class="ar-title" style="color:var(--red)">틀린 문제</div>'+wrong.map(r=>{const it=r.it;
+      return '<div class="syn-wr">'+(it.mode==='word'?'<b>'+esc(g.info[it.k].word)+'</b> <span class="syn-mean">'+esc(rsShort(synMean(it.k)))+'</span> ≈ ':'')+
+        it.ans.map(k=>'<b style="color:#1e7a43">'+esc(g.info[k].word)+'</b> <span class="syn-mean">'+esc(rsShort(synMean(k)))+'</span>').join(' · ')+
+        '<div class="count">내가 고른 것: '+r.picked.map(k=>esc(g.info[k]?g.info[k].word:k)+' ('+esc(rsShort(synMean(k))||'뜻 없음')+')').join(', ')+'</div></div>';}).join('')+'</div>':'<p class="study-tip">다 맞혔어요!</p>')+
+    '<div class="row" style="margin-top:10px;gap:6px"><button class="primary" onclick="synStart2()">한 세트 더</button><button onclick="synClose()">닫기</button></div>';
+}
+function synStart2(){const o=synOpt();synS=null;renderSynCard();synStart();}
+document.addEventListener('keydown',function(e){
+  if(subPage!=='syn'||!synS||synS.done)return;
+  const tag=(e.target&&e.target.tagName)||'';if(tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA')return;
+  if(e.key>='1'&&e.key<='6'){e.preventDefault();if(!synS.checked)synPick(+e.key-1);}
+  else if(e.key==='Enter'){e.preventDefault();if(synS.checked)synNext();else synCheck();}
+});
 
 function vw(k){return !settings.view||settings.view[k]==null||!!settings.view[k];}
 function showQ(){twSync();
