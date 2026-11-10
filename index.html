@@ -884,6 +884,16 @@ body.th-cute .tabs button.add{color:#AFAFAF}
 body.th-cute button.primary{background:#4CC552;border:2px solid #38A23E;border-bottom-width:4px;border-radius:12px;font-weight:700}
 body.th-cute button.primary:active{transform:translateY(2px);border-bottom-width:2px}
 body.th-cute .card{border:2px solid #EFEFEF;border-radius:16px}
+/* 토끼 테마 (고영희 테마 위에 색·캐릭터만 바꿈) */
+body.th-cute.th-bunny{--acc:#FF7EA8;--accD:#E85C8A}
+html.dark body.th-cute.th-bunny{--acc:#FF7EA8;--accD:#E85C8A}
+body.th-cute.th-bunny #appHeader .wm,body.th-cute.th-bunny .sync-title{color:#FF7EA8}
+body.th-cute.th-bunny #todayWord b{color:#D94F7E}
+body.th-cute.th-bunny #todayWord.tw-quiz{border-color:#FFC9DA;background:#FFF4F8}
+body.th-cute.th-bunny #todayWord.tw-quiz::before{background:#FFF4F8;border-color:#FFC9DA}
+body.th-cute.th-bunny .tabs button.deck{--c:#FF7EA8;--d:#E85C8A}
+body.th-cute.th-bunny button.primary{background:#FF7EA8;border-color:#E85C8A}
+body.th-cute.th-bunny .th-cat svg{width:64px;height:56px}
 @media(max-width:640px){body.th-cute #todayWord{display:none}body.th-cute .th-cat svg{width:48px;height:38px}body.th-cute #appHeader .wm{font-size:28px}}
 .plan-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:-4px 0 12px;padding:8px 10px;border:1px dashed var(--line);border-radius:10px}
 .plan-lab{font-weight:700;font-size:13px}
@@ -1094,6 +1104,26 @@ html.dark .syn-opt.bad{background:#401c1c;border-color:#e06c6c}
 .syn-tag{font-size:10.5px;font-weight:700;color:#fff;background:#6b7280;border-radius:6px;padding:1px 6px;margin-left:4px}
 .syn-dict .entry{padding:8px 0}
 .syn-rest summary{cursor:pointer;margin-top:4px}
+.ln-list{display:grid;grid-template-columns:1fr 1fr;grid-auto-flow:column;grid-template-rows:repeat(5,1fr);column-gap:24px;align-content:start}
+.ln-list>.ln-item{min-width:0}
+@media(max-width:640px){.ln-list{column-gap:14px}.ln-word{font-size:17px}.ln-d{margin-left:0}}
+.kws-cols{display:grid;grid-template-columns:1fr 1fr;column-gap:28px;align-items:start;min-height:530px}.kws-col{min-width:0}.kws-col .kws-g:first-child{margin-top:4px}
+@media(max-width:640px){.kws-cols{column-gap:14px;min-height:1000px}.kws-cols .kws-w{grid-template-columns:1fr;gap:0;padding:3px 0}.kws-cols .kws-g{font-size:14px}}
+.ln-item{padding:10px 2px;border-bottom:1px solid var(--line)}
+.ln-top{display:flex;align-items:baseline;gap:8px}.ln-no{font-size:11px;color:var(--sub);min-width:22px}
+.ln-word{font-size:20px;font-weight:800}
+.ln-mean{font-size:15px;margin-top:3px;white-space:pre-line}
+.ln-d{margin-left:30px}.ln-top .ln-d{margin-left:0}
+.ln-hidden .ln-d{visibility:hidden}
+.ln-hold{margin-left:auto;font-size:12px;padding:4px 10px;border-radius:999px;user-select:none;-webkit-user-select:none;touch-action:none}
+.kws-g{font-weight:800;font-size:16px;margin:16px 0 4px;padding-bottom:4px;border-bottom:2px solid var(--line)}
+.kws-s{margin:6px 0 10px}
+.kws-sn{font-weight:700;font-size:14px;color:var(--acc,#4f6bed);margin:8px 0 2px}
+.kws-w{display:grid;grid-template-columns:minmax(110px,170px) 1fr;gap:8px;padding:2px 0;font-size:14px}
+.kw-no{text-align:center;font-size:12px;color:var(--sub);margin-top:10px}
+.kw-from{font-size:11px;color:#b0b6c3}
+.kw-all{border-top:1px dashed var(--line);margin-top:10px}
+.kw-w{padding:3px 0;font-size:14px}
 .syn-miss{margin-top:10px;padding-top:8px;border-top:1px dashed var(--line)}
 </style>
 </head>
@@ -1117,6 +1147,7 @@ html.dark .syn-opt.bad{background:#401c1c;border-color:#e06c6c}
 <div id="studyArea"></div>
 </div>
 
+<div class="card" id="learnCard"><div id="learnArea"></div></div>
 <div class="card" id="testCard">
 <div id="testHead" class="row" style="justify-content:space-between;align-items:center;margin-bottom:6px"><h3 style="margin:0">테스트</h3><span class="rstep"><button class="small" onclick="roundStep(-1)" aria-label="회독 감소">−</button><b id="testRoundLbl">1회독</b><button class="small" onclick="roundStep(1)" aria-label="회독 증가">＋</button></span></div>
 <div class="study-tip" id="roundProgress" style="margin:0 0 8px"></div>
@@ -1152,6 +1183,7 @@ html.dark .syn-opt.bad{background:#401c1c;border-color:#e06c6c}
 </div>
 
 <div class="card" id="synCard"><div id="synArea"></div></div>
+<div class="card" id="kwCard"><div id="kwArea"></div></div>
 
 <div class="card" id="listCard">
 <div class="row" style="justify-content:space-between">
@@ -1245,7 +1277,7 @@ html.dark .syn-opt.bad{background:#401c1c;border-color:#e06c6c}
   <div class="card" id="writingBody"></div>
 </div>
 
-<footer id="appFooter"><details><summary>VOCA v2026.10.30 · 업데이트 기록</summary><ul><li><b>2026.10.30</b> SE 유의어: 채점 후 제시어·정답·고른 단어의 GRE 단어장 정보(뜻·어근·예문·유사어) · ‘테스트 (연습)’ → ‘테스트’ · 테스트 아래에 ‘SE 유의어’ 카드 (단어장에 없는 SE 단어 뜻을 AI 프롬프트로 받아 채우기): 제시어의 같은 뜻 단어 고르기(1~2개) / 6개 중 같은 뜻 쌍 찾기 · TCSE SE 정답 쌍 먼저, 그다음 단어장 유의어 · 오답 선지는 실제 SE 선지·철자 비슷한 단어 · 채점 후 뜻과 원래 SE 문장</li><li><b>2026.10.28</b> 회독별 요약: 50개마다 굵은 선</li><li><b>2026.10.27</b> Quant: 수식·그림 없는 문제 약 340개를 텍스트로 (글자 선명, 보기 클릭, 원본 이미지 전환 가능 · 자료 파일 다시 불러오기 필요) · 그래프 세트 오류 수정 · Quant 문제 이미지 여백을 잘라 글자를 크게, 그래프 자료는 문제 위에 크게 · 다크 모드에서 고른 보기가 잘 보이게 · 맨 위 동기화 표시를 짧게(시간만) · 단축키 바꾸기 (설정 > ⌨️ 단축키) · Quant 탭: 실전 모의고사(2섹션 12문제 21분 + 15문제 26분, 1섹션 결과로 2섹션 난이도 조절) · 주제별 연습 · 틀린 문제 다시 풀기 · 계산기 · 결과에서 문제 이미지/AI 풀이 프롬프트 복사 (문제 자료는 암호로 받기)</li><li><b>2026.10.26</b> 단어 수정이 가끔 되돌아가던 문제 수정 (여러 기기·탭 기록을 단어별로 합치기) · 단어장 필터 정리(몰라요·애매해요·알아요·미체크·틀림 제거) · ‘✍️ 내 예문’ 필터 추가</li><li><b>2026.10.25</b> ‘내 예문’: 단어마다 직접 예문 쓰기(✍️) · 내 예문 모음 · AI 첨삭 프롬프트 복사 · 연습 테스트 ‘회독별 요약’ (맞힌/틀린 단어, 틀린 횟수) · 학습 카드 기본 숨김(세부 설정에서 다시 켤 수 있음), 회독 선택은 테스트 카드로 · TCSE: 기본 출제 순서 랜덤 · 세션 끝나면 선지·문장 단어 점검(단어장에 있는 단어만, 선지 단어는 전부) 90% 넘어야 종료, 켜고 끌 수 있음 · 동기화 데이터 사용량 대폭 줄임 (바뀐 항목만 주고받기) · 다크 모드 (설정 > 테마 > 화면 밝기: 밝게 / 어둡게 / 기기 설정 따라)</li><li><b>2026.10.24</b> 3회독부터 ‘오답 노트’: 6/6 끝낸 묶음에서 틀린 단어를 모아 보기·테스트</li><li><b>2026.10.22</b> 테스트에서 틀렸을 때·결과 화면의 예문/유사어/어근/발음도 ‘표시 항목’ 설정을 따름</li><li><b>2026.10.21</b> 연습 테스트에 ‘답 없음’ 보기 (정답을 빼는 비율 설정 가능, 정답은 ‘답 없음’ 칸에 표시) · ‘모르겠어요’ 버튼 없앰 · 테스트 결과: 전체 단어 결과 펼쳐보기(TCSE 빈출 표시) · 틀린 단어마다 내가 고른 것·헷갈리기 쉬운 단어 함께 보기</li><li><b>2026.10.14</b> 3회독부터 연습 테스트를 50개씩 묶기 · 설정창 정리 (학습 설정 하나로 합치고, 나머지는 ‘표시 · 세부 설정’으로) · 회독 진도를 연습 테스트 완료 일차 기준으로 (빨강 또는 무지개 = 완료) · 3회독부터 묶음 테스트 순서 ①전체 ②전체 ③오답복습 ④전체 ⑤오답복습 ⑥전체 (3회 파랑·5회 빨강·6회 무지개) · 오답 복습 25문제 = 오답 → TCSE 빈출 → 랜덤 순으로 채움</li><li><b>2026.10.06</b> 설정 > 학습 자료 받기: 암호로 잠근 GRE 단어·TCSE·RC·Writing 자료를 받아오기 · 아이패드·아이폰에서 RC·테스트 기록이 안 받아지던 문제 수정 (저장 공간이 모자라면 자동 압축 저장) · 맨 위에 마지막 동기화 시간, 맨 아래에 버전 기록 표시</li><li><b>2026.10.05</b> 단어 테스트: 뜻이 2/3 이상 겹치는 선택은 △ (0.5점) · 고양이 100%/90% 표정 교체</li><li><b>2026.10.03</b> 로그인 · 계정별 클라우드 동기화 (어느 기기에서든 같은 기록)</li><li><b>이전</b> 캘린더 시험일·계획·자동 분배 · 고영희 테마와 점수별 표정 · 호버 사전 · TCSE 실전 화면과 AI 분석 프롬프트 복사 · Writing 예시 CSV 가져오기 · 틀린 단어 어근 표시</li></ul></details></footer>
+<footer id="appFooter"><details><summary>VOCA v2026.11.10 · 업데이트 기록</summary><ul><li><b>2026.11.10</b> 학습 카드를 테스트 위로 · 학습 화면 칸 크기 고정(넘겨도 들쑥날쑥 안 함) · 학습 화면 두 칸 배치 · 스페이스바 또는 화면 아무 데나 탭: 짧게 누르면 가리기 켜기/끄기, 꾹 누르면 그동안만 (단축키를 스페이스바로 바꿔 둬도 학습 화면에서는 가리기로 동작)</li><li><b>2026.11.10</b> ‘학습’ 카드: 일차별 10개씩 띄워 놓고 외우기 (띄울 항목 선택, 스페이스바를 누르고 있으면 단어만)</li><li><b>2026.11.10</b> ‘키워드 묶음’ 카드: 엑셀/CSV(번호·키워드·세부 키워드·단어·뜻)를 불러와 6개 보기 중 키워드에 속하는 단어 2개 고르기 · 자료 여러 개(502, 301 …) 골라 쓰기 · 📖 학습하기(두 칸, 칸마다 단어 최대 20개, 검색, 스페이스바를 누르고 있으면 단어만)</li><li><b>2026.11.04</b> 토끼 테마 (설정 > 테마)</li><li><b>2026.10.30</b> SE 유의어: 채점 후 제시어·정답·고른 단어의 GRE 단어장 정보(뜻·어근·예문·유사어) · ‘테스트 (연습)’ → ‘테스트’ · 테스트 아래에 ‘SE 유의어’ 카드 (단어장에 없는 SE 단어 뜻을 AI 프롬프트로 받아 채우기): 제시어의 같은 뜻 단어 고르기(1~2개) / 6개 중 같은 뜻 쌍 찾기 · TCSE SE 정답 쌍 먼저, 그다음 단어장 유의어 · 오답 선지는 실제 SE 선지·철자 비슷한 단어 · 채점 후 뜻과 원래 SE 문장</li><li><b>2026.10.28</b> 회독별 요약: 50개마다 굵은 선</li><li><b>2026.10.27</b> Quant: 수식·그림 없는 문제 약 340개를 텍스트로 (글자 선명, 보기 클릭, 원본 이미지 전환 가능 · 자료 파일 다시 불러오기 필요) · 그래프 세트 오류 수정 · Quant 문제 이미지 여백을 잘라 글자를 크게, 그래프 자료는 문제 위에 크게 · 다크 모드에서 고른 보기가 잘 보이게 · 맨 위 동기화 표시를 짧게(시간만) · 단축키 바꾸기 (설정 > ⌨️ 단축키) · Quant 탭: 실전 모의고사(2섹션 12문제 21분 + 15문제 26분, 1섹션 결과로 2섹션 난이도 조절) · 주제별 연습 · 틀린 문제 다시 풀기 · 계산기 · 결과에서 문제 이미지/AI 풀이 프롬프트 복사 (문제 자료는 암호로 받기)</li><li><b>2026.10.26</b> 단어 수정이 가끔 되돌아가던 문제 수정 (여러 기기·탭 기록을 단어별로 합치기) · 단어장 필터 정리(몰라요·애매해요·알아요·미체크·틀림 제거) · ‘✍️ 내 예문’ 필터 추가</li><li><b>2026.10.25</b> ‘내 예문’: 단어마다 직접 예문 쓰기(✍️) · 내 예문 모음 · AI 첨삭 프롬프트 복사 · 연습 테스트 ‘회독별 요약’ (맞힌/틀린 단어, 틀린 횟수) · 학습 카드 기본 숨김(세부 설정에서 다시 켤 수 있음), 회독 선택은 테스트 카드로 · TCSE: 기본 출제 순서 랜덤 · 세션 끝나면 선지·문장 단어 점검(단어장에 있는 단어만, 선지 단어는 전부) 90% 넘어야 종료, 켜고 끌 수 있음 · 동기화 데이터 사용량 대폭 줄임 (바뀐 항목만 주고받기) · 다크 모드 (설정 > 테마 > 화면 밝기: 밝게 / 어둡게 / 기기 설정 따라)</li><li><b>2026.10.24</b> 3회독부터 ‘오답 노트’: 6/6 끝낸 묶음에서 틀린 단어를 모아 보기·테스트</li><li><b>2026.10.22</b> 테스트에서 틀렸을 때·결과 화면의 예문/유사어/어근/발음도 ‘표시 항목’ 설정을 따름</li><li><b>2026.10.21</b> 연습 테스트에 ‘답 없음’ 보기 (정답을 빼는 비율 설정 가능, 정답은 ‘답 없음’ 칸에 표시) · ‘모르겠어요’ 버튼 없앰 · 테스트 결과: 전체 단어 결과 펼쳐보기(TCSE 빈출 표시) · 틀린 단어마다 내가 고른 것·헷갈리기 쉬운 단어 함께 보기</li><li><b>2026.10.14</b> 3회독부터 연습 테스트를 50개씩 묶기 · 설정창 정리 (학습 설정 하나로 합치고, 나머지는 ‘표시 · 세부 설정’으로) · 회독 진도를 연습 테스트 완료 일차 기준으로 (빨강 또는 무지개 = 완료) · 3회독부터 묶음 테스트 순서 ①전체 ②전체 ③오답복습 ④전체 ⑤오답복습 ⑥전체 (3회 파랑·5회 빨강·6회 무지개) · 오답 복습 25문제 = 오답 → TCSE 빈출 → 랜덤 순으로 채움</li><li><b>2026.10.06</b> 설정 > 학습 자료 받기: 암호로 잠근 GRE 단어·TCSE·RC·Writing 자료를 받아오기 · 아이패드·아이폰에서 RC·테스트 기록이 안 받아지던 문제 수정 (저장 공간이 모자라면 자동 압축 저장) · 맨 위에 마지막 동기화 시간, 맨 아래에 버전 기록 표시</li><li><b>2026.10.05</b> 단어 테스트: 뜻이 2/3 이상 겹치는 선택은 △ (0.5점) · 고양이 100%/90% 표정 교체</li><li><b>2026.10.03</b> 로그인 · 계정별 클라우드 동기화 (어느 기기에서든 같은 기록)</li><li><b>이전</b> 캘린더 시험일·계획·자동 분배 · 고영희 테마와 점수별 표정 · 호버 사전 · TCSE 실전 화면과 AI 분석 프롬프트 복사 · Writing 예시 CSV 가져오기 · 틀린 단어 어근 표시</li></ul></details></footer>
 
 <div id="settingsModal" class="hide" onclick="if(event.target===this)toggleSettings(false)" style="position:fixed;inset:0;background:rgba(20,25,40,.35);z-index:200;display:flex;justify-content:flex-end">
   <div style="background:var(--card);width:380px;max-width:92vw;height:100%;overflow-y:auto;padding:18px 20px">
@@ -1370,7 +1402,8 @@ html.dark .syn-opt.bad{background:#401c1c;border-color:#e06c6c}
       <summary>🎨 테마</summary>
       <div class="set-body">
         <div class="row" style="gap:18px"><label class="tog"><input type="radio" name="themeSel" value="basic" onchange="thSet('basic')">기본</label>
-        <label class="tog"><input type="radio" name="themeSel" value="cute" onchange="thSet('cute')">고영희</label></div>
+        <label class="tog"><input type="radio" name="themeSel" value="cute" onchange="thSet('cute')">고영희</label>
+        <label class="tog"><input type="radio" name="themeSel" value="bunny" onchange="thSet('bunny')">토끼</label></div>
         <div class="set-sub" style="margin-top:10px">화면 밝기</div>
         <div class="row" style="gap:18px"><label class="tog"><input type="radio" name="darkSel" value="light" onchange="dkSet('light')">밝게</label>
         <label class="tog"><input type="radio" name="darkSel" value="dark" onchange="dkSet('dark')">어둡게</label>
@@ -1417,6 +1450,7 @@ window.addEventListener('keydown',function(e){
   if(e.__voca)return;
   if(keyCapture){e.preventDefault();e.stopImmediatePropagation();keyCapture(e.key);return;}
   if(e.metaKey||e.ctrlKey||e.altKey)return;
+  if(typeof subPage!=='undefined'&&(subPage==='learn'||subPage==='kwstudy')&&(e.key===' '||e.code==='Space'))return;
   const t=e.target,tag=(t&&t.tagName)||'';if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT'||(t&&t.isContentEditable))return;
   const m=keyMap();let def=null;
   for(const a of KEY_ACTS){if(m[a[0]]&&m[a[0]]===e.key&&a[2]!==e.key){def=a[2];break;}}
@@ -1611,13 +1645,15 @@ const TH_ICON={
 };
 function thGet(){try{return localStorage.getItem(THEME_KEY)||'basic'}catch(e){return 'basic'}}
 function thApply(t){
-  document.body.classList.toggle('th-cute',t==='cute');
-  if(t==='cute'&&!document.getElementById('thFonts')){
+  const cute=t==='cute'||t==='bunny';
+  document.body.classList.toggle('th-cute',cute);
+  document.body.classList.toggle('th-bunny',t==='bunny');
+  if(cute&&!document.getElementById('thFonts')){
     const l=document.createElement('link');l.id='thFonts';l.rel='stylesheet';
     l.href='https://fonts.googleapis.com/css2?family=Jua&family=Nunito:wght@800;900&display=swap';document.head.appendChild(l);
   }
   document.querySelectorAll('input[name="themeSel"]').forEach(r=>{r.checked=(r.value===t);});
-  if(t==='cute')twRender();
+  if(cute)twRender();
 }
 function thSet(t){try{localStorage.setItem(THEME_KEY,t);}catch(e){}thApply(t);}
 /* 고양이 표정: 테스트 점수대(10% 단위)별 p100~p0 */
@@ -1638,7 +1674,17 @@ const CAT_FACE={
 };
 CAT_FACE.base=CAT_FACE.p90;CAT_FACE.sleepy=CAT_FACE.p70;CAT_FACE.blank=CAT_FACE.p60;
 const CAT_FLAT='<path d="M6 62 C6 50 14 42 24 40 L27 31 L34 38 C40 37 50 37 56 38 L63 31 L66 40 C76 42 84 50 84 62 C84 64 80 64 45 64 C10 64 6 64 6 62 Z" fill="#fff" stroke="#2B2B2B" stroke-width="3" stroke-linejoin="round"/>';
-function catSVG(face){return '<svg viewBox="-6 -6 102 76" aria-hidden="true">'+(face==='p10'?CAT_FLAT:CAT_BODY)+(CAT_FACE[face]||CAT_FACE.base)+'</svg>';}
+/* 토끼: 같은 표정(CAT_FACE)을 쓰고 몸·귀만 다름 */
+const BUN_BODY='<g stroke="#2B2B2B" stroke-width="3" stroke-linejoin="round"><ellipse cx="34" cy="6" rx="6.5" ry="16" transform="rotate(-12 34 6)" fill="#fff"/><ellipse cx="56" cy="6" rx="6.5" ry="16" transform="rotate(12 56 6)" fill="#fff"/></g>'+
+  '<ellipse cx="34" cy="7" rx="2.6" ry="10" transform="rotate(-12 34 7)" fill="#FFC9DA"/><ellipse cx="56" cy="7" rx="2.6" ry="10" transform="rotate(12 56 7)" fill="#FFC9DA"/>'+
+  '<path d="M16 58 C12 44 18 26 30 21 C38 18 52 18 60 21 C72 26 78 44 74 58 C72 63 68 64 45 64 C22 64 18 63 16 58 Z" fill="#fff" stroke="#2B2B2B" stroke-width="3" stroke-linejoin="round"/>'+
+  '<ellipse cx="25" cy="42" rx="3.5" ry="2" fill="#FFC9DA"/><ellipse cx="65" cy="42" rx="3.5" ry="2" fill="#FFC9DA"/><path d="M28 64 v-4 M62 64 v-4" stroke="#2B2B2B" stroke-width="2.4" stroke-linecap="round"/>';
+const BUN_FLAT='<g stroke="#2B2B2B" stroke-width="3" stroke-linejoin="round"><ellipse cx="14" cy="40" rx="15" ry="5.5" transform="rotate(-8 14 40)" fill="#fff"/><ellipse cx="76" cy="40" rx="15" ry="5.5" transform="rotate(8 76 40)" fill="#fff"/></g>'+
+  '<path d="M6 62 C6 50 16 41 30 39 C40 38 50 38 60 39 C74 41 84 50 84 62 C84 64 80 64 45 64 C10 64 6 64 6 62 Z" fill="#fff" stroke="#2B2B2B" stroke-width="3" stroke-linejoin="round"/>';
+function catSVG(face){
+  const bun=document.body&&document.body.classList.contains('th-bunny');
+  if(bun)return '<svg viewBox="-8 -14 106 80" aria-hidden="true">'+(face==='p10'?BUN_FLAT:BUN_BODY)+(CAT_FACE[face]||CAT_FACE.base)+'</svg>';
+  return '<svg viewBox="-6 -6 102 76" aria-hidden="true">'+(face==='p10'?CAT_FLAT:CAT_BODY)+(CAT_FACE[face]||CAT_FACE.base)+'</svg>';}
 /* 테스트 정답률 → 표정: 마지막 테스트 점수대(10% 단위)의 표정 */
 const CAT_MOOD_KEY='voca_cat_mood';
 function catMoodGet(){try{const v=localStorage.getItem(CAT_MOOD_KEY)||'';if(CAT_FACE[v]&&/^p\d+$/.test(v))return v;return {sleepy:'p70',blank:'p60'}[v]||'base';}catch(e){return 'base';}}
@@ -1826,7 +1872,7 @@ function visible(){
 }
 
 function render(){
-  try{if(!synS&&typeof renderSynCard==='function'){clearTimeout(window.__synT);window.__synT=setTimeout(function(){try{renderSynCard();}catch(e){}},30);}}catch(e){}
+  try{if(!synS&&typeof renderSynCard==='function'){clearTimeout(window.__synT);window.__synT=setTimeout(function(){try{renderSynCard();}catch(e){}try{if(!kwS)renderKwCard();}catch(e){}try{if(!lnS)renderLearnCard();}catch(e){}},30);}}catch(e){}
   const opt={m:optMean.checked,s:optSent.checked,y:optSyn.checked,p:optPron.checked,e:optEtym.checked};
   const arr=visible();
   document.getElementById('listCount').textContent=arr.length;
@@ -2187,7 +2233,7 @@ function renderPracticeLog(){
 let study=null;
 function setStudyMode(on){
   if(on)toggleSettings(false);
-  ['mainTabs','testCard','listCard','addCard','studyTopRow','presetInfo','autoRow','chunkRow','roundProgress','synCard'].forEach(id=>{
+  ['mainTabs','testCard','listCard','addCard','studyTopRow','presetInfo','autoRow','chunkRow','roundProgress','synCard','kwCard','learnCard'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.classList.toggle('hide',on);
   });
 }
@@ -2542,7 +2588,7 @@ function studyHidden(){return !(settings&&settings.showStudy);}
 function applyStudyVis(){const h=studyHidden();const c=document.getElementById('studyCard');if(c&&!(typeof quiz!=='undefined'&&quiz))c.classList.toggle('hide',h);const b=document.getElementById('studyCfgBlock');if(b)b.classList.toggle('hide',h);const t=document.getElementById('setShowStudy');if(t)t.checked=!h;}
 function setQuizMode(on){
   if(on)toggleSettings(false);
-  ['mainTabs','studyCard','listCard','addCard','roundTestBox','testConfig','testChunkRow','noteRow','histRow','roundProgress','freqTestRow','testNote','testHead','freeLbl','synCard'].forEach(id=>{
+  ['mainTabs','studyCard','listCard','addCard','roundTestBox','testConfig','testChunkRow','noteRow','histRow','roundProgress','freqTestRow','testNote','testHead','freeLbl','synCard','kwCard','learnCard'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.classList.toggle('hide',on||(id==='studyCard'&&studyHidden()));
   });
 }
@@ -2806,7 +2852,7 @@ let noteDay=0,subPage='';
 document.addEventListener('keydown',function(e){
   if(e.key!=='Escape'||!subPage||(typeof quiz!=='undefined'&&quiz)||document.getElementById('msOv'))return;
   e.preventDefault();const p=subPage;
-  if(p==='hist')histClose();else if(p==='ms')msPageClose();else if(p==='note')noteClose();else if(p==='syn')synEsc();
+  if(p==='hist')histClose();else if(p==='ms')msPageClose();else if(p==='note')noteClose();else if(p==='syn')synEsc();else if(p==='kw')kwEsc();else if(p==='kwstudy')kwClose();else if(p==='learn')lnClose();
 });
 function noteRound(){try{roundEnsure();return (roundState&&roundState.cur)||1;}catch(e){return 1;}}
 function noteCollect(r){
@@ -3498,7 +3544,7 @@ function synPlan(mode,n){
 /* ---------- 화면 ---------- */
 function synOpen(){synS=null;renderSynCard();}
 function synFocus(on){
-  ['mainTabs','testCard','listCard','addCard','studyCard'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.toggle('hide',on||(id==='studyCard'&&studyHidden()));});
+  ['mainTabs','testCard','listCard','addCard','studyCard','kwCard','learnCard'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.toggle('hide',on||(id==='studyCard'&&studyHidden()));});
   if(on)toggleSettings(false);
 }
 function synClose(){subPage='';synS=null;synFocus(false);renderSynCard();}
@@ -3637,6 +3683,305 @@ document.addEventListener('keydown',function(e){
   if(e.key>='1'&&e.key<='6'){e.preventDefault();if(!synS.checked)synPick(+e.key-1);}
   else if(e.key==='Enter'){e.preventDefault();if(synS.checked)synNext();else synCheck();}
 });
+
+
+/* ================= 키워드 묶음 테스트 (VOCABULARY 502 같은 '키워드 → 같은 뜻 단어들' 자료) =================
+   엑셀(.xlsx)/CSV를 불러와 이 기기에 저장(voca_kw_data, 계정 동기화).
+   문제: 키워드(한국어) 하나 → 보기 중 그 키워드에 속하는 단어를 모두 고르기 (정답 개수 표시). */
+const KW_DATA='voca_kw_data', KW_STAT='voca_kw_stat', KW_OPT='voca_kw_opt';
+let kwS=null, kwCache=null;
+/* 저장 형태: {cur:'502', sets:{'502':[[번호, 키워드, 세부키워드, [[단어,뜻],...]], ...], '301':[...]}} (예전 배열 형태도 읽음) */
+function kwDB(){let d=null;try{d=JSON.parse(localStorage.getItem(KW_DATA));}catch(e){}
+  if(Array.isArray(d))d={cur:'502',sets:{'502':d}};if(!d||!d.sets)d={cur:'',sets:{}};
+  if(!d.sets[d.cur])d.cur=Object.keys(d.sets)[0]||'';return d;}
+function kwSaveDB(d){localStorage.setItem(KW_DATA,JSON.stringify(d));kwCache=null;}
+function kwLoad(){
+  const raw=localStorage.getItem(KW_DATA);if(kwCache&&kwCache.raw===raw)return kwCache;
+  const d=kwDB(),arr=d.sets[d.cur]||[],set=d.cur;
+  const items=arr.filter(r=>r&&r[3]&&r[3].length>=2).map(r=>({id:set+'|'+r[0]+'|'+(r[2]||''),no:+r[0]||0,key:r[1]||'',sub:r[2]||'',words:r[3]}));
+  /* 단어 → 그 단어가 들어 있는 모든 키워드의 낱말 (다른 키워드에도 같은 뜻으로 있는 단어를 오답 보기에서 빼려고) */
+  const wt=new Map();items.forEach(it=>{const tk=kwToks(it.key+' '+it.sub);it.words.forEach(w=>{const k=w[0].toLowerCase();if(!wt.has(k))wt.set(k,new Set());tk.forEach(t=>wt.get(k).add(t));});});
+  kwCache={raw:raw,items:items,groups:arr.length,set:set,sets:Object.keys(d.sets),wt:wt};return kwCache;
+}
+function kwSwitch(name){const d=kwDB();if(!d.sets[name])return;d.cur=name;kwSaveDB(d);renderKwCard();}
+function kwOpt(){try{return Object.assign({lo:'',hi:'',n:20},JSON.parse(localStorage.getItem(KW_OPT))||{});}catch(e){return {lo:'',hi:'',n:20};}}
+function kwSetOpt(k,v){const o=kwOpt();o[k]=v;try{localStorage.setItem(KW_OPT,JSON.stringify(o));}catch(e){}}
+function kwStat(){try{return JSON.parse(localStorage.getItem(KW_STAT))||{};}catch(e){return {};}}
+function kwSaveStat(s){try{localStorage.setItem(KW_STAT,JSON.stringify(s));}catch(e){quotaWarn();}}
+function kwLabel(it){return it.sub?it.sub:it.key;}
+/* ---------- 불러오기 ---------- */
+function kwLoadXLSX(){return new Promise((res,rej)=>{if(window.XLSX)return res(window.XLSX);const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';s.onload=()=>res(window.XLSX);s.onerror=()=>rej(new Error('엑셀 읽기 도구를 못 불러왔어요 (인터넷 연결 확인)'));document.head.appendChild(s);});}
+async function kwImport(inp){
+  const f=inp.files[0];inp.value='';if(!f)return;const msg=document.getElementById('kwMsg');
+  try{
+    let rows;
+    if(/\.csv$/i.test(f.name)){rows=parseCSV(await f.text());}
+    else{const X=await kwLoadXLSX();const wb=X.read(await f.arrayBuffer(),{type:'array'});rows=X.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:''});}
+    if(!rows||rows.length<2)throw new Error('내용이 없어요');
+    const hd=rows[0].map(x=>String(x).trim());
+    const ix=(...ns)=>{for(const n of ns){const i=hd.findIndex(h=>h===n||h.toLowerCase()===n.toLowerCase());if(i>=0)return i;}return -1;};
+    const iN=ix('번호','no'),iK=ix('키워드','keyword'),iS=ix('세부 키워드','세부키워드','sub'),iW=ix('단어','word'),iM=ix('뜻','meaning','mean');
+    if(iK<0||iW<0)throw new Error('첫 줄에 "키워드"와 "단어" 열이 있어야 해요');
+    const map=new Map();
+    rows.slice(1).forEach(r=>{const w=String(r[iW]||'').trim();if(!w)return;const no=iN>=0?String(r[iN]).trim():'';const k=String(r[iK]||'').trim();const s=iS>=0?String(r[iS]||'').trim():'';
+      const id=no+'|'+k+'|'+s;if(!map.has(id))map.set(id,[no?+no||no:'',k,s,[]]);map.get(id)[3].push([w,iM>=0?String(r[iM]||'').trim():'']);});
+    const arr=[...map.values()];
+    const m3=f.name.match(/\d{3}/);let name=m3?m3[0]:f.name.replace(/\.[^.]+$/,'').slice(0,20);
+    const d=kwDB();d.sets[name]=arr;d.cur=name;kwSaveDB(d);
+    const c=kwLoad();if(msg)msg.textContent='‘'+name+'’ 불러왔어요: 키워드 '+c.items.length+'개 · 단어 '+arr.reduce((m,r)=>m+r[3].length,0)+'개';
+    setTimeout(renderKwCard,1200);
+  }catch(e){if(msg)msg.textContent='불러오기 실패: '+(e.message||e);else alert(e.message||e);}
+}
+function kwClear(){const d=kwDB();if(!d.cur||!confirm('‘'+d.cur+'’ 자료를 지울까요? (기록은 남아요)'))return;delete d.sets[d.cur];d.cur=Object.keys(d.sets)[0]||'';kwSaveDB(d);renderKwCard();}
+/* ---------- 문제 만들기 ---------- */
+const KW_STOP=new Set(['있다','하다','되다','있는','하는','없는','않는','않다','만들다','시키다','하게','것','사람','따위','등의','등을','등이']);
+function kwToks(s){return String(s||'').replace(/\([^)]*\)/g,' ').split(/[\s,·;/()\[\]~\-]+/).map(t=>t.trim()).filter(t=>t.length>=2&&/[가-힣]/.test(t)&&!KW_STOP.has(t));}
+function kwShuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function kwMake(it,items,wt){
+  const nw=it.words.length;
+  const c=2,total=6;
+  const ans=kwShuffle(it.words).slice(0,c);
+  const sameGroup=new Set();items.forEach(x=>{if(x.no===it.no&&x.key===it.key)x.words.forEach(w=>sameGroup.add(w[0].toLowerCase()));});
+  const toks=new Set(kwToks(it.key+' '+it.sub));
+  const opts=ans.map(w=>({w:w[0],m:w[1],ok:1,src:it}));const used=new Set(ans.map(w=>w[0].toLowerCase()));
+  let guard=0;
+  while(opts.length<total&&guard++<600){
+    const o=items[Math.floor(Math.random()*items.length)];if(o.no===it.no&&o.key===it.key)continue;
+    if(kwToks(o.key+' '+o.sub).some(t=>toks.has(t)))continue;
+    const w=o.words[Math.floor(Math.random()*o.words.length)];const lw=w[0].toLowerCase();
+    if(used.has(lw)||sameGroup.has(lw))continue;
+    if(kwToks(w[1]).some(t=>toks.has(t)))continue;
+    if(wt&&wt.has(lw)&&[...wt.get(lw)].some(t=>toks.has(t)))continue;
+    used.add(lw);opts.push({w:w[0],m:w[1],ok:0,src:o});
+  }
+  return {it:it,opts:kwShuffle(opts),need:c};
+}
+function kwPlan(n){
+  const c=kwLoad(),o=kwOpt(),lo=+o.lo||0,hi=+o.hi||0,st=kwStat();
+  const pool=c.items.filter(it=>(!lo||it.no>=lo)&&(!hi||it.no<=hi));
+  const sc=it=>{const s=st[it.id]||{seen:0,wrong:0};return s.wrong*3-s.seen+(s.seen?0:2)+Math.random()*2;};
+  return pool.sort((a,b)=>sc(b)-sc(a)).slice(0,n).map(it=>kwMake(it,c.items,c.wt));
+}
+/* ---------- 카드 ---------- */
+function renderKwCard(){
+  const a=document.getElementById('kwArea');if(!a||kwS)return;
+  if(a.contains(document.activeElement)&&document.activeElement.tagName==='INPUT')return;
+  if(typeof mainTab!=='undefined'&&mainTab!=='gre')return;
+  const c=kwLoad(),o=kwOpt(),st=kwStat();
+  const wrongN=Object.keys(st).filter(k=>st[k].wrong>0&&k.indexOf(c.set+'|')===0).length;
+  const maxNo=c.items.reduce((m,x)=>Math.max(m,x.no),0);
+  let h='<div class="row" style="justify-content:space-between;align-items:baseline"><h3 style="margin:0">키워드 묶음</h3><span class="count">'+(c.items.length?'키워드 '+c.items.length+'개'+(wrongN?' · 틀린 적 있는 키워드 '+wrongN:''):'자료 없음')+'</span></div>'+
+    '<p class="study-tip" style="margin:4px 0 8px">한국어 키워드를 보고, 6개 보기 중 그 키워드에 속하는 영어 단어 2개를 골라요. 틀린 적 있는 키워드·안 본 키워드가 먼저 나와요.</p>'+
+    (c.sets.length>1?'<div class="row" style="gap:6px;margin-bottom:8px">'+c.sets.map(n=>'<button class="chip'+(n===c.set?' on':'')+'" onclick="kwSwitch(\''+esc(n).replace(/'/g,"\\'")+'\')">'+esc(n)+'</button>').join('')+'</div>':'');
+  if(c.items.length){
+    h+='<div class="row" style="gap:6px;flex-wrap:wrap;align-items:center"><span>번호</span>'+
+      '<input id="kwLo" type="number" min="1" max="'+maxNo+'" placeholder="처음" value="'+(o.lo||'')+'" style="width:66px" onchange="kwSetOpt(\'lo\',this.value)"> ~ '+
+      '<input id="kwHi" type="number" min="1" max="'+maxNo+'" placeholder="끝" value="'+(o.hi||'')+'" style="width:66px" onchange="kwSetOpt(\'hi\',this.value)">'+
+      '<input id="kwN" type="number" min="5" max="100" value="'+o.n+'" style="width:60px" onchange="kwSetOpt(\'n\',+this.value||20)"> 개 '+
+      '<button class="primary" onclick="kwStart()">키워드 테스트</button><button class="small" onclick="kwStudy(\'\')">📖 학습하기</button></div>';
+  }
+  h+='<div class="row" style="gap:6px;margin-top:8px;align-items:center"><button class="small" onclick="document.getElementById(\'kwFile\').click()">📁 '+(c.items.length?'자료 추가·다시 불러오기':'엑셀/CSV 불러오기')+'</button>'+
+    '<input type="file" id="kwFile" accept=".xlsx,.xls,.csv" class="hide" onchange="kwImport(this)">'+(c.items.length?'<button class="small" onclick="kwClear()">‘'+esc(c.set)+'’ 지우기</button>':'')+
+    '<span class="count" id="kwMsg"></span></div>'+
+    (c.items.length?'':'<div class="count" style="margin-top:4px">첫 줄 열 이름: 번호 · 키워드 · 세부 키워드 · 단어 · 뜻</div>');
+  a.innerHTML=h;
+}
+window.addEventListener('load',function(){try{renderKwCard();}catch(e){}});
+/* 학습하기: 키워드별로 단어 전체 보기 (번호 범위를 따름) */
+let kwSt={q:'',page:0};
+function kwStudy(q,page){
+  ['kwLo','kwHi'].forEach(id=>{const el=document.getElementById(id);if(el)el.dispatchEvent(new Event('change'));});
+  if(q!==undefined){kwSt.q=(q||'').trim().toLowerCase();kwSt.page=0;}
+  if(page!==undefined)kwSt.page=page;
+  const c=kwLoad(),o=kwOpt(),lo=+o.lo||0,hi=+o.hi||0,st=kwStat(),Q=kwSt.q;
+  const d=kwDB(),arr=(d.sets[c.set]||[]).filter(r=>{const n=+r[0]||0;return (!lo||n>=lo)&&(!hi||n<=hi);});
+  const hit=r=>!Q||(r[1]+' '+r[2]).toLowerCase().indexOf(Q)>=0||r[3].some(w=>(w[0]+' '+w[1]).toLowerCase().indexOf(Q)>=0);
+  const list=arr.filter(hit);
+  /* 칸마다 단어 최대 20개 · 한 화면 2칸 · 남은 자리에 안 들어가는 묶음은 다음 칸으로, 20개 넘는 묶음은 이어서 */
+  const grs=[];let gl=null;list.forEach(r=>{const gk=r[0]+'|'+r[1];if(gk!==gl){grs.push({rows:[]});gl=gk;}grs[grs.length-1].rows.push(r);});
+  /* 칸 높이를 ‘단어 줄’ 단위로 셈: 단어 1 · 키워드 제목 2.2 · 세부 키워드 1.5 · 묶음 간격 0.75 → 칸마다 25줄(단어는 최대 20개) */
+  const CAP=20,CAPU=25,U_G=2.2,U_S=1.5,U_B=.75,cols=[];let col=null,left=0,lu=0;
+  const newCol=()=>{col=[];cols.push(col);left=CAP;lu=CAPU;};newCol();
+  grs.forEach((g,gi)=>{const need=g.rows.reduce((s,r)=>s+r[3].length+U_B+(r[2]?U_S:0),U_G),wn=g.rows.reduce((s,r)=>s+r[3].length,0);
+    if(col.length&&(wn>left||need>lu))newCol();
+    let seg={gi,cont:false,rows:[]};col.push(seg);lu-=U_G;
+    g.rows.forEach(r=>{let ws=r[3],first=true;
+      if(!ws.length){seg.rows.push({r,ws:[],head:true});lu-=U_B+(r[2]?U_S:0);return;}
+      while(ws.length){const hu=U_B+(first&&r[2]?U_S:0);
+        if(!left||lu-hu<1){newCol();seg={gi,cont:true,rows:[]};col.push(seg);lu-=U_G;}
+        const n=Math.max(1,Math.min(left,Math.floor(lu-(U_B+(first&&r[2]?U_S:0)))));
+        const take=ws.slice(0,n);seg.rows.push({r,ws:take,head:first});lu-=take.length+U_B+(first&&r[2]?U_S:0);first=false;left-=take.length;ws=ws.slice(take.length);}});});
+  const pages=Math.max(1,Math.ceil(cols.length/2));
+  if(kwSt.page>=pages)kwSt.page=pages-1;if(kwSt.page<0)kwSt.page=0;
+  const cur=cols.slice(kwSt.page*2,kwSt.page*2+2).filter(c=>c.length),gTot=grs.length;
+  const gIdx=[].concat(...cur.map(c=>c.map(s=>s.gi))),gFrom=gIdx.length?Math.min(...gIdx):0,gTo=gIdx.length?Math.max(...gIdx):0;
+  if(subPage!=='kwstudy'){try{document.activeElement&&document.activeElement.blur();}catch(e){}}
+  subPage='kwstudy';kwFocus(true);
+  const a=document.getElementById('kwArea');let h='';
+  cur.forEach(cc=>{h+='<div class="kws-col">';cc.forEach(sg=>{const g0=grs[sg.gi].rows[0];
+    h+='<div class="kws-g">'+(g0[0]?String(g0[0]).padStart(3,'0')+'. ':'')+esc(g0[1])+(sg.cont?' <span class="count">(이어서)</span>':'')+'</div>';
+    sg.rows.forEach(x=>{const r=x.r,s=st[c.set+'|'+r[0]+'|'+(r[2]||'')],wr=x.head&&s&&s.wrong?' <span class="note-cnt">'+s.wrong+'번 틀림</span>':'';
+      h+='<div class="kws-s">'+(r[2]&&x.head?'<div class="kws-sn">'+esc(r[2])+wr+'</div>':(wr?'<div class="kws-sn">'+wr+'</div>':''))+
+        x.ws.map(w=>'<div class="kws-w"><b>'+esc(w[0])+'</b><span class="syn-mean ln-d" style="margin-left:0">'+esc(w[1])+'</span></div>').join('')+'</div>';});});
+    h+='</div>';});
+  a.innerHTML='<div class="row" style="justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap"><div class="row" style="gap:6px;align-items:center">'+
+      '<button class="small" onclick="kwStudy(undefined,kwSt.page-1)">◀</button><b>📖 '+esc(c.set)+' · '+(kwSt.page+1)+'/'+pages+'</b><button class="small" onclick="kwStudy(undefined,kwSt.page+1)">▶</button></div>'+
+      '<button class="small" onclick="kwClose()">닫기</button></div>'+
+    '<div class="row" style="gap:6px;margin:8px 0;align-items:center"><input id="kwsQ" placeholder="키워드·단어·뜻 검색" value="'+esc(Q)+'" style="flex:1;min-width:0" onkeydown="if(event.key===\'Enter\'){kwStudy(this.value);this.blur();}"><button class="small" onclick="kwStudy(document.getElementById(\'kwsQ\').value)">검색</button>'+
+      '<button class="ln-hold" data-hold="kwsList" onpointerdown="holdDown(\'kwsList\');event.preventDefault()" onpointerup="holdUp(\'kwsList\')" onpointerleave="holdUp(\'kwsList\')" onpointercancel="holdUp(\'kwsList\')">'+(HOLD.base.kwsList?'가림 켜짐 (화면 탭: 끄기)':'화면 탭: 가리기 · 꾹: 잠깐')+'</button></div>'+
+    '<div class="count" style="margin-bottom:6px">'+(lo||hi?'번호 '+(lo||1)+'~'+(hi||'끝')+' · ':'')+'키워드 '+gTot+'개 중 '+(cur.length?(gFrom+1)+(gTo>gFrom?'–'+(gTo+1):''):0)+'</div>'+
+    '<div id="kwsList" class="kws-cols'+(HOLD.base.kwsList?' ln-hidden':'')+'">'+(h||'<p class="study-tip">해당하는 키워드가 없어요.</p>')+'</div>'+
+    '<div class="study-tip">스페이스바·화면 아무 데나: 짧게 = 가리기 켜기/끄기 · 꾹 = 누르는 동안만 · ← → 이전/다음 화면 · Esc 닫기</div>';
+  const L=document.getElementById('kwsList');if(L&&cur.length){L.style.minHeight=kwSt.minH?kwSt.minH+'px':'';const hh=L.getBoundingClientRect().height;if(hh>(kwSt.minH||0)){kwSt.minH=Math.ceil(hh);L.style.minHeight=kwSt.minH+'px';}}
+  window.scrollTo(0,0);
+}
+function kwsHide(on){if(on)holdDown('kwsList');else holdUp('kwsList');}
+document.addEventListener('keydown',function(e){
+  if(subPage!=='kwstudy')return;const tag=(e.target&&e.target.tagName)||'';if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT')return;
+  if(e.code==='Space'||e.key===' '){e.preventDefault();if(!e.repeat)kwsHide(true);}
+  else if(e.key==='ArrowRight'){e.preventDefault();kwStudy(undefined,kwSt.page+1);}
+  else if(e.key==='ArrowLeft'){e.preventDefault();kwStudy(undefined,kwSt.page-1);}
+},true);
+document.addEventListener('keyup',function(e){if(subPage!=='kwstudy')return;if(e.code==='Space'||e.key===' '){e.preventDefault();kwsHide(false);}},true);
+function kwFocus(on){['mainTabs','testCard','listCard','addCard','synCard','studyCard','learnCard'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.toggle('hide',on||(id==='studyCard'&&studyHidden()));});if(on)toggleSettings(false);}
+function kwStart(){
+  ['kwLo','kwHi','kwN'].forEach(id=>{const el=document.getElementById(id);if(el)el.dispatchEvent(new Event('change'));});
+  const n=Math.max(5,Math.min(100,+kwOpt().n||20));
+  const qs=kwPlan(n).filter(q=>q.opts.length>q.need);
+  if(!qs.length){alert('이 범위에는 낼 키워드가 없어요.');return;}
+  subPage='kw';kwFocus(true);kwS={qs:qs,i:0,sel:[],checked:false,ok:0,res:[]};kwShow();
+}
+function kwShow(){
+  const a=document.getElementById('kwArea'),s=kwS,q=s.qs[s.i],it=q.it;
+  let h='<div class="row" style="justify-content:space-between;align-items:center"><span class="count">'+(s.i+1)+' / '+s.qs.length+' · 맞힘 '+s.ok+'</span><button class="small" onclick="kwEsc()">그만</button></div>'+
+    '<div class="kw-no">'+esc(kwLoad().set)+' · '+(it.no?String(it.no).padStart(3,'0'):'')+(it.sub?' · '+esc(it.key):'')+'</div>'+
+    '<div class="syn-prompt" style="font-size:24px;margin-top:2px">'+esc(kwLabel(it))+'</div>'+
+    '<div class="count" style="text-align:center;margin-bottom:8px">해당하는 단어 <b>'+q.need+'개</b>를 고르세요</div>'+
+    '<div class="syn-grid">'+q.opts.map((o,i)=>{let cls='';const sel=s.sel.indexOf(i)>=0;
+      if(s.checked)cls=o.ok?(sel?' ok':' miss'):(sel?' bad':' dim');else if(sel)cls=' sel';
+      return '<button class="syn-opt'+cls+'" onclick="kwPick('+i+')"><span class="syn-n">'+(i+1)+'</span><b>'+esc(o.w)+'</b>'+
+        (s.checked?'<span class="syn-mean">'+esc(o.m||'')+(o.ok?'':' <span class="kw-from">← '+esc(kwLabel(o.src))+'</span>')+'</span>':'')+'</button>';}).join('')+'</div>';
+  if(s.checked){
+    const r=s.res[s.res.length-1];
+    h+='<div class="qt-check '+(r.ok?'ok':'bad')+'">'+(r.ok?'✓ 정답':'✗ 오답')+'</div>'+
+      '<div class="row" style="margin-top:10px"><button class="primary" id="kwNext" onclick="kwNext()">'+(s.i+1<s.qs.length?'다음 →':'결과 보기')+'</button></div>'+
+      '<div class="kw-all"><div class="count" style="margin:10px 0 4px">'+esc(kwLabel(it))+' — 단어 전체 '+it.words.length+'개</div>'+
+      it.words.map(w=>'<div class="kw-w"><b>'+esc(w[0])+'</b> <span class="syn-mean">'+esc(w[1])+'</span></div>').join('')+'</div>';
+  }else h+='<div class="row" style="margin-top:10px"><button class="primary" onclick="kwCheck()"'+(s.sel.length===q.need?'':' disabled')+'>확인</button></div>';
+  h+='<div class="study-tip">키보드: 1~'+q.opts.length+' 고르기 · Enter 확인/다음 · Esc 그만</div>';
+  a.innerHTML=h;
+}
+function kwPick(i){const s=kwS;if(!s||s.checked)return;const q=s.qs[s.i];const j=s.sel.indexOf(i);
+  if(j>=0)s.sel.splice(j,1);else{s.sel.push(i);if(s.sel.length>q.need)s.sel.shift();}kwShow();}
+function kwCheck(){const s=kwS,q=s.qs[s.i];if(s.checked||s.sel.length!==q.need)return;
+  const ok=s.sel.every(i=>q.opts[i].ok);s.checked=true;if(ok)s.ok++;s.res.push({q:q,sel:s.sel.slice(),ok:ok});
+  const st=kwStat(),o=st[q.it.id]||(st[q.it.id]={seen:0,wrong:0});o.seen++;if(!ok)o.wrong++;o.t=Date.now();kwSaveStat(st);kwShow();}
+function kwNext(){const s=kwS;if(s.i+1>=s.qs.length){kwFinish();return;}s.i++;s.sel=[];s.checked=false;kwShow();}
+function kwEsc(){if(kwS&&!kwS.done){if(!kwS.res.length){kwClose();return;}if(!confirm('그만두고 결과를 볼까요?'))return;kwFinish();return;}kwClose();}
+function kwClose(){subPage='';kwS=null;kwFocus(false);renderKwCard();}
+function kwFinish(){
+  const s=kwS;s.done=true;const a=document.getElementById('kwArea');const n=s.res.length,wrong=s.res.filter(r=>!r.ok);
+  try{if(n&&typeof actBump==='function')actBump('kw',n);}catch(e){}
+  a.innerHTML='<div class="row" style="justify-content:space-between;align-items:center"><h3 style="margin:0">키워드 묶음 결과</h3><button class="small" onclick="kwClose()">닫기</button></div>'+
+    '<div class="statgrid"><div class="stat"><b>'+s.ok+'/'+n+'</b><span class="count">정답</span></div><div class="stat"><b>'+(n?Math.round(s.ok/n*100):0)+'%</b><span class="count">정답률</span></div><div class="stat"><b>'+wrong.length+'</b><span class="count">틀림</span></div></div>'+
+    (wrong.length?'<div class="allres" style="margin-top:6px"><div class="ar-title" style="color:var(--red)">틀린 키워드</div>'+wrong.map(r=>{const q=r.q;
+      return '<div class="syn-wr"><b>'+esc(kwLabel(q.it))+'</b>: '+q.it.words.map(w=>esc(w[0])).join(', ')+
+        '<div class="count">고른 것: '+r.sel.map(i=>{const o=q.opts[i];return '<span style="color:'+(o.ok?'#1e7a43':'#c0392b')+'">'+esc(o.w)+'</span>'+(o.ok?'':' ('+esc(o.m)+')');}).join(', ')+'</div></div>';}).join('')+'</div>':'<p class="study-tip">다 맞혔어요!</p>')+
+    '<div class="row" style="margin-top:10px;gap:6px"><button class="primary" onclick="kwS=null;renderKwCard();kwStart()">한 세트 더</button><button onclick="kwClose()">닫기</button></div>';
+}
+document.addEventListener('keydown',function(e){
+  if(subPage!=='kw'||!kwS||kwS.done)return;
+  const tag=(e.target&&e.target.tagName)||'';if(tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA')return;
+  const q=kwS.qs[kwS.i];
+  if(e.key>='1'&&e.key<='9'&&+e.key<=q.opts.length){e.preventDefault();if(!kwS.checked)kwPick(+e.key-1);}
+  else if(e.key==='Enter'){e.preventDefault();if(kwS.checked)kwNext();else kwCheck();}
+});
+
+
+/* ================= 학습 (일차별 10개씩 띄워 놓고 외우기) =================
+   스페이스바를 누르고 있는 동안 단어만 남기고 가림 → 떼면 다시 보임. 휴대폰은 '가리기' 버튼을 누르고 있기. */
+const LN_OPT='voca_learn_opt';
+let lnS=null;
+function lnOpt(){try{return Object.assign({day:1,page:0,size:10,f:{m:1,y:0,s:0,e:0,p:0}},JSON.parse(localStorage.getItem(LN_OPT))||{});}catch(e){return {day:1,page:0,size:10,f:{m:1,y:0,s:0,e:0,p:0}};}}
+function lnSave(o){try{localStorage.setItem(LN_OPT,JSON.stringify(o));}catch(e){}}
+const LN_F=[['m','뜻'],['y','유의어'],['s','예문'],['e','어근·어원'],['p','발음']];
+function lnWords(day){return data.filter(w=>+w.day===+day).sort((a,b)=>(+a.no||0)-(+b.no||0));}
+function renderLearnCard(){
+  const a=document.getElementById('learnArea');if(!a||lnS)return;
+  if(typeof mainTab!=='undefined'&&mainTab!=='gre')return;
+  const o=lnOpt(),md=Math.max(1,maxDay());if(o.day>md)o.day=md;
+  const n=lnWords(o.day).length,pages=Math.max(1,Math.ceil(n/o.size));if(o.page>=pages)o.page=0;
+  a.innerHTML='<div class="row" style="justify-content:space-between;align-items:baseline"><h3 style="margin:0">학습</h3><span class="count">10개씩 두 칸으로 띄워 놓고 외우기 · 스페이스바 짧게 = 가리기 켜기/끄기, 꾹 = 누르는 동안만</span></div>'+
+    '<div class="row" style="gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px">'+
+    '<button class="small" onclick="lnDay(-1)">◀</button><b style="min-width:60px;text-align:center">'+o.day+'일차</b><button class="small" onclick="lnDay(1)">▶</button>'+
+    '<span class="count">'+n+'단어 · '+pages+'회</span>'+
+    '<select id="lnPage" onchange="const o=lnOpt();o.page=+this.value;lnSave(o)">'+Array.from({length:pages},(_,i)=>'<option value="'+i+'"'+(i===o.page?' selected':'')+'>'+(i+1)+'회 ('+(i*o.size+1)+'–'+Math.min(n,(i+1)*o.size)+')</option>').join('')+'</select>'+
+    '<button class="primary" onclick="lnStart()"'+(n?'':' disabled')+'>학습 시작</button></div>'+
+    '<div class="row" style="gap:6px;flex-wrap:wrap;margin-top:8px"><span class="count">띄울 항목</span>'+LN_F.map(([k,l])=>'<button class="chip'+(o.f[k]?' on':'')+'" onclick="lnToggle(\''+k+'\',true)">'+l+'</button>').join('')+'</div>';
+}
+function lnDay(d){const o=lnOpt(),md=Math.max(1,maxDay());o.day=Math.min(md,Math.max(1,(+o.day||1)+d));o.page=0;lnSave(o);if(lnS){lnS.day=o.day;lnS.page=0;lnShow();}else renderLearnCard();}
+function lnToggle(k,card){const o=lnOpt();o.f[k]=o.f[k]?0:1;lnSave(o);if(lnS)lnShow();else if(card)renderLearnCard();}
+function lnFocus(on){['mainTabs','testCard','synCard','kwCard','listCard','addCard','studyCard','learnCard'].forEach(id=>{const el=document.getElementById(id);if(!el)return;
+  if(id==='learnCard')return;el.classList.toggle('hide',on||(id==='studyCard'&&studyHidden()));});if(on)toggleSettings(false);}
+function lnStart(){try{document.activeElement&&document.activeElement.blur();}catch(e){}const o=lnOpt();lnS={day:o.day,page:o.page,hide:false};subPage='learn';lnFocus(true);lnShow();window.scrollTo(0,0);}
+function lnClose(){lnS=null;subPage='';lnFocus(false);renderLearnCard();}
+function lnPage(d){const s=lnS,n=lnWords(s.day).length,pages=Math.max(1,Math.ceil(n/10));let p=s.page+d;
+  if(p<0){if(s.day>1){s.day--;const nn=lnWords(s.day).length;p=Math.max(0,Math.ceil(nn/10)-1);}else p=0;}
+  else if(p>=pages){if(s.day<maxDay()){s.day++;p=0;}else p=pages-1;}
+  s.page=p;const o=lnOpt();o.day=s.day;o.page=p;lnSave(o);lnShow();window.scrollTo(0,0);}
+function lnShow(){
+  const a=document.getElementById('learnArea'),s=lnS,o=lnOpt(),f=o.f;
+  const all=lnWords(s.day),n=all.length,pages=Math.max(1,Math.ceil(n/10)),ws=all.slice(s.page*10,s.page*10+10);
+  a.innerHTML='<div class="row" style="justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap">'+
+      '<div class="row" style="gap:6px;align-items:center"><button class="small" onclick="lnPage(-1)">◀</button><b>'+s.day+'일차 · '+(s.page+1)+'/'+pages+'회</b><span class="count">'+(s.page*10+1)+'–'+Math.min(n,s.page*10+10)+'</span><button class="small" onclick="lnPage(1)">▶</button></div>'+
+      '<button class="small" onclick="lnClose()">닫기</button></div>'+
+    '<div class="row" style="gap:6px;flex-wrap:wrap;margin:8px 0">'+LN_F.map(([k,l])=>'<button class="chip'+(f[k]?' on':'')+'" onclick="lnToggle(\''+k+'\')">'+l+'</button>').join('')+
+      '<button class="ln-hold" data-hold="lnList" onpointerdown="holdDown(\'lnList\');event.preventDefault()" onpointerup="holdUp(\'lnList\')" onpointerleave="holdUp(\'lnList\')" onpointercancel="holdUp(\'lnList\')">'+(HOLD.base.lnList?'가림 켜짐 (화면 탭: 끄기)':'화면 탭: 가리기 · 꾹: 잠깐')+'</button></div>'+
+    '<div id="lnList" class="ln-list'+(HOLD.base.lnList?' ln-hidden':'')+'">'+ws.map(w=>'<div class="ln-item"><div class="ln-top"><span class="ln-no">'+w.no+'</span><span class="ln-word">'+esc(w.word)+'</span>'+(f.p&&w.pron?'<span class="e-pron ln-d">'+esc(w.pron)+'</span>':'')+'</div>'+
+      '<div class="ln-d">'+(f.m&&w.mean?'<div class="ln-mean">'+esc(breakNumbered(w.mean))+'</div>':'')+(f.e&&w.etym?'<div class="etym"><b>어근·어원</b> · '+esc(w.etym)+'</div>':'')+
+      (f.y&&w.syn?'<div class="e-syn">≈ '+esc(w.syn)+'</div>':'')+(f.s&&w.sent?'<div class="e-sent">'+esc(breakNumbered(w.sent))+'</div>':'')+'</div></div>').join('')+'</div>'+
+    '<div class="study-tip">스페이스바·화면 아무 데나: 짧게 = 가리기 켜기/끄기 · 꾹 = 누르는 동안만 · ← → 이전/다음 10개 · Esc 닫기</div>';
+  const L=document.getElementById('lnList'),sig=Object.keys(f).filter(k=>f[k]).join('')+'|'+innerWidth;
+  if(L){if(s.hsig!==sig){s.hsig=sig;s.minH=0;}L.style.minHeight=s.minH?s.minH+'px':'';
+    const hh=Math.ceil(L.getBoundingClientRect().height);if(hh>(s.minH||0)){s.minH=hh;L.style.minHeight=hh+'px';}}
+}
+/* 스페이스바(또는 버튼): 짧게 누르면 가리기 켜기/끄기, 꾹 누르고 있으면 그동안만 반대로 */
+const HOLD={base:{},t0:0,down:false};
+function holdApply(id,on){const l=document.getElementById(id);if(l)l.classList.toggle('ln-hidden',on);}
+function holdDown(id){if(HOLD.down)return;HOLD.down=true;HOLD.t0=Date.now();holdApply(id,!HOLD.base[id]);}
+function holdUp(id){if(!HOLD.down)return;HOLD.down=false;if(Date.now()-HOLD.t0<250)HOLD.base[id]=!HOLD.base[id];holdApply(id,!!HOLD.base[id]);holdLbl(id);}
+function holdCancel(id){if(!HOLD.down)return;HOLD.down=false;holdApply(id,!!HOLD.base[id]);}
+/* 학습 화면 어디든: 짧게 탭 = 가리기 켜기/끄기 · 꾹(0.2초 이상) = 누르는 동안만 · 끌면(드래그) 글자 선택만 */
+(function(){let pid=null,x0=0,y0=0,tm=null,held=false,lastTog=0;
+  const cur=()=>subPage==='learn'&&lnS?'lnList':subPage==='kwstudy'?'kwsList':null;
+  const stop=()=>{clearTimeout(tm);tm=null;pid=null;};
+  document.addEventListener('pointerdown',function(e){const id=cur();if(!id||e.button>0||HOLD.down)return;
+    if(e.target.closest('button,a,input,select,textarea,summary,label,.chip,[contenteditable]'))return;
+    pid=e.pointerId;x0=e.clientX;y0=e.clientY;held=false;
+    tm=setTimeout(function(){tm=null;held=true;holdApply(id,!HOLD.base[id]);},200);},true);
+  document.addEventListener('pointermove',function(e){if(pid!==e.pointerId)return;
+    if(Math.abs(e.clientX-x0)+Math.abs(e.clientY-y0)>8){const id=cur();if(held&&id)holdApply(id,!!HOLD.base[id]);stop();}},true);
+  document.addEventListener('pointerup',function(e){if(pid!==e.pointerId)return;const id=cur(),quick=!!tm;stop();if(!id)return;
+    const sel=(window.getSelection&&String(window.getSelection()))||'';
+    if(quick&&!sel){HOLD.base[id]=!HOLD.base[id];lastTog=Date.now();}
+    holdApply(id,!!HOLD.base[id]);holdLbl(id);},true);
+  document.addEventListener('pointercancel',function(e){if(pid!==e.pointerId)return;const id=cur();stop();if(id)holdApply(id,!!HOLD.base[id]);},true);
+  /* 더블클릭으로 단어를 고를 때는 첫 탭의 켜기/끄기를 되돌림 */
+  document.addEventListener('dblclick',function(e){const id=cur();if(!id||Date.now()-lastTog>600)return;
+    if(e.target.closest('button,a,input,select,textarea,summary,label,.chip'))return;
+    HOLD.base[id]=!HOLD.base[id];holdApply(id,!!HOLD.base[id]);holdLbl(id);},true);
+})();
+function holdLbl(id){const b=document.querySelector('[data-hold="'+id+'"]');if(b)b.textContent=HOLD.base[id]?'가림 켜짐 (화면 탭: 끄기)':'화면 탭: 가리기 · 꾹: 잠깐';}
+function lnHide(on){if(!lnS)return;if(on)holdDown('lnList');else holdUp('lnList');}
+document.addEventListener('keydown',function(e){
+  if(subPage!=='learn'||!lnS)return;const tag=(e.target&&e.target.tagName)||'';if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT')return;
+  if(e.code==='Space'||e.key===' '){e.preventDefault();if(!e.repeat)lnHide(true);}
+  else if(e.key==='ArrowRight'){e.preventDefault();lnPage(1);}
+  else if(e.key==='ArrowLeft'){e.preventDefault();lnPage(-1);}
+},true);
+document.addEventListener('keyup',function(e){if(subPage!=='learn'||!lnS)return;if(e.code==='Space'||e.key===' '){e.preventDefault();lnHide(false);}},true);
+window.addEventListener('blur',function(){if(HOLD.down){HOLD.down=false;['lnList','kwsList'].forEach(id=>holdApply(id,!!HOLD.base[id]));}});
+window.addEventListener('load',function(){try{renderLearnCard();}catch(e){}});
 
 function vw(k){return !settings.view||settings.view[k]==null||!!settings.view[k];}
 function showQ(){twSync();
