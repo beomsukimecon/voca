@@ -1107,6 +1107,8 @@ html.dark .syn-opt.bad{background:#401c1c;border-color:#e06c6c}
 .ln-list{display:grid;grid-template-columns:1fr 1fr;grid-auto-flow:column;grid-template-rows:repeat(5,1fr);column-gap:24px;align-content:start}
 .ln-list>.ln-item{min-width:0}
 mark.hl{background:#ffe866;color:inherit;border-radius:3px;padding:0 1px}
+.ln-item{position:relative;isolation:isolate}.ln-item.ln-rowhl::before{content:'';position:absolute;left:23px;right:-2px;top:4px;bottom:4px;background:#fff3a6;border-radius:8px;z-index:-1}html.dark .ln-item.ln-rowhl::before{background:#5c4f00}.ln-rowhl mark.hl{background:#ffd900}
+.ln-hlmode .ln-no{cursor:pointer}
 html.dark mark.hl{background:#8a7400;color:#fff}
 .ln-hlmode .ln-list,.ln-hlmode #kwsList{cursor:text}
 .hl-btn.on{background:#ffe866;color:#222;border-color:#e0c200}
@@ -3958,6 +3960,8 @@ document.addEventListener('mouseup',function(e){if(!HLMODE||!(subPage==='learn'|
   if(hit.length)H[k]=H[k].filter(s=>hit.indexOf(s)<0);else H[k].push(t);
   if(!H[k].length)delete H[k];hlSave();
   sel.removeAllRanges();hlRerender();});
+function lnRowHL(el){if(!HLMODE)return;const c=el.closest('[data-hk]');if(!c)return;const k='r:'+c.getAttribute('data-hk'),H=hlLoad();
+  if(H[k])delete H[k];else H[k]=1;hlSave();c.classList.toggle('ln-rowhl',!!H[k]);}
 function lnFlag(i,btn){const x=data[i];if(!x)return;x.flag=!x.flag;saveWords();if(btn){btn.textContent=x.flag?'★':'☆';btn.classList.toggle('on',!!x.flag);}}
 function lnShow(){
   const a=document.getElementById('learnArea'),s=lnS,o=lnOpt(),f=o.f;
@@ -3967,7 +3971,7 @@ function lnShow(){
       '<div class="row" style="gap:6px">'+hlBtn()+'<button class="small" onclick="lnClose()">닫기</button></div></div>'+
     '<div class="row" style="gap:6px;flex-wrap:wrap;margin:8px 0">'+LN_F.map(([k,l])=>'<button class="chip'+(f[k]?' on':'')+'" onclick="lnToggle(\''+k+'\')">'+l+'</button>').join('')+
       '<button class="ln-hold" data-hold="lnList" onpointerdown="holdDown(\'lnList\');event.preventDefault()" onpointerup="holdUp(\'lnList\')" onpointerleave="holdUp(\'lnList\')" onpointercancel="holdUp(\'lnList\')">'+(HOLD.base.lnList?'가림 켜짐 (화면 탭: 끄기)':'화면 탭: 가리기 · 꾹: 잠깐')+'</button></div>'+
-    '<div id="lnList" class="ln-list'+(HOLD.base.lnList?' ln-hidden':'')+'">'+ws.map(w=>{const K='g:'+String(w.word).toLowerCase(),di=data.indexOf(w);return '<div class="ln-item" data-hk="'+esc(K)+'"><div class="ln-top"><span class="ln-no">'+w.no+((w.wrong||0)>0||tcFreqOf(w.word)>0?'<span class="ln-dots">'+((w.wrong||0)>0?'<i class="ln-dot r" title="테스트에서 틀린 적 있음 ('+w.wrong+'번)"></i>':'<i class="ln-dot"></i>')+(tcFreqOf(w.word)>0?'<i class="ln-dot g" title="TCSE에 나온 단어 ('+tcFreqOf(w.word)+'번)"></i>':'')+'</span>':'')+'</span><span class="ln-word">'+hlT(K,w.word)+'</span>'+(f.p&&w.pron?'<span class="e-pron ln-d">'+esc(w.pron)+'</span>':'')+'</div>'+
+    '<div id="lnList" class="ln-list'+(HOLD.base.lnList?' ln-hidden':'')+'">'+ws.map(w=>{const K='g:'+String(w.word).toLowerCase(),di=data.indexOf(w);return '<div class="ln-item'+(hlLoad()['r:'+K]?' ln-rowhl':'')+'" data-hk="'+esc(K)+'"><div class="ln-top"><span class="ln-no" onclick="lnRowHL(this)">'+w.no+((w.wrong||0)>0||tcFreqOf(w.word)>0?'<span class="ln-dots">'+((w.wrong||0)>0?'<i class="ln-dot r" title="테스트에서 틀린 적 있음 ('+w.wrong+'번)"></i>':'<i class="ln-dot"></i>')+(tcFreqOf(w.word)>0?'<i class="ln-dot g" title="TCSE에 나온 단어 ('+tcFreqOf(w.word)+'번)"></i>':'')+'</span>':'')+'</span><span class="ln-word">'+hlT(K,w.word)+'</span>'+(f.p&&w.pron?'<span class="e-pron ln-d">'+esc(w.pron)+'</span>':'')+'</div>'+
       '<div class="ln-d">'+(f.m&&w.mean?'<div class="ln-mean">'+hlT(K,breakNumbered(w.mean))+'</div>':'')+(f.e&&w.etym?'<div class="etym"><b>어근·어원</b> · '+hlT(K,w.etym)+'</div>':'')+
       (f.y&&w.syn?'<div class="e-syn">≈ '+hlT(K,w.syn)+'</div>':'')+(f.s&&w.sent?'<div class="e-sent">'+hlT(K,breakNumbered(w.sent))+'</div>':'')+'</div></div>';}).join('')+'</div>'+
     '<div class="study-tip">스페이스바·화면 아무 데나: 짧게 = 가리기 켜기/끄기 · 꾹 = 누르는 동안만 · ← → 이전/다음 10개 · Esc 닫기</div>';
