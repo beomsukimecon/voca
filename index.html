@@ -1119,6 +1119,10 @@ mark.hl{background:#ffe866;color:inherit;border-radius:3px;padding:0 1px}
 .pz-p{padding:6px 11px;border:1px solid var(--line);border-radius:999px;font-size:14px;cursor:grab;background:var(--card,transparent);user-select:none}
 .pz-tgt .pz-slot{border-color:#a97bff;border-style:solid;box-shadow:0 0 0 2px rgba(169,123,255,.35)}
 .tc-grid{display:grid;gap:8px 8px;align-items:center;justify-content:start;max-width:100%;overflow-x:auto}.tc-grid .chip{width:100%;margin:0;justify-content:center;text-align:center;white-space:nowrap}.tcg-lbl{white-space:nowrap;padding-right:4px}.pz-chunk[disabled]{opacity:.45;cursor:default}
+.pz-sw{display:inline-flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;user-select:none}
+.pz-sw input{display:none}.pz-sw span{width:28px;height:16px;border-radius:9px;background:var(--line);position:relative;transition:.15s}
+.pz-sw span::after{content:'';position:absolute;left:2px;top:2px;width:12px;height:12px;border-radius:50%;background:#fff;transition:.15s}
+.pz-sw input:checked+span{background:#a97bff}.pz-sw input:checked+span::after{left:14px}
 .pz-p.sel{border-color:#a97bff;box-shadow:0 0 0 2px rgba(169,123,255,.45)}
 .pz-p:active{cursor:grabbing}
 .pz-done{margin-top:14px;padding:12px;border-radius:10px;background:rgba(47,163,107,.12);display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-weight:700}
@@ -1128,6 +1132,12 @@ mark.hl{background:#ffe866;color:inherit;border-radius:3px;padding:0 1px}
 html.dark mark.hl{background:rgba(180,140,255,.36);color:inherit}html.dark .hl-btn.on{background:rgba(170,120,255,.3);color:#fff;border-color:#a97bff}
 .ln-hlmode .ln-list,.ln-hlmode #kwsList{cursor:text}
 .ln-wrsel{font-size:12px;padding:3px 28px 3px 8px!important;width:auto!important;min-width:0;background-position:right 8px center}
+.ln-word{cursor:pointer}.ln-hlmode .ln-word{cursor:text}
+.ln-card-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px}
+.ln-card{background:var(--card,#fff);color:var(--text,inherit);border:1px solid var(--line);border-radius:14px;max-width:560px;width:100%;max-height:85vh;overflow:auto;padding:16px 18px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+html.dark .ln-card{background:#1f2128}
+.ln-card-w{font-size:28px;font-weight:800;margin-top:4px}
+.ln-card-sec{margin-top:10px}.ln-card-sec>b{font-size:12px;color:var(--sub)}
 .ic-btn{min-width:34px;font-size:15px;padding:4px 8px}
 .hl-btn.on{background:#ffe866;color:#222;border-color:#e0c200}
 .ln-flag{border:none;background:none;padding:0 2px;font-size:18px;line-height:1;color:var(--sub);cursor:pointer;margin-left:2px}.ln-flag.on{color:#e0a800}
@@ -1304,7 +1314,7 @@ html.dark mark.hl{background:rgba(180,140,255,.36);color:inherit}html.dark .hl-b
   <div class="card" id="writingBody"></div>
 </div>
 
-<footer id="appFooter"><details><summary>VOCA v2026.11.11 · 업데이트 기록</summary><ul><li><b>2026.11.11</b> 🧩 맞히면 다음 빈 단어 칸이 바로 선택됨 · 🧩 뜻 맞추기 키보드: WASD = 단어 칸 이동, 방향키 = 뜻 조각 이동, Enter = 넣기</li><li><b>2026.11.10</b> 테스트 묶음(무지개 칩) 밑 🧩 오답 퍼즐: 이번 회독 그 묶음에서 틀린 단어만 뜻 맞추기 · 학습 화면 빨간 점: 현재 회독 연습 테스트 오답 기준(학습 카드에서 회독/전체 누적 선택) · 학습 화면: 🧩 뜻 맞추기(단어 10개는 그대로, 뜻 조각 + 미끼 3개를 끌어다 놓기 또는 조각 고르고 번호키 1–0, 오답 기록 안 남김) · 🖍 형광펜(번호 클릭 = 칸 전체 칠하기, 단어장 ★ 체크와 연동 · 켜 둔 동안은 화면 탭으로 가리지 않음, 드래그하면 칠하기, 칠한 곳 다시 드래그하면 지우기) · 설정 > 학습 설정: 학습 화면 드래그(글자 선택) 켜기/끄기 · 학습 화면: 번호 밑에 빨간 점(테스트에서 틀린 적 있음)·초록 점(TCSE에 나온 단어) · 학습 카드를 테스트 위로 · 학습 화면 칸 크기 고정(넘겨도 들쑥날쑥 안 함) · 학습 화면 두 칸 배치 · 스페이스바 또는 화면 아무 데나 탭: 짧게 누르면 가리기 켜기/끄기, 꾹 누르면 그동안만 (단축키를 스페이스바로 바꿔 둬도 학습 화면에서는 가리기로 동작)</li><li><b>2026.11.10</b> ‘학습’ 카드: 일차별 10개씩 띄워 놓고 외우기 (띄울 항목 선택, 스페이스바를 누르고 있으면 단어만)</li><li><b>2026.11.10</b> ‘키워드 묶음’ 카드: 엑셀/CSV(번호·키워드·세부 키워드·단어·뜻)를 불러와 6개 보기 중 키워드에 속하는 단어 2개 고르기 · 자료 여러 개(502, 301 …) 골라 쓰기 · 📖 학습하기(두 칸, 칸마다 단어 최대 20개, 검색, 스페이스바를 누르고 있으면 단어만)</li><li><b>2026.11.04</b> 토끼 테마 (설정 > 테마)</li><li><b>2026.10.30</b> SE 유의어: 채점 후 제시어·정답·고른 단어의 GRE 단어장 정보(뜻·어근·예문·유사어) · ‘테스트 (연습)’ → ‘테스트’ · 테스트 아래에 ‘SE 유의어’ 카드 (단어장에 없는 SE 단어 뜻을 AI 프롬프트로 받아 채우기): 제시어의 같은 뜻 단어 고르기(1~2개) / 6개 중 같은 뜻 쌍 찾기 · TCSE SE 정답 쌍 먼저, 그다음 단어장 유의어 · 오답 선지는 실제 SE 선지·철자 비슷한 단어 · 채점 후 뜻과 원래 SE 문장</li><li><b>2026.10.28</b> 회독별 요약: 50개마다 굵은 선</li><li><b>2026.10.27</b> Quant: 수식·그림 없는 문제 약 340개를 텍스트로 (글자 선명, 보기 클릭, 원본 이미지 전환 가능 · 자료 파일 다시 불러오기 필요) · 그래프 세트 오류 수정 · Quant 문제 이미지 여백을 잘라 글자를 크게, 그래프 자료는 문제 위에 크게 · 다크 모드에서 고른 보기가 잘 보이게 · 맨 위 동기화 표시를 짧게(시간만) · 단축키 바꾸기 (설정 > ⌨️ 단축키) · Quant 탭: 실전 모의고사(2섹션 12문제 21분 + 15문제 26분, 1섹션 결과로 2섹션 난이도 조절) · 주제별 연습 · 틀린 문제 다시 풀기 · 계산기 · 결과에서 문제 이미지/AI 풀이 프롬프트 복사 (문제 자료는 암호로 받기)</li><li><b>2026.10.26</b> 단어 수정이 가끔 되돌아가던 문제 수정 (여러 기기·탭 기록을 단어별로 합치기) · 단어장 필터 정리(몰라요·애매해요·알아요·미체크·틀림 제거) · ‘✍️ 내 예문’ 필터 추가</li><li><b>2026.10.25</b> ‘내 예문’: 단어마다 직접 예문 쓰기(✍️) · 내 예문 모음 · AI 첨삭 프롬프트 복사 · 연습 테스트 ‘회독별 요약’ (맞힌/틀린 단어, 틀린 횟수) · 학습 카드 기본 숨김(세부 설정에서 다시 켤 수 있음), 회독 선택은 테스트 카드로 · TCSE: 기본 출제 순서 랜덤 · 세션 끝나면 선지·문장 단어 점검(단어장에 있는 단어만, 선지 단어는 전부) 90% 넘어야 종료, 켜고 끌 수 있음 · 동기화 데이터 사용량 대폭 줄임 (바뀐 항목만 주고받기) · 다크 모드 (설정 > 테마 > 화면 밝기: 밝게 / 어둡게 / 기기 설정 따라)</li><li><b>2026.10.24</b> 3회독부터 ‘오답 노트’: 6/6 끝낸 묶음에서 틀린 단어를 모아 보기·테스트</li><li><b>2026.10.22</b> 테스트에서 틀렸을 때·결과 화면의 예문/유사어/어근/발음도 ‘표시 항목’ 설정을 따름</li><li><b>2026.10.21</b> 연습 테스트에 ‘답 없음’ 보기 (정답을 빼는 비율 설정 가능, 정답은 ‘답 없음’ 칸에 표시) · ‘모르겠어요’ 버튼 없앰 · 테스트 결과: 전체 단어 결과 펼쳐보기(TCSE 빈출 표시) · 틀린 단어마다 내가 고른 것·헷갈리기 쉬운 단어 함께 보기</li><li><b>2026.10.14</b> 3회독부터 연습 테스트를 50개씩 묶기 · 설정창 정리 (학습 설정 하나로 합치고, 나머지는 ‘표시 · 세부 설정’으로) · 회독 진도를 연습 테스트 완료 일차 기준으로 (빨강 또는 무지개 = 완료) · 3회독부터 묶음 테스트 순서 ①전체 ②전체 ③오답복습 ④전체 ⑤오답복습 ⑥전체 (3회 파랑·5회 빨강·6회 무지개) · 오답 복습 25문제 = 오답 → TCSE 빈출 → 랜덤 순으로 채움</li><li><b>2026.10.06</b> 설정 > 학습 자료 받기: 암호로 잠근 GRE 단어·TCSE·RC·Writing 자료를 받아오기 · 아이패드·아이폰에서 RC·테스트 기록이 안 받아지던 문제 수정 (저장 공간이 모자라면 자동 압축 저장) · 맨 위에 마지막 동기화 시간, 맨 아래에 버전 기록 표시</li><li><b>2026.10.05</b> 단어 테스트: 뜻이 2/3 이상 겹치는 선택은 △ (0.5점) · 고양이 100%/90% 표정 교체</li><li><b>2026.10.03</b> 로그인 · 계정별 클라우드 동기화 (어느 기기에서든 같은 기록)</li><li><b>이전</b> 캘린더 시험일·계획·자동 분배 · 고영희 테마와 점수별 표정 · 호버 사전 · TCSE 실전 화면과 AI 분석 프롬프트 복사 · Writing 예시 CSV 가져오기 · 틀린 단어 어근 표시</li></ul></details></footer>
+<footer id="appFooter"><details><summary>VOCA v2026.11.11 · 업데이트 기록</summary><ul><li><b>2026.11.11</b> 학습 화면: 단어 누르면 단어 카드(뜻·유의어·어원·예문·내 예문·오답/TCSE, Esc로 닫기) · 🧩 🔀 스위치로 단어 순서 섞기 · 🧩 맞히면 다음 빈 단어 칸이 바로 선택됨 · 🧩 뜻 맞추기 키보드: WASD = 단어 칸 이동, 방향키 = 뜻 조각 이동, Enter = 넣기</li><li><b>2026.11.10</b> 테스트 묶음(무지개 칩) 밑 🧩 오답 퍼즐: 이번 회독 그 묶음에서 틀린 단어만 뜻 맞추기 · 학습 화면 빨간 점: 현재 회독 연습 테스트 오답 기준(학습 카드에서 회독/전체 누적 선택) · 학습 화면: 🧩 뜻 맞추기(단어 10개는 그대로, 뜻 조각 + 미끼 3개를 끌어다 놓기 또는 조각 고르고 번호키 1–0, 오답 기록 안 남김) · 🖍 형광펜(번호 클릭 = 칸 전체 칠하기, 단어장 ★ 체크와 연동 · 켜 둔 동안은 화면 탭으로 가리지 않음, 드래그하면 칠하기, 칠한 곳 다시 드래그하면 지우기) · 설정 > 학습 설정: 학습 화면 드래그(글자 선택) 켜기/끄기 · 학습 화면: 번호 밑에 빨간 점(테스트에서 틀린 적 있음)·초록 점(TCSE에 나온 단어) · 학습 카드를 테스트 위로 · 학습 화면 칸 크기 고정(넘겨도 들쑥날쑥 안 함) · 학습 화면 두 칸 배치 · 스페이스바 또는 화면 아무 데나 탭: 짧게 누르면 가리기 켜기/끄기, 꾹 누르면 그동안만 (단축키를 스페이스바로 바꿔 둬도 학습 화면에서는 가리기로 동작)</li><li><b>2026.11.10</b> ‘학습’ 카드: 일차별 10개씩 띄워 놓고 외우기 (띄울 항목 선택, 스페이스바를 누르고 있으면 단어만)</li><li><b>2026.11.10</b> ‘키워드 묶음’ 카드: 엑셀/CSV(번호·키워드·세부 키워드·단어·뜻)를 불러와 6개 보기 중 키워드에 속하는 단어 2개 고르기 · 자료 여러 개(502, 301 …) 골라 쓰기 · 📖 학습하기(두 칸, 칸마다 단어 최대 20개, 검색, 스페이스바를 누르고 있으면 단어만)</li><li><b>2026.11.04</b> 토끼 테마 (설정 > 테마)</li><li><b>2026.10.30</b> SE 유의어: 채점 후 제시어·정답·고른 단어의 GRE 단어장 정보(뜻·어근·예문·유사어) · ‘테스트 (연습)’ → ‘테스트’ · 테스트 아래에 ‘SE 유의어’ 카드 (단어장에 없는 SE 단어 뜻을 AI 프롬프트로 받아 채우기): 제시어의 같은 뜻 단어 고르기(1~2개) / 6개 중 같은 뜻 쌍 찾기 · TCSE SE 정답 쌍 먼저, 그다음 단어장 유의어 · 오답 선지는 실제 SE 선지·철자 비슷한 단어 · 채점 후 뜻과 원래 SE 문장</li><li><b>2026.10.28</b> 회독별 요약: 50개마다 굵은 선</li><li><b>2026.10.27</b> Quant: 수식·그림 없는 문제 약 340개를 텍스트로 (글자 선명, 보기 클릭, 원본 이미지 전환 가능 · 자료 파일 다시 불러오기 필요) · 그래프 세트 오류 수정 · Quant 문제 이미지 여백을 잘라 글자를 크게, 그래프 자료는 문제 위에 크게 · 다크 모드에서 고른 보기가 잘 보이게 · 맨 위 동기화 표시를 짧게(시간만) · 단축키 바꾸기 (설정 > ⌨️ 단축키) · Quant 탭: 실전 모의고사(2섹션 12문제 21분 + 15문제 26분, 1섹션 결과로 2섹션 난이도 조절) · 주제별 연습 · 틀린 문제 다시 풀기 · 계산기 · 결과에서 문제 이미지/AI 풀이 프롬프트 복사 (문제 자료는 암호로 받기)</li><li><b>2026.10.26</b> 단어 수정이 가끔 되돌아가던 문제 수정 (여러 기기·탭 기록을 단어별로 합치기) · 단어장 필터 정리(몰라요·애매해요·알아요·미체크·틀림 제거) · ‘✍️ 내 예문’ 필터 추가</li><li><b>2026.10.25</b> ‘내 예문’: 단어마다 직접 예문 쓰기(✍️) · 내 예문 모음 · AI 첨삭 프롬프트 복사 · 연습 테스트 ‘회독별 요약’ (맞힌/틀린 단어, 틀린 횟수) · 학습 카드 기본 숨김(세부 설정에서 다시 켤 수 있음), 회독 선택은 테스트 카드로 · TCSE: 기본 출제 순서 랜덤 · 세션 끝나면 선지·문장 단어 점검(단어장에 있는 단어만, 선지 단어는 전부) 90% 넘어야 종료, 켜고 끌 수 있음 · 동기화 데이터 사용량 대폭 줄임 (바뀐 항목만 주고받기) · 다크 모드 (설정 > 테마 > 화면 밝기: 밝게 / 어둡게 / 기기 설정 따라)</li><li><b>2026.10.24</b> 3회독부터 ‘오답 노트’: 6/6 끝낸 묶음에서 틀린 단어를 모아 보기·테스트</li><li><b>2026.10.22</b> 테스트에서 틀렸을 때·결과 화면의 예문/유사어/어근/발음도 ‘표시 항목’ 설정을 따름</li><li><b>2026.10.21</b> 연습 테스트에 ‘답 없음’ 보기 (정답을 빼는 비율 설정 가능, 정답은 ‘답 없음’ 칸에 표시) · ‘모르겠어요’ 버튼 없앰 · 테스트 결과: 전체 단어 결과 펼쳐보기(TCSE 빈출 표시) · 틀린 단어마다 내가 고른 것·헷갈리기 쉬운 단어 함께 보기</li><li><b>2026.10.14</b> 3회독부터 연습 테스트를 50개씩 묶기 · 설정창 정리 (학습 설정 하나로 합치고, 나머지는 ‘표시 · 세부 설정’으로) · 회독 진도를 연습 테스트 완료 일차 기준으로 (빨강 또는 무지개 = 완료) · 3회독부터 묶음 테스트 순서 ①전체 ②전체 ③오답복습 ④전체 ⑤오답복습 ⑥전체 (3회 파랑·5회 빨강·6회 무지개) · 오답 복습 25문제 = 오답 → TCSE 빈출 → 랜덤 순으로 채움</li><li><b>2026.10.06</b> 설정 > 학습 자료 받기: 암호로 잠근 GRE 단어·TCSE·RC·Writing 자료를 받아오기 · 아이패드·아이폰에서 RC·테스트 기록이 안 받아지던 문제 수정 (저장 공간이 모자라면 자동 압축 저장) · 맨 위에 마지막 동기화 시간, 맨 아래에 버전 기록 표시</li><li><b>2026.10.05</b> 단어 테스트: 뜻이 2/3 이상 겹치는 선택은 △ (0.5점) · 고양이 100%/90% 표정 교체</li><li><b>2026.10.03</b> 로그인 · 계정별 클라우드 동기화 (어느 기기에서든 같은 기록)</li><li><b>이전</b> 캘린더 시험일·계획·자동 분배 · 고영희 테마와 점수별 표정 · 호버 사전 · TCSE 실전 화면과 AI 분석 프롬프트 복사 · Writing 예시 CSV 가져오기 · 틀린 단어 어근 표시</li></ul></details></footer>
 
 <div id="settingsModal" class="hide" onclick="if(event.target===this)toggleSettings(false)" style="position:fixed;inset:0;background:rgba(20,25,40,.35);z-index:200;display:flex;justify-content:flex-end">
   <div style="background:var(--card);width:380px;max-width:92vw;height:100%;overflow-y:auto;padding:18px 20px">
@@ -4039,7 +4049,8 @@ function lnPzBuild(){const s=lnS,all=lnPool(s),ws=all.slice(s.page*10,s.page*10+
   const ex=[];for(let k=0;k<pool.length*2&&ex.length<3&&pool.length;k++){const w=pool[Math.floor(Math.random()*pool.length)];const t=lnShortMean(w.mean);if(t&&!used.has(t)){used.add(t);ex.push(t);}}
   ex.forEach((t,k)=>pieces.push({id:100+k,t,ans:-1}));
   for(let i=pieces.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pieces[i],pieces[j]]=[pieces[j],pieces[i]];}
-  s.pz={key:s.day+'|'+s.page,ws,pieces,placed:{},sel:null,tgt:0,wrong:0,bad:null};}
+  const ord=ws.map((_,i)=>i);if(lnOpt().pzShuf){for(let i=ord.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[ord[i],ord[j]]=[ord[j],ord[i]];}}
+  s.pz={key:s.day+'|'+s.page,ord,ws,pieces,placed:{},sel:null,tgt:ord[0],wrong:0,bad:null};}
 function lnPzStart(){if(!lnS)return;lnS.pzOn=true;lnS.pz=null;lnShow();}
 function lnPzEnd(){if(!lnS)return;if(lnS.wl){lnClose();return;}lnS.pzOn=false;lnS.pz=null;lnShow();}
 function lnPzLeft(){const z=lnS.pz;return z.pieces.filter(p=>!Object.values(z.placed).includes(p.id));}
@@ -4048,15 +4059,15 @@ function lnPzTgt(){const z=lnS&&lnS.pz;document.querySelectorAll('.pz-item').for
 function lnPzSel(id){const z=lnS.pz;if(!z)return;z.sel=id;document.querySelectorAll('.pz-p').forEach(el=>el.classList.toggle('sel',+el.dataset.pid===id));}
 function lnPzPlace(pid,wi){const z=lnS.pz;if(!z||pid==null||z.placed[wi]!=null||wi<0||wi>=z.ws.length)return;
   const p=z.pieces.find(x=>x.id===pid);if(!p||Object.values(z.placed).includes(pid))return;
-  if(p.ans===wi){z.placed[wi]=pid;z.sel=null;{const n=z.ws.length;z.tgt=null;for(let k=1;k<n;k++){const i=(wi+k)%n;if(z.placed[i]==null){z.tgt=i;break;}}}z.bad=null;lnPzShow();
+  if(p.ans===wi){z.placed[wi]=pid;z.sel=null;{const n=z.ws.length,o=z.ord||z.ws.map((_,i)=>i),p0=o.indexOf(wi);z.tgt=null;for(let k=1;k<n;k++){const i=o[(p0+k)%n];if(z.placed[i]==null){z.tgt=i;break;}}}z.bad=null;lnPzShow();
     const it=document.querySelector('.pz-item[data-wi="'+wi+'"]');if(it){it.classList.add('pz-ok-flash');}}
   else{z.wrong++;z.bad=wi;const it=document.querySelector('.pz-item[data-wi="'+wi+'"]');
     if(it){it.classList.remove('pz-bad');void it.offsetWidth;it.classList.add('pz-bad');}
     const c=document.getElementById('pzWrong');if(c)c.textContent=z.wrong;}}
 /* 키보드: WASD = 위 단어 칸 이동(게임처럼, 한글 입력 상태여도 됨) · 방향키 = 아래 뜻 조각 이동 · Enter/Space = 넣기 · 숫자 1–9,0 = 그 칸에 바로 넣기 */
-function lnPzMoveTgt(dir){const z=lnS.pz,n=z.ws.length,R=5;const pos=i=>[i%R,Math.floor(i/R)],idx=(r,c)=>c*R+r;
+function lnPzMoveTgt(dir){const z=lnS.pz,n=z.ws.length,R=5,o=z.ord||z.ws.map((_,i)=>i);const pos=i=>{const p=o.indexOf(i);return [p%R,Math.floor(p/R)];},idx=(r,c)=>{const p=c*R+r;return p<n?o[p]:-1;};
   const open=i=>i>=0&&i<n&&z.placed[i]==null;
-  if(z.tgt==null){const f=[...Array(n).keys()].find(open);if(f!=null)z.tgt=f;lnPzTgt();return;}
+  if(z.tgt==null){const f=o.find(open);if(f!=null)z.tgt=f;lnPzTgt();return;}
   let [r,c]=pos(z.tgt);
   if(dir==='W'||dir==='S'){const dr=dir==='W'?-1:1;for(let rr=r+dr;rr>=0&&rr<R;rr+=dr){const i=idx(rr,c);if(open(i)){z.tgt=i;break;}}}
   else{const nc=dir==='A'?c-1:c+1;if(nc<0||nc>1){lnPzTgt();return;}
@@ -4075,7 +4086,7 @@ function lnPzMoveSel(dir){const z=lnS.pz,l=lnPzLeft();if(!l.length)return;
   const el=document.querySelector('.pz-p.sel');if(el&&el.scrollIntoView)el.scrollIntoView({block:'nearest'});}
 function lnPzKey(e){const z=lnS.pz;if(!z)return false;
   if(e.metaKey||e.ctrlKey||e.altKey)return false;
-  if(/^[0-9]$/.test(e.key)){const wi=e.key==='0'?9:+e.key-1;lnPzPlace(z.sel,wi);return true;}
+  if(/^[0-9]$/.test(e.key)){const ps=e.key==='0'?9:+e.key-1,o=z.ord||[];const wi=o.length?o[ps]:ps;if(wi!=null)lnPzPlace(z.sel,wi);return true;}
   const W={KeyW:'W',KeyA:'A',KeyS:'S',KeyD:'D'}[e.code];
   if(W&&!lnPzDone()){lnPzMoveTgt(W);return true;}
   const A={ArrowLeft:'L',ArrowRight:'R',ArrowUp:'U',ArrowDown:'D'}[e.key];
@@ -4091,14 +4102,32 @@ function lnPzShow(){const a=document.getElementById('learnArea'),s=lnS;
   if(z.sel!=null&&!left.some(p=>p.id===z.sel))z.sel=null;
   a.innerHTML='<div class="row" style="justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap">'+
       '<div class="row" style="gap:6px;align-items:center"><button class="small" onclick="lnPage(-1)">◀</button><b>🧩 '+(s.wl?s.day+'일차 '+(s.lab?s.lab+' ':'')+s.wr+'회독 오답 · '+(s.page+1)+'/'+pages:s.day+'일차 · '+(s.page+1)+'/'+pages+'회')+'</b><span class="count">맞춤 '+Object.keys(z.placed).length+'/'+z.ws.length+' · 틀림 <span id="pzWrong">'+z.wrong+'</span></span><button class="small" onclick="lnPage(1)">▶</button></div>'+
-      '<div class="row" style="gap:6px"><button class="small" onclick="lnS.pz=null;lnPzShow()">다시 섞기</button><button class="small" onclick="lnPzEnd()">'+(s.wl?'닫기':'학습으로')+'</button></div></div>'+
-    '<div id="lnList" class="ln-list pz-list">'+z.ws.map((w,i)=>{const pid=z.placed[i],p=pid!=null?z.pieces.find(x=>x.id===pid):null;
+      '<div class="row" style="gap:6px;align-items:center"><label class="pz-sw" title="단어 순서 섞기"><input type="checkbox"'+(lnOpt().pzShuf?' checked':'')+' onchange="const o=lnOpt();o.pzShuf=this.checked?1:0;lnSave(o);lnS.pz=null;lnPzShow()"><span></span>🔀</label><button class="small" onclick="lnS.pz=null;lnPzShow()">다시 섞기</button><button class="small" onclick="lnPzEnd()">'+(s.wl?'닫기':'학습으로')+'</button></div></div>'+
+    '<div id="lnList" class="ln-list pz-list">'+(z.ord||z.ws.map((_,i)=>i)).map((i,pos)=>{const w=z.ws[i];const pid=z.placed[i],p=pid!=null?z.pieces.find(x=>x.id===pid):null;
       return '<div class="ln-item pz-item'+(p?' pz-ok':'')+'" data-wi="'+i+'" ondragover="event.preventDefault();this.classList.add(\'pz-over\')" ondragleave="this.classList.remove(\'pz-over\')" ondrop="event.preventDefault();this.classList.remove(\'pz-over\');lnPzPlace(+event.dataTransfer.getData(\'text/plain\'),'+i+')" onclick="if(lnS.pz&&lnS.pz.sel!=null)lnPzPlace(lnS.pz.sel,'+i+')">'+
-        '<div class="ln-top"><span class="ln-no pz-num">'+(i===9?'0':i+1)+'</span><span class="ln-word">'+esc(w.word)+'</span></div>'+
+        '<div class="ln-top"><span class="ln-no pz-num">'+(pos===9?'0':pos+1)+'</span><span class="ln-word">'+esc(w.word)+'</span></div>'+
         '<div class="pz-slot">'+(p?esc(p.t):'<span class="pz-ph">여기에 뜻</span>')+'</div></div>';}).join('')+'</div>'+
     (done?'<div class="pz-done">🎉 다 맞췄어요 · 틀림 '+z.wrong+'번 <button class="small" onclick="lnS.pz=null;lnPzShow()">다시 섞기</button> '+(s.wl&&s.page>=pages-1?'<button class="primary small" onclick="lnClose()">끝내기</button>':'<button class="primary small" onclick="lnPage(1)">다음 10개 ▶</button>')+'</div>':
     '<div class="pz-pool">'+left.map(p=>'<div class="pz-p'+(p.id===z.sel?' sel':'')+'" draggable="true" data-pid="'+p.id+'" ondragstart="event.dataTransfer.setData(\'text/plain\',\''+p.id+'\');event.dataTransfer.effectAllowed=\'move\';lnPzSel('+p.id+')" onclick="lnPzSel('+p.id+')">'+esc(p.t)+'</div>').join('')+'</div>')+
     '<div class="study-tip"><b>WASD</b> 단어 칸 · <b>방향키</b> 뜻 조각 · <b>Enter</b> 넣기(다 맞춘 뒤엔 다음) · 숫자 1–9, 0 바로 넣기 · 끌어다 놓기·클릭도 됨 · Esc 나가기</div>';lnPzTgt();}
+/* ---- 학습 화면: 단어 누르면 단어 카드 (Esc로 닫기) ---- */
+function lnCard(di){const w=data[di];if(!w)return;lnCardClose();
+  const wr=(()=>{try{return lnWrongMap()[w.day+'_'+w.no]||0;}catch(e){return 0;}})(),fq=tcFreqOf(w.word)||0,seen=(typeof tcSeen==='function'?tcSeen(w.word):0)||0;
+  const badges=[(w.wrong||0)>0?'<span class="wrongcnt" title="전체 테스트 오답">✗'+w.wrong+'</span>':'',wr>0?'<span class="wrongcnt" style="opacity:.75" title="'+lnWrongRound()+'회독 오답">'+lnWrongRound()+'회독 ✗'+wr+'</span>':'',
+    fq>0?'<span class="tcse-freq" title="TCSE 정답 선지 등장">빈출 '+fq+'</span>':'',seen>0?'<span class="tcse-badge" title="TCSE 오답/등장">TCSE '+tcMissed(w.word)+'/'+seen+'</span>':'',w.flag?'<span style="color:#e0a800">★</span>':''].join('');
+  const d=document.createElement('div');d.id='lnCardBg';d.className='ln-card-bg';
+  d.innerHTML='<div class="ln-card" role="dialog" onclick="event.stopPropagation()">'+
+    '<div class="row" style="justify-content:space-between;align-items:center"><span class="count">'+w.day+'일차 · '+w.no+'번</span><button class="small ic-btn" title="닫기 (Esc)" onclick="lnCardClose()">✕</button></div>'+
+    '<div class="ln-card-w">'+esc(w.word)+'</div>'+(w.pron?'<div class="e-pron" style="margin:2px 0 6px">'+esc(w.pron)+'</div>':'')+
+    (badges?'<div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:8px">'+badges+'</div>':'')+
+    (w.mean?'<div class="ln-card-sec"><b>뜻</b><div class="e-mean" style="margin:2px 0 0">'+esc(breakNumbered(w.mean))+'</div></div>':'')+
+    (w.syn?'<div class="ln-card-sec"><b>유의어</b><div class="e-syn" style="margin:2px 0 0">≈ '+esc(w.syn)+'</div></div>':'')+
+    (w.etym?'<div class="ln-card-sec"><b>어근·어원</b><div style="margin-top:2px">'+esc(w.etym)+'</div></div>':'')+
+    (w.sent?'<div class="ln-card-sec"><b>예문</b><div class="e-sent" style="margin-top:4px">'+esc(breakNumbered(w.sent))+'</div></div>':'')+
+    (typeof msInline==='function'?msInline(w):'')+'</div>';
+  d.onclick=lnCardClose;document.body.appendChild(d);}
+function lnCardClose(){const d=document.getElementById('lnCardBg');if(d){d.remove();return true;}return false;}
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.getElementById('lnCardBg')){e.preventDefault();e.stopImmediatePropagation();lnCardClose();}},true);
 function lnFlag(i,btn){const x=data[i];if(!x)return;x.flag=!x.flag;saveWords();if(btn){btn.textContent=x.flag?'★':'☆';btn.classList.toggle('on',!!x.flag);}}
 function lnShow(){
   if(lnS&&lnS.pzOn)return lnPzShow();
@@ -4109,7 +4138,7 @@ function lnShow(){
       '<div class="row" style="gap:6px"><button class="small ic-btn" title="뜻 맞추기" onclick="lnPzStart()">🧩</button>'+hlBtn()+'<button class="small ic-btn" title="닫기 (Esc)" onclick="lnClose()">✕</button></div></div>'+
     '<div class="row" style="gap:6px;flex-wrap:wrap;margin:8px 0">'+LN_F.map(([k,l])=>'<button class="chip'+(f[k]?' on':'')+'" onclick="lnToggle(\''+k+'\')">'+l+'</button>').join('')+
       '<button class="ln-hold" data-hold="lnList" onpointerdown="holdDown(\'lnList\');event.preventDefault()" onpointerup="holdUp(\'lnList\')" onpointerleave="holdUp(\'lnList\')" onpointercancel="holdUp(\'lnList\')">'+(HOLD.base.lnList?'가림 켜짐 (화면 탭: 끄기)':'화면 탭: 가리기 · 꾹: 잠깐')+'</button></div>'+
-    '<div id="lnList" class="ln-list'+(HOLD.base.lnList?' ln-hidden':'')+'">'+ws.map(w=>{const K='g:'+String(w.word).toLowerCase(),di=data.indexOf(w);return '<div class="ln-item'+(w.flag?' ln-rowhl':'')+'" data-hk="'+esc(K)+'" data-di="'+di+'"><div class="ln-top"><span class="ln-no" onclick="lnRowHL(this)">'+w.no+((WM[w.day+'_'+w.no]||0)>0||tcFreqOf(w.word)>0?'<span class="ln-dots">'+((WM[w.day+'_'+w.no]||0)>0?'<i class="ln-dot r" title="'+(lnWrongRound()<0?'전체':lnWrongRound()+'회독')+' 테스트에서 '+WM[w.day+'_'+w.no]+'번 틀림"></i>':'<i class="ln-dot"></i>')+(tcFreqOf(w.word)>0?'<i class="ln-dot g" title="TCSE에 나온 단어 ('+tcFreqOf(w.word)+'번)"></i>':'')+'</span>':'')+'</span><span class="ln-word">'+hlT(K,w.word)+'</span>'+(f.p&&w.pron?'<span class="e-pron ln-d">'+esc(w.pron)+'</span>':'')+'</div>'+
+    '<div id="lnList" class="ln-list'+(HOLD.base.lnList?' ln-hidden':'')+'">'+ws.map(w=>{const K='g:'+String(w.word).toLowerCase(),di=data.indexOf(w);return '<div class="ln-item'+(w.flag?' ln-rowhl':'')+'" data-hk="'+esc(K)+'" data-di="'+di+'"><div class="ln-top"><span class="ln-no" onclick="lnRowHL(this)">'+w.no+((WM[w.day+'_'+w.no]||0)>0||tcFreqOf(w.word)>0?'<span class="ln-dots">'+((WM[w.day+'_'+w.no]||0)>0?'<i class="ln-dot r" title="'+(lnWrongRound()<0?'전체':lnWrongRound()+'회독')+' 테스트에서 '+WM[w.day+'_'+w.no]+'번 틀림"></i>':'<i class="ln-dot"></i>')+(tcFreqOf(w.word)>0?'<i class="ln-dot g" title="TCSE에 나온 단어 ('+tcFreqOf(w.word)+'번)"></i>':'')+'</span>':'')+'</span><span class="ln-word" onclick="if(!HLMODE&&!String(getSelection()))lnCard('+di+')">'+hlT(K,w.word)+'</span>'+(f.p&&w.pron?'<span class="e-pron ln-d">'+esc(w.pron)+'</span>':'')+'</div>'+
       '<div class="ln-d">'+(f.m&&w.mean?'<div class="ln-mean">'+hlT(K,breakNumbered(w.mean))+'</div>':'')+(f.e&&w.etym?'<div class="etym"><b>어근·어원</b> · '+hlT(K,w.etym)+'</div>':'')+
       (f.y&&w.syn?'<div class="e-syn">≈ '+hlT(K,w.syn)+'</div>':'')+(f.s&&w.sent?'<div class="e-sent">'+hlT(K,breakNumbered(w.sent))+'</div>':'')+'</div></div>';}).join('')+'</div>'+
     '<div class="study-tip">스페이스바·화면 아무 데나: 짧게 = 가리기 켜기/끄기 · 꾹 = 누르는 동안만 · ← → 이전/다음 10개 · Esc 닫기</div>';
