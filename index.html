@@ -4039,7 +4039,7 @@ function lnPzBuild(){const s=lnS,all=lnPool(s),ws=all.slice(s.page*10,s.page*10+
   const ex=[];for(let k=0;k<pool.length*2&&ex.length<3&&pool.length;k++){const w=pool[Math.floor(Math.random()*pool.length)];const t=lnShortMean(w.mean);if(t&&!used.has(t)){used.add(t);ex.push(t);}}
   ex.forEach((t,k)=>pieces.push({id:100+k,t,ans:-1}));
   for(let i=pieces.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pieces[i],pieces[j]]=[pieces[j],pieces[i]];}
-  s.pz={key:s.day+'|'+s.page,ws,pieces,placed:{},sel:null,wrong:0,bad:null};}
+  s.pz={key:s.day+'|'+s.page,ws,pieces,placed:{},sel:null,tgt:0,wrong:0,bad:null};}
 function lnPzStart(){if(!lnS)return;lnS.pzOn=true;lnS.pz=null;lnShow();}
 function lnPzEnd(){if(!lnS)return;if(lnS.wl){lnClose();return;}lnS.pzOn=false;lnS.pz=null;lnShow();}
 function lnPzLeft(){const z=lnS.pz;return z.pieces.filter(p=>!Object.values(z.placed).includes(p.id));}
@@ -4133,6 +4133,7 @@ function holdCancel(id){if(!HOLD.down)return;HOLD.down=false;holdApply(id,!!HOLD
   const stop=()=>{clearTimeout(tm);tm=null;pid=null;};
   document.addEventListener('pointerdown',function(e){const id=cur();if(!id||e.button>0||HOLD.down||HLMODE)return;
     if(e.target.closest('button,a,input,select,textarea,summary,label,.chip,[contenteditable]'))return;
+    if(e.target.closest(id==='lnList'?'#learnCard':'#kwCard'))return;
     pid=e.pointerId;x0=e.clientX;y0=e.clientY;held=false;
     tm=setTimeout(function(){tm=null;held=true;holdApply(id,!HOLD.base[id]);},200);},true);
   document.addEventListener('pointermove',function(e){if(pid!==e.pointerId)return;
