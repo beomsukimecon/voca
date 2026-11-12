@@ -4165,7 +4165,7 @@ function holdCancel(id){if(!HOLD.down)return;HOLD.down=false;holdApply(id,!!HOLD
 (function(){let pid=null,x0=0,y0=0,tm=null,held=false,lastTog=0;
   const cur=()=>subPage==='learn'&&lnS&&!lnS.pzOn?'lnList':subPage==='kwstudy'?'kwsList':null;
   const stop=()=>{clearTimeout(tm);tm=null;pid=null;};
-  document.addEventListener('pointerdown',function(e){const id=cur();if(!id||e.button>0||HOLD.down||HLMODE)return;
+  document.addEventListener('pointerdown',function(e){const id=cur();if(!id||e.button>0||HOLD.down||HLMODE||document.getElementById('lnCardBg'))return;
     if(e.target.closest('button,a,input,select,textarea,summary,label,.chip,[contenteditable]'))return;
     if(e.target.closest(id==='lnList'?'#learnCard':'#kwCard'))return;
     pid=e.pointerId;x0=e.clientX;y0=e.clientY;held=false;
