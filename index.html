@@ -1123,6 +1123,7 @@ mark.hl{background:#ffe866;color:inherit;border-radius:3px;padding:0 1px}
 .pz-sw input{display:none}.pz-sw span{width:28px;height:16px;border-radius:9px;background:var(--line);position:relative;transition:.15s}
 .pz-sw span::after{content:'';position:absolute;left:2px;top:2px;width:12px;height:12px;border-radius:50%;background:#fff;transition:.15s}
 .pz-sw input:checked+span{background:#a97bff}.pz-sw input:checked+span::after{left:14px}
+.pz-p{touch-action:manipulation}
 .pz-p.sel{border-color:#a97bff;box-shadow:0 0 0 2px rgba(169,123,255,.45)}
 .pz-p:active{cursor:grabbing}
 .pz-done{margin-top:14px;padding:12px;border-radius:10px;background:rgba(47,163,107,.12);display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-weight:700}
@@ -4055,6 +4056,10 @@ function lnPzStart(){if(!lnS)return;lnS.pzOn=true;lnS.pz=null;lnShow();}
 function lnPzEnd(){if(!lnS)return;if(lnS.wl){lnClose();return;}lnS.pzOn=false;lnS.pz=null;lnShow();}
 function lnPzLeft(){const z=lnS.pz;return z.pieces.filter(p=>!Object.values(z.placed).includes(p.id));}
 function lnPzDone(){const z=lnS.pz;return Object.keys(z.placed).length>=z.ws.length;}
+/* 조각: 한 번 누르면 선택, 빠르게 두 번(더블클릭·더블탭) 누르면 지금 선택된 단어 칸에 바로 넣기 */
+let PZ_TAP={id:null,t:0};
+function lnPzTap(id){const z=lnS&&lnS.pz;if(!z)return;const now=Date.now(),dbl=PZ_TAP.id===id&&now-PZ_TAP.t<400;PZ_TAP={id:dbl?null:id,t:now};
+  lnPzSel(id);if(dbl&&z.tgt!=null&&z.placed[z.tgt]==null){lnPzPlace(id,z.tgt);lnPzTgt();}}
 function lnPzTgt(){const z=lnS&&lnS.pz;document.querySelectorAll('.pz-item').forEach(el=>el.classList.toggle('pz-tgt',!!z&&z.tgt!=null&&+el.dataset.wi===z.tgt));}
 function lnPzSel(id){const z=lnS.pz;if(!z)return;z.sel=id;document.querySelectorAll('.pz-p').forEach(el=>el.classList.toggle('sel',+el.dataset.pid===id));}
 function lnPzPlace(pid,wi){const z=lnS.pz;if(!z||pid==null||z.placed[wi]!=null||wi<0||wi>=z.ws.length)return;
@@ -4108,8 +4113,8 @@ function lnPzShow(){const a=document.getElementById('learnArea'),s=lnS;
         '<div class="ln-top"><span class="ln-no pz-num">'+(pos===9?'0':pos+1)+'</span><span class="ln-word">'+esc(w.word)+'</span></div>'+
         '<div class="pz-slot">'+(p?esc(p.t):'<span class="pz-ph">여기에 뜻</span>')+'</div></div>';}).join('')+'</div>'+
     (done?'<div class="pz-done">🎉 다 맞췄어요 · 틀림 '+z.wrong+'번 <button class="small" onclick="lnS.pz=null;lnPzShow()">다시 섞기</button> '+(s.wl&&s.page>=pages-1?'<button class="primary small" onclick="lnClose()">끝내기</button>':'<button class="primary small" onclick="lnPage(1)">다음 10개 ▶</button>')+'</div>':
-    '<div class="pz-pool">'+left.map(p=>'<div class="pz-p'+(p.id===z.sel?' sel':'')+'" draggable="true" data-pid="'+p.id+'" ondragstart="event.dataTransfer.setData(\'text/plain\',\''+p.id+'\');event.dataTransfer.effectAllowed=\'move\';lnPzSel('+p.id+')" onclick="lnPzSel('+p.id+')">'+esc(p.t)+'</div>').join('')+'</div>')+
-    '<div class="study-tip"><b>WASD</b> 단어 칸 · <b>방향키</b> 뜻 조각 · <b>Enter</b> 넣기(다 맞춘 뒤엔 다음) · 숫자 1–9, 0 바로 넣기 · 끌어다 놓기·클릭도 됨 · Esc 나가기</div>';lnPzTgt();}
+    '<div class="pz-pool">'+left.map(p=>'<div class="pz-p'+(p.id===z.sel?' sel':'')+'" draggable="true" data-pid="'+p.id+'" ondragstart="event.dataTransfer.setData(\'text/plain\',\''+p.id+'\');event.dataTransfer.effectAllowed=\'move\';lnPzSel('+p.id+')" onclick="lnPzTap('+p.id+')">'+esc(p.t)+'</div>').join('')+'</div>')+
+    '<div class="study-tip"><b>WASD</b> 단어 칸 · <b>방향키</b> 뜻 조각 · <b>Enter</b>·조각 더블클릭 넣기(다 맞춘 뒤엔 Enter 다음) · 숫자 1–9, 0 바로 넣기 · 끌어다 놓기·클릭도 됨 · Esc 나가기</div>';lnPzTgt();}
 /* ---- 학습 화면: 단어 누르면 단어 카드 (Esc로 닫기) ---- */
 function lnCard(di){const w=data[di];if(!w)return;lnCardClose();
   const wr=(()=>{try{return lnWrongMap()[w.day+'_'+w.no]||0;}catch(e){return 0;}})(),fq=tcFreqOf(w.word)||0,seen=(typeof tcSeen==='function'?tcSeen(w.word):0)||0;
